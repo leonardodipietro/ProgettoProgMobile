@@ -1,5 +1,78 @@
 package com.example.progettoprogmobile
 
+import androidx.lifecycle.ViewModelProvider
+import android.content.Intent
+import android.net.Uri
+import android.util.Log //per il test sul Log
+import androidx.appcompat.app.AppCompatActivity
+import android.os.Bundle
+import com.example.progettoprogmobile.viewModel.SpotifyViewModel
+import com.example.progettoprogmobile.R
+import android.view.View
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var viewModel: SpotifyViewModel
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        viewModel = ViewModelProvider(this).get(SpotifyViewModel::class.java)
+
+        handleIntent(intent)
+       //l'observer è ciò che sta dentro le parantesi
+        viewModel.spotifyTokenResponse.observe(this, { tokenResponse ->
+            if (tokenResponse?.access_token != null) {
+                Log.d("SpotifyToken", "Token ottenuto: ${tokenResponse.access_token}")
+            } else {
+                Log.d("SpotifyToken", "Nessun token ottenuto!")
+            }
+        })
+
+        viewModel.error.observe(this, { throwable ->
+            Log.e("SpotifyTokenError", "Errore durante la richiesta del token", throwable)
+        })
+    }
+
+    // Resto del tuo codice (es. startSpotifyAuthentication, onNewIntent, handleIntent)
+   fun startSpotifyAuthentication(view: View) {
+        val authUrl = "https://accounts.spotify.com/authorize?client_id=f81649b34ef74684b08943e7ce931d23&response_type=code&redirect_uri=myapp://callback&scope=user-read-private"
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(authUrl))
+        startActivity(intent)
+    }
+
+    fun handleIntent(intent: Intent?) {
+
+        //viene attivata dopo che viene completata l'autorizzazione da spotify e che viene quincdei completata la callback all'app
+
+        val uri = intent?.data
+        //usiamo un metodo dell oggetto Uri di android per estarre il codice dall'indirizzo (che viene consdierato una stringa)
+        //myapp://callback?code=YOUR_AUTHORIZATION_CODE_HERE. che è sempre ugauale nella sintassi nell'autorizzazione qauth
+        val code = uri?.getQueryParameter("code")
+        if (code != null) {
+            viewModel.getAccessToken(code)
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*package com.example.progettoprogmobile
+
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import retrofit2.Retrofit
@@ -114,3 +187,4 @@ class MainActivity : AppCompatActivity() {
 
 
 }
+*/
