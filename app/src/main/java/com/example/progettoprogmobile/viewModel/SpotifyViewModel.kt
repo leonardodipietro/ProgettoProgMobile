@@ -3,13 +3,15 @@ import androidx.lifecycle.ViewModel
 import com.example.progettoprogmobile.api.SpotifyRepository
 import com.example.progettoprogmobile.model.SpotifyTokenResponse
 import androidx.lifecycle.MutableLiveData
-
-
+import com.example.progettoprogmobile.model.TopTracksResponse
+import android.util.Log
 class SpotifyViewModel : ViewModel() {
 
     private val repository = SpotifyRepository()
     val spotifyTokenResponse = MutableLiveData<SpotifyTokenResponse?>()
     val error = MutableLiveData<Throwable?>()
+    val topTracks = MutableLiveData<TopTracksResponse?>()
+
 
 //il code che passiamo non è il token di accesso che
     fun getAccessToken(code: String) {
@@ -27,4 +29,18 @@ class SpotifyViewModel : ViewModel() {
             }
         }
     }
+
+
+    fun fetchTopTracks(token: String) {
+        repository.getTopTracks(token) { response, error ->
+            if (response != null) {
+                topTracks.postValue(response)
+            } else if (error != null) {
+                this.error.postValue(error)
+            }
+        }
+
+    }
+
+
 }

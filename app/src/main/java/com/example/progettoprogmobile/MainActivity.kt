@@ -1,4 +1,99 @@
+
 package com.example.progettoprogmobile
+
+import android.content.Intent
+import android.net.Uri
+import android.os.Bundle
+import android.util.Log
+import android.view.View
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
+import com.example.progettoprogmobile.R
+import com.example.progettoprogmobile.viewModel.SpotifyViewModel
+
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var viewModel: SpotifyViewModel
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        viewModel = ViewModelProvider(this).get(SpotifyViewModel::class.java)
+
+        handleIntent(intent)
+
+        viewModel.spotifyTokenResponse.observe(this, { tokenResponse ->
+            if (tokenResponse?.access_token != null) {
+                Log.d("SpotifyToken", "Token ottenuto: ${tokenResponse.access_token}")
+
+                // Una volta ottenuto il token, recupera le tracce più ascoltate
+                viewModel.fetchTopTracks(tokenResponse.access_token)
+            } else {
+                Log.d("SpotifyToken", "Nessun token ottenuto!")
+            }
+        })
+
+        viewModel.error.observe(this, { throwable ->
+            Log.e("SpotifyTokenError", "Errore durante la richiesta del token", throwable)
+        })
+
+
+        viewModel.topTracks.observe(this, { tracksResponse ->
+            if (tracksResponse != null) {
+                tracksResponse.items.forEach { track ->
+                    Log.d("TopTrack", "Track Name: ${track.name}, Album: ${track.album.name}, Artists: ${track.artists.joinToString { it.name }}")
+                }
+            } else {
+                Log.e("TopTrackError", "Errore durante il recupero delle tracce")
+            }
+        })
+/*
+        viewModel.topTracks.observe(this, { tracksResponse ->
+            tracksResponse?.items?.forEach { track ->
+                Log.d("TopTrack", "Track Name: ${track.name}, Album: ${track.album.name}, Artists: ${track.artists.joinToString { it.name }}")
+            }
+        })
+        */
+
+    }
+
+    fun startSpotifyAuthentication(view: View) {
+        val authUrl = "https://accounts.spotify.com/authorize?client_id=f81649b34ef74684b08943e7ce931d23&response_type=code&redirect_uri=myapp://callback&scope=user-read-private%20user-top-read"
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(authUrl))
+        startActivity(intent)
+    }
+
+    fun handleIntent(intent: Intent?) {
+        val uri = intent?.data
+        val code = uri?.getQueryParameter("code")
+        if (code != null) {
+            viewModel.getAccessToken(code)
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*package com.example.progettoprogmobile
 
 import androidx.lifecycle.ViewModelProvider
 import android.content.Intent
@@ -21,22 +116,35 @@ class MainActivity : AppCompatActivity() {
 
         handleIntent(intent)
        //l'observer è ciò che sta dentro le parantesi
+        //per il token d'accesso
         viewModel.spotifyTokenResponse.observe(this, { tokenResponse ->
             if (tokenResponse?.access_token != null) {
                 Log.d("SpotifyToken", "Token ottenuto: ${tokenResponse.access_token}")
             } else {
                 Log.d("SpotifyToken", "Nessun token ottenuto!")
             }
-        })
 
+
+        })
         viewModel.error.observe(this, { throwable ->
             Log.e("SpotifyTokenError", "Errore durante la richiesta del token", throwable)
         })
+
+      //per le tracce
+        viewModel.topTracks.observe(this, { tracksResponse ->
+            tracksResponse?.items?.forEach { track ->
+                Log.d("TopTrack", "Track Name: ${track.name}, Album: ${track.album.name}, Artists: ${track.artists.joinToString { it.name }}")
+            }
+        })
+
+
+
+
     }
 
     // Resto del tuo codice (es. startSpotifyAuthentication, onNewIntent, handleIntent)
    fun startSpotifyAuthentication(view: View) {
-        val authUrl = "https://accounts.spotify.com/authorize?client_id=f81649b34ef74684b08943e7ce931d23&response_type=code&redirect_uri=myapp://callback&scope=user-read-private"
+        val authUrl = "https://accounts.spotify.com/authorize?client_id=f81649b34ef74684b08943e7ce931d23&response_type=code&redirect_uri=myapp://callback&scope=user-read-private%20user-top-read"
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(authUrl))
         startActivity(intent)
     }
@@ -55,7 +163,7 @@ class MainActivity : AppCompatActivity() {
     }
 }
 
-
+*/
 
 
 
@@ -179,11 +287,11 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call<SpotifyTokenResponse>, t: Throwable) {
-                // Gestisci l'errore
-                Log.e("SpotifyTokenError", "Errore durante la richiesta del token", t)
-            }
-        })
-    }
+    // Gestisci l'errore
+    Log.e("SpotifyTokenError", "Errore durante la richiesta del token", t)
+}
+})
+}
 
 
 }
