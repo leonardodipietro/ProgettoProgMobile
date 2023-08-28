@@ -10,7 +10,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.progettoprogmobile.R
 import com.example.progettoprogmobile.viewModel.SpotifyViewModel
-
+import androidx.browser.customtabs.CustomTabsIntent
+import androidx.core.content.ContextCompat
 class MainActivity : AppCompatActivity() {
 
     private lateinit var viewModel: SpotifyViewModel
@@ -23,7 +24,7 @@ class MainActivity : AppCompatActivity() {
 
         handleIntent(intent)
 
-        viewModel.spotifyTokenResponse.observe(this, { tokenResponse ->
+        viewModel.spotifyTokenResponse.observe(this) { tokenResponse ->
             if (tokenResponse?.access_token != null) {
                 Log.d("SpotifyToken", "Token ottenuto: ${tokenResponse.access_token}")
 
@@ -32,29 +33,32 @@ class MainActivity : AppCompatActivity() {
             } else {
                 Log.d("SpotifyToken", "Nessun token ottenuto!")
             }
-        })
+        }
 
-        viewModel.error.observe(this, { throwable ->
+        viewModel.error.observe(this) { throwable ->
             Log.e("SpotifyTokenError", "Errore durante la richiesta del token", throwable)
-        })
+        }
 
 
-        viewModel.topTracks.observe(this, { tracksResponse ->
+        viewModel.topTracks.observe(this) { tracksResponse ->
             if (tracksResponse != null) {
                 tracksResponse.items.forEach { track ->
-                    Log.d("TopTrack", "Track Name: ${track.name}, Album: ${track.album.name}, Artists: ${track.artists.joinToString { it.name }}")
+                    Log.d(
+                        "TopTrack",
+                        "Track Name: ${track.name}, Album: ${track.album.name}, Artists: ${track.artists.joinToString { it.name }}"
+                    )
                 }
             } else {
                 Log.e("TopTrackError", "Errore durante il recupero delle tracce")
             }
-        })
-/*
-        viewModel.topTracks.observe(this, { tracksResponse ->
-            tracksResponse?.items?.forEach { track ->
-                Log.d("TopTrack", "Track Name: ${track.name}, Album: ${track.album.name}, Artists: ${track.artists.joinToString { it.name }}")
-            }
-        })
-        */
+        }
+        /*
+                viewModel.topTracks.observe(this, { tracksResponse ->
+                    tracksResponse?.items?.forEach { track ->
+                        Log.d("TopTrack", "Track Name: ${track.name}, Album: ${track.album.name}, Artists: ${track.artists.joinToString { it.name }}")
+                    }
+                })
+                */
 
     }
 
@@ -64,6 +68,10 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        handleIntent(intent)
+    }
     fun handleIntent(intent: Intent?) {
         val uri = intent?.data
         val code = uri?.getQueryParameter("code")
