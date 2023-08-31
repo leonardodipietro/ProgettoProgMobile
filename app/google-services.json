@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1015481085823",
+    "project_id": "progettoprogmobile-8208d",
+    "storage_bucket": "progettoprogmobile-8208d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1015481085823:android:7ebc0fc0e8afdc6f46b44a",
+        "android_client_info": {
+          "package_name": "com.example.progettoprogmobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1015481085823-qoahe5kh7fl8ujhggebcuiamameq18ie.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD38_MNXYz7AYB7tCJVESq2nPyM2PDOzv0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1015481085823-qoahe5kh7fl8ujhggebcuiamameq18ie.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
