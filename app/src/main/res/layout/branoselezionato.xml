@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+
+
+    <include layout="@layout/genitore"></include>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="80dp"
+        android:text="titolo canzone"
+        android:textColor="@color/white"
+        android:textSize="40sp"
+        android:layout_centerHorizontal="true"
+
+        />
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="170dp"
+        android:layout_marginTop="150dp"
+        android:background="@color/dark_gray"
+        android:id="@+id/dettaglibranoselezionato">
+        <ImageView
+              android:id="@+id/imageView3"
+              android:layout_width="170dp"
+              android:layout_height="match_parent"
+              app:srcCompat="@android:drawable/btn_star_big_on"
+        />
+        <LinearLayout
+            android:layout_width="210dp"
+            android:layout_height="match_parent"
+            android:layout_toRightOf="@+id/imageView3"
+            android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="210dp"
+                android:layout_height="85dp"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="Album:"
+                    android:textSize="24dp"
+                    android:textColor="@color/white"/>
+                <TextView
+                    android:layout_width="105dp"
+                    android:layout_height="match_parent"/>
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="210dp"
+                android:layout_height="85dp"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="Artista:"
+
+                    android:textColor="@color/white"
+                    android:textSize="24dp"/>
+                <TextView
+                    android:layout_width="105dp"
+                    android:layout_height="match_parent"/>
+
+            </LinearLayout>
+        </LinearLayout>
+    </RelativeLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="lascia un commento:"
+        android:textColor="@color/white"
+        android:textSize="30sp"
+        android:layout_below="@+id/dettaglibranoselezionato"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/iniziorecensionepersonale"
+        />
+
+    <EditText
+        android:id="@+id/recensionepersonale"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:layout_marginTop="10dp"
+        android:layout_below="@+id/iniziorecensionepersonale"
+        android:inputType="textMultiLine"
+        android:layout_marginLeft="50dp"/>
+
+    <ImageButton
+        android:id="@+id/inviarrecensione"
+        android:layout_width="50dp"
+        android:layout_weight="1"
+        android:layout_marginLeft="30sp"
+        android:layout_height="50sp"
+        android:layout_marginTop="10dp"
+        android:layout_toRightOf="@id/recensionepersonale"
+        android:layout_below="@+id/iniziorecensionepersonale"
+        android:src="@drawable/commenta"
+        app:tint="@color/white"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="recensioni:"
+        android:textColor="@color/white"
+        android:textSize="30sp"
+        android:layout_below="@id/recensionepersonale"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/iniziorecensioni"
+        />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/toolbarBottom"
+        android:layout_below="@+id/iniziorecensioni"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="2dp" />
+
+
+</RelativeLayout>
+
+
+
