@@ -1,4 +1,3 @@
-
 package com.example.progettoprogmobile
 
 import android.content.Intent
@@ -12,90 +11,15 @@ import com.example.progettoprogmobile.R
 import com.example.progettoprogmobile.viewModel.SpotifyViewModel
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.content.ContextCompat
-
-
-import android.app.PendingIntent
-import android.widget.Button
-import com.firebase.ui.auth.AuthUI
-import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
-import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
-import com.google.firebase.FirebaseApp
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
-
-
-
 class MainActivity : AppCompatActivity() {
 
     private lateinit var viewModel: SpotifyViewModel
-
-    private lateinit var database: DatabaseReference
-
-
-
-    private val signInLauncher = registerForActivityResult(
-        FirebaseAuthUIActivityResultContract()
-    ) { result ->
-        onSignInResult(result)
-    }
-
-
-    private fun createSignInIntent() {
-        // [START auth_fui_create_intent]
-        // Choose authentication providers
-        val providers = arrayListOf(
-            AuthUI.IdpConfig.EmailBuilder().build()
-
-        )
-
-
-        // Create and launch sign-in intent
-        val signInIntent = AuthUI.getInstance()
-            .createSignInIntentBuilder()
-            .setAvailableProviders(providers)
-            .build()
-
-        PendingIntent.getActivity(
-            this, // Context
-            0, // Request code
-            signInIntent,
-            PendingIntent.FLAG_IMMUTABLE // Add this flag
-        )
-
-        signInLauncher.launch(signInIntent)
-        // [END auth_fui_create_intent]
-    }
-
-    private fun onSignInResult(result: FirebaseAuthUIAuthenticationResult) {
-        result.idpResponse
-        if (result.resultCode == RESULT_OK) {
-            // Successfully signed in
-            FirebaseAuth.getInstance().currentUser
-            // ...
-        } else {
-            // Sign in failed. If response is null the user canceled the
-            // sign-in flow using the back button. Otherwise check
-            // response.getError().getErrorCode() and handle the error.
-            // ...
-        }
-    }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val emailSignInButton = findViewById<Button>(R.id.emailSignInButton) // Cambia con l'ID effettivo del tuo pulsante di accesso tramite email
-        emailSignInButton.setOnClickListener {
-            createSignInIntent()
-        }
-
-
-        FirebaseApp.initializeApp(this)
-        database = FirebaseDatabase.getInstance().reference.child("tracks")
-
-        viewModel = ViewModelProvider(this)[SpotifyViewModel::class.java]
+        viewModel = ViewModelProvider(this).get(SpotifyViewModel::class.java)
 
         handleIntent(intent)
 
@@ -127,23 +51,6 @@ class MainActivity : AppCompatActivity() {
                 Log.e("TopTrackError", "Errore durante il recupero delle tracce")
             }
         }
-
-        viewModel.topTracks.observe(this) { tracksResponse ->
-            if (tracksResponse != null) {
-                tracksResponse.items.forEach { track ->
-                    Log.d(
-                        "TopTrack",
-                        "Track Name: ${track.name}, Album: ${track.album.name}, Artists: ${track.artists.joinToString { it.name }}"
-                    )
-
-                    // Chiamare la funzione saveTrackToFirebase per salvare la traccia nel database
-                    val trackInfo = Track(track.name, Album(track.album.name), track.artists.map { Artist(it.name) })
-                    saveTrackToFirebase(trackInfo)
-                }
-            } else {
-                Log.e("TopTrackError", "Errore durante il recupero delle tracce")
-            }
-        }
         /*
                 viewModel.topTracks.observe(this, { tracksResponse ->
                     tracksResponse?.items?.forEach { track ->
@@ -153,62 +60,25 @@ class MainActivity : AppCompatActivity() {
                 */
 
     }
+
     fun startSpotifyAuthentication(view: View) {
         val authUrl = "https://accounts.spotify.com/authorize?client_id=f81649b34ef74684b08943e7ce931d23&response_type=code&redirect_uri=myapp://callback&scope=user-read-private%20user-top-read"
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(authUrl))
-        signInLauncher.launch(intent)
+        startActivity(intent)
     }
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         handleIntent(intent)
     }
-    private fun handleIntent(intent: Intent?) {
+    fun handleIntent(intent: Intent?) {
         val uri = intent?.data
         val code = uri?.getQueryParameter("code")
         if (code != null) {
             viewModel.getAccessToken(code)
         }
     }
-    private fun saveTrackToFirebase(track: Track) {
-        val trackData = hashMapOf(
-            "trackName" to track.name,
-            "album" to track.album.name,
-            "artists" to track.artists.joinToString { it.name }
-        )
-
-        // Carica i dati nel database Firebase
-        val newTrackRef = database.push()
-        newTrackRef.setValue(trackData)
-            .addOnSuccessListener {
-                Log.d("Firebase", "Dati traccia salvati su Firebase: $trackData")
-            }
-            .addOnFailureListener {
-                Log.e("Firebase", "Errore nel salvataggio dati traccia su Firebase: ${it.message}")
-            }
-    }
 }
-
-
-data class Track(
-    val name: String,
-    val album: Album,
-    val artists: List<Artist>
-)
-
-data class Album(
-    val name: String
-)
-
-data class Artist(
-    val name: String
-)
-
-
-
-
-
-
 
 
 
