@@ -1,6 +1,8 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'com.google.gms.google-services'
+
 }
 
 android {
@@ -44,4 +46,13 @@ dependencies {
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
     implementation "androidx.browser:browser:1.6.0"
+    implementation 'com.google.firebase:firebase-auth:22.1.1'
+    implementation 'com.google.firebase.firebase-perf:com.google.firebase.firebase-perf.gradle.plugin:1.4.2'
+    implementation 'androidx.activity:activity-ktx:1.7.2'
+    implementation 'androidx.fragment:fragment-ktx:1.6.1'
+    implementation 'com.firebaseui:firebase-ui-auth:8.0.2'
+
+    implementation 'com.google.firebase:firebase-database:20.2.2'
+
+
 }

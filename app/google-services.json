@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "119631011759",
+    "firebase_url": "https://progettoprogmobile-195ef-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "progettoprogmobile-195ef",
+    "storage_bucket": "progettoprogmobile-195ef.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:119631011759:android:0e1133b646667df3ac995a",
+        "android_client_info": {
+          "package_name": "com.example.progettoprogmobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "119631011759-bdo6ojauvljff72pqec093euijpg9nb6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAZUmxcaYnL7e9YAgZlcQC0EMXv2OeFfT0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "119631011759-bdo6ojauvljff72pqec093euijpg9nb6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
