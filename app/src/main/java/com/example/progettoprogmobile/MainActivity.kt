@@ -1,35 +1,24 @@
 package com.example.progettoprogmobile
 
-//Import per autenticazione con email gestita da firebase
-
 import android.app.PendingIntent
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.util.Log
-import android.view.View
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
-import com.example.progettoprogmobile.viewModel.SpotifyViewModel
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
-import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
-
 
 
 
 class MainActivity : AppCompatActivity() {
 
+    /*
     private lateinit var viewModel: SpotifyViewModel
 
     private lateinit var database: DatabaseReference
-
-
+    */
 
     private val signInLauncher = registerForActivityResult(
         FirebaseAuthUIActivityResultContract()
@@ -43,9 +32,7 @@ class MainActivity : AppCompatActivity() {
         // Choose authentication providers
         val providers = arrayListOf(
             AuthUI.IdpConfig.EmailBuilder().build()
-
         )
-
 
         // Create and launch sign-in intent
         val signInIntent = AuthUI.getInstance()
@@ -53,12 +40,14 @@ class MainActivity : AppCompatActivity() {
             .setAvailableProviders(providers)
             .build()
 
+
         PendingIntent.getActivity(
             this, // Context
             0, // Request code
             signInIntent,
             PendingIntent.FLAG_IMMUTABLE // Add this flag
         )
+
 
         signInLauncher.launch(signInIntent)
         // [END auth_fui_create_intent]
@@ -69,6 +58,8 @@ class MainActivity : AppCompatActivity() {
         if (result.resultCode == RESULT_OK) {
             // Successfully signed in
             FirebaseAuth.getInstance().currentUser
+            val intent = Intent(this, SecondActivity::class.java)
+            startActivity(intent)
             // ...
         } else {
             // Sign in failed. If response is null the user canceled the
@@ -83,12 +74,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val emailSignInButton = findViewById<Button>(R.id.emailSignInButton) // Cambia con l'ID effettivo del tuo pulsante di accesso tramite email
+        val emailSignInButton = findViewById<Button>(R.id.emailSignInButton)
         emailSignInButton.setOnClickListener {
             createSignInIntent()
         }
 
-
+        /*
         FirebaseApp.initializeApp(this)
         database = FirebaseDatabase.getInstance().reference.child("tracks")
 
@@ -149,7 +140,11 @@ class MainActivity : AppCompatActivity() {
                 })
                 */
 
+        */
+
     }
+
+    /*
     fun startSpotifyAuthentication(view: View) {
         val authUrl = "https://accounts.spotify.com/authorize?client_id=f81649b34ef74684b08943e7ce931d23&response_type=code&redirect_uri=myapp://callback&scope=user-read-private%20user-top-read"
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(authUrl))
@@ -184,9 +179,10 @@ class MainActivity : AppCompatActivity() {
                 Log.e("Firebase", "Errore nel salvataggio dati traccia su Firebase: ${it.message}")
             }
     }
+    */
 }
 
-
+/*
 data class Track(
     val name: String,
     val album: Album,
@@ -200,7 +196,7 @@ data class Album(
 data class Artist(
     val name: String
 )
-
+*/
 
 
 
