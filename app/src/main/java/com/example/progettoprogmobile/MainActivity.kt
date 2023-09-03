@@ -1,5 +1,62 @@
 package com.example.progettoprogmobile
+import android.content.Intent
+import android.os.Bundle
+import android.widget.Button
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
+import com.example.progettoprogmobile.viewModel.FirebaseAuthViewModel
 
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var firebaseviewModel: FirebaseAuthViewModel
+    private val signInLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        firebaseviewModel.handleSignInResult(result)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        // Inizializza la ViewModel
+        firebaseviewModel = ViewModelProvider(this)[FirebaseAuthViewModel::class.java]
+
+        // Ottieni una referenza al pulsante di accesso con email
+        val emailSignInButton = findViewById<Button>(R.id.emailSignInButton)
+
+        // Gestisci il click sul pulsante
+        emailSignInButton.setOnClickListener {
+            // Avvia l'intento di accesso con email
+            firebaseviewModel.createSignInIntent()
+            signInLauncher.launch(firebaseviewModel.signInIntent)
+        }
+
+        // Osserva il risultato dell'accesso
+        firebaseviewModel.signInResult.observe(this) { result ->
+            if (result == FirebaseAuthViewModel.SignInResult.SUCCESS) {
+                // Accesso riuscito, vai alla SecondActivity
+                val intent = Intent(this, SecondActivity::class.java)
+                startActivity(intent)
+            } else {
+                // Gestisci l'errore di accesso
+            }
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+/*
 import android.app.PendingIntent
 import android.content.Intent
 import android.os.Bundle
@@ -79,6 +136,12 @@ class MainActivity : AppCompatActivity() {
             createSignInIntent()
         }
 
+*/
+
+
+
+
+
         /*
         FirebaseApp.initializeApp(this)
         database = FirebaseDatabase.getInstance().reference.child("tracks")
@@ -142,7 +205,7 @@ class MainActivity : AppCompatActivity() {
 
         */
 
-    }
+
 
     /*
     fun startSpotifyAuthentication(view: View) {
@@ -180,7 +243,7 @@ class MainActivity : AppCompatActivity() {
             }
     }
     */
-}
+
 
 /*
 data class Track(

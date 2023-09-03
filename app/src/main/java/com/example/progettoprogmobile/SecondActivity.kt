@@ -11,9 +11,7 @@ import com.example.progettoprogmobile.viewModel.SpotifyViewModel
 import com.google.firebase.FirebaseApp
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
-
-
-
+import com.example.progettoprogmobile.model.*
 
 class SecondActivity : AppCompatActivity() {
 
@@ -107,16 +105,3 @@ class SecondActivity : AppCompatActivity() {
 
 }
 
-data class Track(
-    val name: String,
-    val album: Album,
-    val artists: List<Artist>
-)
-
-data class Album(
-    val name: String
-)
-
-data class Artist(
-    val name: String
-)
