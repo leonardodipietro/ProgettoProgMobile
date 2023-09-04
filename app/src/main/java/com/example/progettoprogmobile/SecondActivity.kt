@@ -12,26 +12,33 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.example.progettoprogmobile.model.*
+import androidx.recyclerview.widget.RecyclerView
+import com.example.progettoprogmobile.adapter.TrackAdapter
+import androidx.recyclerview.widget.LinearLayoutManager
+
 
 class SecondActivity : AppCompatActivity() {
 
     private lateinit var viewModel: SpotifyViewModel
-    private lateinit var database: DatabaseReference
+    // private lateinit var database: DatabaseReference
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var trackAdapter: TrackAdapter
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_second)
+
 
         val startAuthButton = findViewById<Button>(R.id.startAuthButton)
         startAuthButton.setOnClickListener {
             startSpotifyAuthentication()
         }
 
-
-        FirebaseApp.initializeApp(this)
-        database = FirebaseDatabase.getInstance().reference.child("tracks")
+      /*  FirebaseApp.initializeApp(this)
+        database = FirebaseDatabase.getInstance().reference.child("tracks") */
         viewModel = ViewModelProvider(this)[SpotifyViewModel::class.java]
-
+     //   viewModel.initDatabase(database) // Inizializza il database nel ViewModel
         handleIntent(intent)
 
         viewModel.spotifyTokenResponse.observe(this) { tokenResponse ->
@@ -49,21 +56,26 @@ class SecondActivity : AppCompatActivity() {
             Log.e("SpotifyTokenError", "Errore durante la richiesta del token", throwable)
         }
 
+        // Recupera le ultime 50 tracce dal database Firebase e visualizzale nella RecyclerView
+        viewModel.fetchTopTracksFromFirebase()
 
+        recyclerView = findViewById(R.id.recyclerViewtopbrani)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        trackAdapter = TrackAdapter(emptyList()) // Inizialmente senza tracce
+        recyclerView.adapter = trackAdapter
         viewModel.topTracks.observe(this) { tracksResponse ->
             if (tracksResponse != null) {
-                tracksResponse.items.forEach { track ->
-                    Log.d(
-                        "TopTrack",
-                        "Track Name: ${track.name}, Album: ${track.album.name}, Artists: ${track.artists.joinToString { it.name }}"
-                    )
+                // Aggiorna l'adapter con le tracce recuperate dal database Firebase
+                trackAdapter = TrackAdapter(tracksResponse.items)
+                recyclerView.adapter = trackAdapter
+                trackAdapter.submitList(tracksResponse.items)
 
-                    // Chiamare la funzione saveTrackToFirebase per salvare la traccia nel database
-                    val trackInfo = Track(track.name, Album(track.album.name), track.artists.map { Artist(it.name) })
-                    saveTrackToFirebase(trackInfo)
+                // Salvare le tracce nel database Firebase
+                tracksResponse.items.forEach { track ->
+                    viewModel.saveTrackToFirebase(track)
                 }
             } else {
-                Log.e("TopTrackError", "Errore durante il recupero delle tracce")
+                Log.e("TopTrackError", "Errore durante il recupero delle tracce dal database Firebase")
             }
         }
     }
@@ -85,23 +97,7 @@ class SecondActivity : AppCompatActivity() {
             viewModel.getAccessToken(code)
         }
     }
-    private fun saveTrackToFirebase(track: Track) {
-        val trackData = hashMapOf(
-            "trackName" to track.name,
-            "album" to track.album.name,
-            "artists" to track.artists.joinToString { it.name }
-        )
 
-        // Carica i dati nel database Firebase
-        val newTrackRef = database.push()
-        newTrackRef.setValue(trackData)
-            .addOnSuccessListener {
-                Log.d("Firebase", "Dati traccia salvati su Firebase: $trackData")
-            }
-            .addOnFailureListener {
-                Log.e("Firebase", "Errore nel salvataggio dati traccia su Firebase: ${it.message}")
-            }
-    }
 
 }
 
