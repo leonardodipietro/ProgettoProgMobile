@@ -7,6 +7,9 @@ import com.example.progettoprogmobile.model.TopTracksResponse
 import com.google.firebase.database.*
 import com.example.progettoprogmobile.model.*
 import android.util.Log
+
+
+//TODO POTREBBE ESSERE NECCESARIO CREARE SUDDIVIDERE QUESTO VIEW MODEL IN UNO PER LA GESTIONE DELLE TRACCE DI SPOTIFY E UNO PER I DATI DEL DB
 class SpotifyViewModel : ViewModel() {
 
     private val repository = SpotifyRepository()
@@ -60,8 +63,8 @@ class SpotifyViewModel : ViewModel() {
         )
 
         // Carica i dati nel database Firebase
-        val newTrackRef = database.push()
-        newTrackRef.setValue(trackData)
+        val newTrackRef = database.push() // Creazione di un riferimento ad un nuovo nodo con un ID univoco generato da Firebase
+        newTrackRef.setValue(trackData) //mette i dati e sostituisce quelli già esistenti
             .addOnSuccessListener {
                 Log.d("Firebase", "Dati traccia salvati su Firebase: $trackData")
             }
@@ -74,8 +77,9 @@ class SpotifyViewModel : ViewModel() {
     fun fetchTopTracksFromFirebase() {
         // Ottieni un riferimento al nodo "tracks" con ordinamento per chiave e limitazione agli ultimi 50 elementi
         val query = database.child("tracks").orderByKey().limitToLast(50)
-
+        //listener per l evento di recupero dati
         query.addListenerForSingleValueEvent(object : ValueEventListener {
+
             override fun onDataChange(snapshot: DataSnapshot) {
                 val tracks = mutableListOf<Track>()
 

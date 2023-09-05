@@ -1,0 +1,21 @@
+
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/my_nav"
+    app:startDestination="@id/firstFragment">
+    <fragment
+        android:id="@+id/firstFragment"
+        android:name="com.example.progettoprogmobile.FirstFragment"
+        android:label="fragment_first"
+        tools:layout="@layout/fragment_first">
+        <action android:id="@+id/navigateToSecondFragment" app:destination="@id/secondFragment"/>
+    </fragment>
+    <fragment
+        android:id="@+id/secondFragment"
+        android:name="com.example.progettoprogmobile.SecondFragment"
+        android:label="fragment_second"
+        tools:layout="@layout/fragment_second">
+        <action android:id="@+id/navigateToFirstFragment" app:destination="@id/firstFragment"/>
+    </fragment>
+</navigation>
