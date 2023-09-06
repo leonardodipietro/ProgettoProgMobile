@@ -9,13 +9,21 @@
         android:name="com.example.progettoprogmobile.FirstFragment"
         android:label="fragment_first"
         tools:layout="@layout/fragment_first">
-        <action android:id="@+id/navigateToSecondFragment" app:destination="@id/secondFragment"/>
+        <action
+            android:id="@+id/navigateToSecondFragment"
+            app:destination="@id/secondFragment"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/secondFragment"
         android:name="com.example.progettoprogmobile.SecondFragment"
         android:label="fragment_second"
         tools:layout="@layout/fragment_second">
-        <action android:id="@+id/navigateToFirstFragment" app:destination="@id/firstFragment"/>
+        <action
+            android:id="@+id/navigateToFirstFragment"
+            app:destination="@id/firstFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim" />
     </fragment>
 </navigation>

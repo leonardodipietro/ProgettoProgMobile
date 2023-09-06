@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:id="@+id/group_fragment" android:checkableBehavior="single">
+        <item
+            android:id="@+id/menu_first_fragment"
+            android:title="Primo Fragment" />
+        <item
+            android:id="@+id/menu_second_fragment"
+            android:title="Secondo Fragment" />
+    </group>
+    <group android:id="@+id/group_buttons" android:checkableBehavior="single">
+        <item
+            android:id="@+id/menu_button_1"
+            android:title="Button 1" />
+        <item
+            android:id="@+id/menu_button_2"
+            android:title="Button 2" />
+    </group>
+</menu>
+
+
+<!--<menu xmlns:android="http://schemas.android.com/apk/res/android">-->
+
+<!--    <group-->
+<!--        android:checkableBehavior="single"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent" >-->
+<!--        <item-->
+<!--            android:id="@+id/firstFragment"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:title="Home" />-->
+<!--        <item-->
+<!--            android:id="@+id/secondFragment"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:title="SecondFragment" />-->
+<!--    </group>-->
+<!--</menu>-->
+

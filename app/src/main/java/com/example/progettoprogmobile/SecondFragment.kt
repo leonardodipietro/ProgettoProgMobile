@@ -15,12 +15,11 @@ class SecondFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val rootView = inflater.inflate(R.layout.fragment_second, container, false)
-        val prevButton2 = rootView.findViewById<Button>(R.id.prevButton2)
-    prevButton2.setOnClickListener {
+        val prevButton2 = rootView.findViewById<Button>(R.id.prevButton2) //per ottenere il Button dal layout
+    prevButton2.setOnClickListener { //setOnClickListener con una lambda che contiene l'azione da eseguire quando l'elemento viene cliccato
         val navController = Navigation.findNavController(requireView())
         navController.navigate(R.id.navigateToFirstFragment)
     }
-
         return rootView
     }
 

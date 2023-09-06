@@ -7,8 +7,10 @@ import com.firebase.ui.auth.AuthUI
 import android.content.Intent
 import android.app.PendingIntent
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.gms.tasks.Task
 
 class FirebaseAuthViewModel : ViewModel() {
+
 
     // Definisci i possibili risultati dell'accesso
     enum class SignInResult {
@@ -16,7 +18,7 @@ class FirebaseAuthViewModel : ViewModel() {
         FAILURE
     }
 
-    lateinit var signInIntent: Intent // L'intento per l'accesso
+    lateinit var signInIntent: Intent // L'intento per accessor
 
     // Variabile LiveData per osservare il risultato dell'accesso
     val signInResult = MutableLiveData<SignInResult>()
@@ -46,4 +48,3 @@ class FirebaseAuthViewModel : ViewModel() {
         }
     }
 }
-
