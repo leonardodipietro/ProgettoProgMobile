@@ -5,10 +5,12 @@
     <string name="accedi_con_google">Accedi con Google</string>
     <string name="per_continuare_su_see_your_music">Per continuare su See Your Music</string>
     <string name="benvenuto_su_see_your_music">Benvenuto su See Your Music</string>
-<!--    <string name="app_name">Firebase Auth</string>-->
+    <!--    <string name="app_name">Firebase Auth</string>-->
     <string name="login">Login</string>
     <string name="email">Login</string>
     <string name="password">Login</string>
     <string name="register">Register</string>
     <string name="Click_to_login">Register</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

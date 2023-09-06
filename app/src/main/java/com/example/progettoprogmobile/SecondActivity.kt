@@ -18,6 +18,7 @@ import com.example.progettoprogmobile.viewModel.SpotifyViewModel
 import com.google.firebase.FirebaseApp
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import androidx.viewbinding.ViewBinding
 
 
 class SecondActivity : AppCompatActivity() {
@@ -90,23 +91,37 @@ class SecondActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
+            // Naviga al primo fragment quando l'opzione del menu è selezionata
             R.id.menu_first_fragment -> {
                 val navController = Navigation.findNavController(this, R.id.nav_host_fragment)
                 navController.navigate(R.id.firstFragment)
                 return true
             }
             R.id.menu_second_fragment -> {
+                // Naviga al secondo fragment quando l'opzione del menu è selezionata
                 val navController = Navigation.findNavController(this, R.id.nav_host_fragment)
                 navController.navigate(R.id.secondFragment)
                 return true
             }
-            R.id.menu_button_1 -> {
-                startSpotifyAuthentication()
+            R.id.menu_third_fragment -> {
+                // Naviga al terzo fragment quando l'opzione del menu è selezionata
+                val navController = Navigation.findNavController(this, R.id.nav_host_fragment)
+                navController.navigate(R.id.thirdFragment)
                 return true
             }
-            R.id.menu_button_2 -> {
-                // Esegui l'azione relativa al Button 2
-                // Ad esempio, avvia un'altra azione desiderata
+            R.id.home -> {
+                val navController = Navigation.findNavController(this, R.id.bottomNavigationView)
+                navController.navigate(R.id.firstFragment)
+                return true
+            }
+            R.id.profile -> {
+                val navController = Navigation.findNavController(this, R.id.bottomNavigationView)
+                navController.navigate(R.id.secondFragment)
+                return true
+            }
+            R.id.settings -> {
+                val navController = Navigation.findNavController(this, R.id.bottomNavigationView)
+                navController.navigate(R.id.thirdFragment)
                 return true
             }
             else -> return super.onOptionsItemSelected(item)
