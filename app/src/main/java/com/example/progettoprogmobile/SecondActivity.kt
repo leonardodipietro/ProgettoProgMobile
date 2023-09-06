@@ -12,14 +12,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.progettoprogmobile.R
 import com.example.progettoprogmobile.adapter.TrackAdapter
 import com.example.progettoprogmobile.viewModel.SpotifyViewModel
-import com.google.firebase.FirebaseApp
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
-import androidx.viewbinding.ViewBinding
-
+import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class SecondActivity : AppCompatActivity() {
 
@@ -109,24 +104,37 @@ class SecondActivity : AppCompatActivity() {
                 navController.navigate(R.id.thirdFragment)
                 return true
             }
-            R.id.home -> {
-                val navController = Navigation.findNavController(this, R.id.bottomNavigationView)
-                navController.navigate(R.id.firstFragment)
-                return true
-            }
-            R.id.profile -> {
-                val navController = Navigation.findNavController(this, R.id.bottomNavigationView)
-                navController.navigate(R.id.secondFragment)
-                return true
-            }
-            R.id.settings -> {
-                val navController = Navigation.findNavController(this, R.id.bottomNavigationView)
-                navController.navigate(R.id.thirdFragment)
-                return true
-            }
             else -> return super.onOptionsItemSelected(item)
         }
+
+        @Suppress("UNREACHABLE_CODE") val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+        @Suppress("UNREACHABLE_CODE")
+        bottomNavigationView.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.home -> {
+                    val navController = Navigation.findNavController(this, R.id.nav_host_fragment)
+                    navController.navigate(R.id.firstFragment)
+                    true
+                }
+                R.id.profile -> {
+                    val navController = Navigation.findNavController(this, R.id.nav_host_fragment)
+                    navController.navigate(R.id.secondFragment)
+                    true
+                }
+                R.id.settings -> {
+                    val navController = Navigation.findNavController(this, R.id.nav_host_fragment)
+                    navController.navigate(R.id.thirdFragment)
+                    true
+                }
+                else -> false
+            }
+        }
+
+
     }
+
+
+
 
     private fun startSpotifyAuthentication() {
         val authUrl = "https://accounts.spotify.com/authorize?client_id=f81649b34ef74684b08943e7ce931d23&response_type=code&redirect_uri=myapp://callback&scope=user-read-private%20user-top-read"
