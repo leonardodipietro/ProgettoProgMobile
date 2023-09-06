@@ -77,6 +77,35 @@ class SecondActivity : AppCompatActivity() {
                 Log.e("TopTrackError", "Errore durante il recupero delle tracce dal database Firebase")
             }
         }
+
+        // Trova il componente BottomNavigationView nel layout XML e lo assegna ad una variabile
+        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+        // Imposta un listener per la selezione degli elementi nel BottomNavigationView
+        bottomNavigationView.setOnItemSelectedListener { item ->
+            // Gestisci la selezione in base all'ID dell'elemento selezionato
+            when (item.itemId) {
+                R.id.home -> {
+                    // Trova il NavController e naviga al primo fragment
+                    val navController = Navigation.findNavController(this, R.id.nav_host_fragment)
+                    navController.navigate(R.id.firstFragment)
+                    true // Indica che la selezione è stata gestita con successo
+                }
+                R.id.profile -> {
+                    // Trova il NavController e naviga al secondo fragment
+                    val navController = Navigation.findNavController(this, R.id.nav_host_fragment)
+                    navController.navigate(R.id.secondFragment)
+                    true // Indica che la selezione è stata gestita con successo
+                }
+                R.id.settings -> {
+                    // Trova il NavController e naviga al terzo fragment
+                    val navController = Navigation.findNavController(this, R.id.nav_host_fragment)
+                    navController.navigate(R.id.thirdFragment)
+                    true // Indica che la selezione è stata gestita con successo
+                }
+                else -> false // Gestione predefinita nel caso in cui l'ID dell'elemento non corrisponda a nessuno dei casi precedenti
+            }
+        }
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -106,35 +135,7 @@ class SecondActivity : AppCompatActivity() {
             }
             else -> return super.onOptionsItemSelected(item)
         }
-
-        @Suppress("UNREACHABLE_CODE") val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
-        @Suppress("UNREACHABLE_CODE")
-        bottomNavigationView.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.home -> {
-                    val navController = Navigation.findNavController(this, R.id.nav_host_fragment)
-                    navController.navigate(R.id.firstFragment)
-                    true
-                }
-                R.id.profile -> {
-                    val navController = Navigation.findNavController(this, R.id.nav_host_fragment)
-                    navController.navigate(R.id.secondFragment)
-                    true
-                }
-                R.id.settings -> {
-                    val navController = Navigation.findNavController(this, R.id.nav_host_fragment)
-                    navController.navigate(R.id.thirdFragment)
-                    true
-                }
-                else -> false
-            }
-        }
-
-
     }
-
-
-
 
     private fun startSpotifyAuthentication() {
         val authUrl = "https://accounts.spotify.com/authorize?client_id=f81649b34ef74684b08943e7ce931d23&response_type=code&redirect_uri=myapp://callback&scope=user-read-private%20user-top-read"
