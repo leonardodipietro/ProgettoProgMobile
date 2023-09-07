@@ -2,9 +2,15 @@
     <string name="app_name">See Your Music</string>
     <string name="accedi_con_email">Accedi con email</string>
     <string name="inizia_autenticazione_spotify">Inizia Autenticazione Spotify</string>
-    <string name="accedi_con_google">Accedi con Google</string>
     <string name="per_continuare_su_see_your_music">Per continuare su See Your Music</string>
     <string name="benvenuto_su_see_your_music">Benvenuto su See Your Music</string>
+    <string name="logOut">logOut</string>
+    <string name="signOut">signOut\n</string>
+    <string name="Elimina_account">Elimina Account</string>
+    <string name="logout">LogOut</string>
+    <string name="iscriviti_con_email">Iscriviti con Email</string>
+    <string name="accedi_con_google">Accedi con Google</string>
+    <string name="accedi">Accedi</string>/>
     <!--    <string name="app_name">Firebase Auth</string>-->
     <string name="login">Login</string>
     <string name="email">Login</string>

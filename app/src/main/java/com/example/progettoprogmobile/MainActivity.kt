@@ -7,12 +7,14 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.progettoprogmobile.viewModel.FirebaseAuthViewModel
+import com.google.firebase.FirebaseApp
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 
 class MainActivity : AppCompatActivity() {
 
+    private val viewModel = FirebaseAuthViewModel()
     private lateinit var auth: FirebaseAuth
     private lateinit var button: Button
     private lateinit var textView: TextView
@@ -31,6 +33,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        viewModel.checkAuthenticationStatus()
 
         auth = FirebaseAuth.getInstance()
         button = findViewById(R.id.logout)
@@ -59,12 +63,13 @@ class MainActivity : AppCompatActivity() {
         // Inizializza la ViewModel
         firebaseviewModel = ViewModelProvider(this)[FirebaseAuthViewModel::class.java]
 
-        // Ottieni una referenza al pulsante di accesso con email
-        val emailSignInButton = findViewById<Button>(R.id.emailSignInButton)
+        // Ottieni una referenza al pulsante di accesso
+        val signInButton = findViewById<Button>(R.id.signInButton)
+
 
         // Gestisci il click sul pulsante
-        emailSignInButton.setOnClickListener {
-            // Avvia l'intento di accesso con email
+        signInButton.setOnClickListener {
+            // Avvia l'intento di accesso
             firebaseviewModel.createSignInIntent()
             signInLauncher.launch(firebaseviewModel.signInIntent)
         }
@@ -79,5 +84,7 @@ class MainActivity : AppCompatActivity() {
                 // Gestisci l'errore di accesso
             }
         }
+
+        FirebaseApp.initializeApp(this)
     }
 }

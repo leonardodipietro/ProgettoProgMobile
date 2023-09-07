@@ -26,7 +26,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
         <Button
-            android:id="@+id/emailSignInButton"
+            android:id="@+id/signInButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/verde_spotify"
@@ -50,7 +50,7 @@
             android:textColor="@color/white"
             android:textSize="30sp"
             android:textStyle="normal"
-            app:layout_constraintBottom_toTopOf="@+id/emailSignInButton"
+            app:layout_constraintBottom_toTopOf="@+id/signInButton"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
