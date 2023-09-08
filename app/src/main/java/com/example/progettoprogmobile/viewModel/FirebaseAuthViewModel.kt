@@ -9,11 +9,11 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import com.example.progettoprogmobile.MainActivity
 import com.google.firebase.auth.FirebaseAuth
+import android.util.Log
 
 
 
 class FirebaseAuthViewModel : ViewModel() {
-
 
     // Definisci i possibili risultati dell'accesso
     enum class SignInResult {
@@ -78,9 +78,11 @@ class FirebaseAuthViewModel : ViewModel() {
     }
 
     fun signOut(context:Context) {
+        Log.d("MyApp", "Before signOut")
         AuthUI.getInstance()
             .signOut(context)
             .addOnCompleteListener { task ->
+                Log.d("MyApp", "SignOut completed")
                 if (task.isSuccessful) {
                     val intent = Intent(context, MainActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -90,12 +92,15 @@ class FirebaseAuthViewModel : ViewModel() {
                     signOutResult.value = SignOutResult.FAILURE
                 }
             }
+        Log.d("MyApp", "After signOut")
     }
 
     fun delete(context:Context) {
+        Log.d("MyApp", "Before delete")
         AuthUI.getInstance()
             .delete(context)
             .addOnCompleteListener { task ->
+                Log.d("MyApp", "Delete completed")
                 if (task.isSuccessful) {
                     deleteResult.value = DeleteResult.SUCCESS
                     val intent = Intent(context, MainActivity::class.java)
@@ -105,6 +110,7 @@ class FirebaseAuthViewModel : ViewModel() {
                     deleteResult.value = DeleteResult.FAILURE
                 }
             }
+        Log.d("MyApp", "After delete")
     }
 
 }

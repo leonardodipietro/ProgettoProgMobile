@@ -7,10 +7,18 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.progettoprogmobile.viewModel.FirebaseAuthViewModel
 import com.google.firebase.FirebaseApp
+import com.firebase.ui.auth.AuthUI
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 
 class MainActivity : AppCompatActivity() {
 
     private val viewModel = FirebaseAuthViewModel()
+    private lateinit var auth: FirebaseAuth
+    private var user: FirebaseUser? = null //per evitare il tipo mismatch error
+
+    // Initialize the FirebaseUI Widget using Firebase
+    var ui: AuthUI = AuthUI.getInstance()
 
     private lateinit var firebaseviewModel: FirebaseAuthViewModel
     private val signInLauncher = registerForActivityResult(
@@ -24,6 +32,18 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         viewModel.checkAuthenticationStatus()
+
+        auth = FirebaseAuth.getInstance()
+        user = auth.currentUser
+
+
+        if (user != null) {
+            // L'utente è già autenticato, vai direttamente alla SecondActivity
+            val intent = Intent(applicationContext, SecondActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+
 
         // Inizializza la ViewModel
         firebaseviewModel = ViewModelProvider(this)[FirebaseAuthViewModel::class.java]
