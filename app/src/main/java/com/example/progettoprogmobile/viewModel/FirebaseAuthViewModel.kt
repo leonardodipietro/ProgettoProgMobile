@@ -11,7 +11,6 @@ import com.example.progettoprogmobile.MainActivity
 import com.google.firebase.auth.FirebaseAuth
 
 
-
 class FirebaseAuthViewModel : ViewModel() {
 
 
@@ -93,6 +92,13 @@ class FirebaseAuthViewModel : ViewModel() {
     }
 
     fun delete(context:Context) {
+        val user = FirebaseAuth.getInstance().currentUser
+        val userId = user?.uid
+        if(userId != null){
+            val firebaseViewModel = FirebaseViewModel()
+            firebaseViewModel.deleteUserDataFromFirebase(userId)
+        }
+
         AuthUI.getInstance()
             .delete(context)
             .addOnCompleteListener { task ->

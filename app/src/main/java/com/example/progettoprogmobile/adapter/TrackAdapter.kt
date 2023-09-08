@@ -31,7 +31,7 @@ class TrackAdapter(private var tracks: List<Track>) : RecyclerView.Adapter<Track
         fun bind(track: Track) {
             trackNameTextView.text = track.name
             val artistNames = track.artists.joinToString(", ") { it.name }
-            albumAndArtistsTextView.text = "${track.album.name} - $artistNames"
+            albumAndArtistsTextView.text = "${track.album} - $artistNames"
         }
     }
 
