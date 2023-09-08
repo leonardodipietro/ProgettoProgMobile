@@ -9,19 +9,6 @@
     android:background="@color/black"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/user_details"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Hello Word"
-        android:textColor="#fff"/>
-
-    <Button
-        android:text="logout"
-        android:id="@+id/logout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent" >

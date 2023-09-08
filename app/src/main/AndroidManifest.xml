@@ -15,20 +15,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ProgettoProgMobile"
         tools:targetApi="33">
-        <activity
-            android:name=".Register"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-            android:exported="false" />
-        <activity
-            android:name=".Login"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
-            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
         <activity
             android:name=".MainActivity"
             android:exported="true"
