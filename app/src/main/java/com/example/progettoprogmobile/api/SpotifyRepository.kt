@@ -13,8 +13,11 @@ import retrofit2.http.Field
 import retrofit2.http.Header
 import com.example.progettoprogmobile.model.SpotifyTokenResponse
 import com.example.progettoprogmobile.model.TopTracksResponse
+import com.example.progettoprogmobile.model.TopArtistsResponse
 import android.util.Log
-//TODO inserire questa classe all'interno del model
+import retrofit2.http.Query
+
+
 class SpotifyRepository {
 
     private val retrofit = Retrofit.Builder()
@@ -29,7 +32,8 @@ class SpotifyRepository {
         .build()
 
     private val spotifyService: SpotifyAuthService = retrofit.create(SpotifyAuthService::class.java)
-    private val spotifyApiService: SpotifyApiService = apiRetrofit.create(SpotifyApiService::class.java)
+    private val spotifyApiTrackService: SpotifyApiTrackService = apiRetrofit.create(SpotifyApiTrackService::class.java)
+    private val spotifyApiArtistService: SpotifyApiArtistService = apiRetrofit.create(SpotifyApiArtistService::class.java)
     fun getAccessToken(
         code: String,
         redirectUri: String,
@@ -48,10 +52,10 @@ class SpotifyRepository {
         })
     }
 
-    fun getTopTracks(token: String, callback: (response: TopTracksResponse?, error: Throwable?) -> Unit) {
+    fun getTopTracks(token: String,timeRange: String,limit: Int, callback: (response: TopTracksResponse?, error: Throwable?) -> Unit) {
         Log.d("SpotifyRepo", "Chiamata getTopTracks iniziata con il token: $token")  // Log per tracciare l'inizio della chiamata
 
-        spotifyApiService.getTopTracks("Bearer $token").enqueue(object : Callback<TopTracksResponse> {
+        spotifyApiTrackService.getTopTracks("Bearer $token",timeRange,limit).enqueue(object : Callback<TopTracksResponse> {
             override fun onResponse(call: Call<TopTracksResponse>, response: Response<TopTracksResponse>) {
                 if (response.isSuccessful) {
                     Log.d("SpotifyRepo", "Risposta ricevuta con successo: ${response.body()}")  // Log in caso di risposta di successo
@@ -68,18 +72,27 @@ class SpotifyRepository {
         })
     }
 
-    /*fun getTopTracks(token: String, callback: (response: TopTracksResponse?, error: Throwable?) -> Unit) {
-        spotifyService.getTopTracks("Bearer $token").enqueue(object : Callback<TopTracksResponse> {
-            override fun onResponse(call: Call<TopTracksResponse>, response: Response<TopTracksResponse>) {
+    fun getTopArtists(token: String, timeRange: String, limit: Int, callback: (response: TopArtistsResponse?, error: Throwable?) -> Unit) {
+        Log.d("SpotifyRepo", "Chiamata getTopArtists iniziata con il token: $token")  // Log per tracciare l'inizio della chiamata
+
+        spotifyApiArtistService.getTopArtists("Bearer $token", timeRange, limit).enqueue(object : Callback<TopArtistsResponse> {
+            override fun onResponse(call: Call<TopArtistsResponse>, response: Response<TopArtistsResponse>) {
+                if (response.isSuccessful) {
+                    Log.d("SpotifyRepo", "Risposta ricevuta con successo: ${response.body()}")  // Log in caso di risposta di successo
+                } else {
+                    Log.d("SpotifyRepo", "Risposta con errore. Codice: ${response.code()}, Messaggio: ${response.message()}")  // Log in caso di risposta con codice d'errore
+                }
                 callback(response.body(), null)
             }
 
-            override fun onFailure(call: Call<TopTracksResponse>, t: Throwable) {
+            override fun onFailure(call: Call<TopArtistsResponse>, t: Throwable) {
+                Log.e("SpotifyRepo", "Errore durante la chiamata getTopArtists", t)  // Log in caso di errore di chiamata
                 callback(null, t)
             }
         })
     }
-*/
+
+
 
     interface SpotifyAuthService {
         @POST("api/token")
@@ -96,8 +109,23 @@ class SpotifyRepository {
 
     }
 
-    interface SpotifyApiService {
-        @GET("me/top/tracks?time_range=short_term&limit=50")
-        fun getTopTracks(@Header("Authorization") authToken: String): Call<TopTracksResponse>
+    interface SpotifyApiTrackService {
+        @GET("me/top/tracks")
+        fun getTopTracks(
+            @Header("Authorization") authToken: String,
+            @Query("time_range") timeRange:String,
+            @Query("limit")limit:Int
+            ): Call<TopTracksResponse>
     }
+
+    interface SpotifyApiArtistService {
+        @GET("me/top/artists")
+        fun getTopArtists(
+            @Header("Authorization") authToken: String,
+            @Query("time_range") timeRange:String,
+            @Query("limit")limit:Int
+        ): Call<TopArtistsResponse>
+    }
+
+
 }

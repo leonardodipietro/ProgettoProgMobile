@@ -15,6 +15,7 @@ import android.util.Log
 
 class FirebaseAuthViewModel : ViewModel() {
 
+
     // Definisci i possibili risultati dell'accesso
     enum class SignInResult {
         SUCCESS,
