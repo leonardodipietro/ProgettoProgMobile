@@ -1,10 +1,7 @@
 package com.example.progettoprogmobile.viewModel
 
 import androidx.lifecycle.ViewModel
-import com.example.progettoprogmobile.api.SpotifyRepository
-import com.example.progettoprogmobile.model.SpotifyTokenResponse
 import androidx.lifecycle.MutableLiveData
-import com.example.progettoprogmobile.model.TopTracksResponse
 import com.google.firebase.database.*
 import com.example.progettoprogmobile.model.*
 import android.util.Log
@@ -76,42 +73,60 @@ class FirebaseViewModel : ViewModel() {
        if (userId != null) {
            val query = database.child("users").child(userId).child("topTracks").orderByKey()
 
-       query.addListenerForSingleValueEvent(object : ValueEventListener {
+           query.addListenerForSingleValueEvent(object : ValueEventListener {
 
-           override fun onDataChange(snapshot: DataSnapshot) {
-               Log.d("FirebaseData", "Metodo onDataChange chiamato")
-               val tracks = mutableListOf<Track>()
+               override fun onDataChange(snapshot: DataSnapshot) {
+                   Log.d("FirebaseData", "Metodo onDataChange chiamato")
+                   val tracks = mutableListOf<Track>()
 
-               for (trackSnapshot in snapshot.children) {
-                   val trackName = trackSnapshot.child("trackName").getValue(String::class.java) ?: ""
-                   val albumName = trackSnapshot.child("album").getValue(String::class.java) ?: ""
-                   val artistNames = trackSnapshot.child("artists").getValue(String::class.java) ?: ""
+                   for (trackSnapshot in snapshot.children) {
+                       val trackName =
+                           trackSnapshot.child("trackName").getValue(String::class.java) ?: ""
+                       val albumName =
+                           trackSnapshot.child("album").getValue(String::class.java) ?: ""
+                       val artistNames =
+                           trackSnapshot.child("artists").getValue(String::class.java) ?: ""
 
-                   val artists = artistNames.split(",").map { Artist(it.trim()) }
-                   val track = Track(trackName, Album(albumName), artists)
-                   tracks.add(track)
+                       val artists = artistNames.split(",").map { Artist(it.trim()) }
+                       val track = Track(trackName, Album(albumName), artists)
+                       tracks.add(track)
 
-                   // Aggiungi log per vedere i dati durante l'elaborazione
-                   Log.d("FirebaseData", "Nome traccia: $trackName")
-                   Log.d("FirebaseData", "Nome album: $albumName")
-                   Log.d("FirebaseData", "Nomi artisti: $artistNames")
+                       // Aggiungi log per vedere i dati durante l'elaborazione
+                       Log.d("FirebaseData", "Nome traccia: $trackName")
+                       Log.d("FirebaseData", "Nome album: $albumName")
+                       Log.d("FirebaseData", "Nomi artisti: $artistNames")
+                   }
+
+                   // Aggiungi log per vedere la lista di tracce completata
+                   Log.d("FirebaseData", "Lista tracce completata: $tracks")
+
+                   // Aggiorna il LiveData delle tracce nella RecyclerView
+                   topTracksfromdb.postValue(tracks)
                }
 
-               // Aggiungi log per vedere la lista di tracce completata
-               Log.d("FirebaseData", "Lista tracce completata: $tracks")
-
-               // Aggiorna il LiveData delle tracce nella RecyclerView
-               topTracksfromdb.postValue(tracks)
-           }
-
-           val error: MutableLiveData<Throwable> = MutableLiveData()
-           override fun onCancelled(error: DatabaseError) {
-               // Gestisci l'errore in caso di problema con la lettura dal database
-               Log.e("FirebaseError", "Errore durante la lettura dal database Firebase: ${error.message}")
-               this.error.postValue(error.toException())
-           }
-       })
+               val error: MutableLiveData<Throwable> = MutableLiveData()
+               override fun onCancelled(error: DatabaseError) {
+                   // Gestisci l'errore in caso di problema con la lettura dal database
+                   Log.e(
+                       "FirebaseError",
+                       "Errore durante la lettura dal database Firebase: ${error.message}"
+                   )
+                   this.error.postValue(error.toException())
+               }
+           })
+       }
    }
 
+    fun deleteUserDataFromFirebase(userId: String) {
+       val userRef = FirebaseDatabase.getInstance().reference.child("users").child(userId)
 
-}}
+       // Rimuovi tutti i dati dell'utente, inclusi i dati delle tracce
+       userRef.removeValue()
+           .addOnSuccessListener {
+               Log.d("Firebase", "Dati dell'utente eliminati con successo da Firebase: $userId")
+           }
+           .addOnFailureListener {
+               Log.e("Firebase", "Errore nell'eliminazione dei dati dell'utente da Firebase: ${it.message}")
+           }
+   }
+}
