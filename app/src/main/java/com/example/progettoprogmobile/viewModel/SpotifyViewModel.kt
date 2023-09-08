@@ -15,6 +15,7 @@ class SpotifyViewModel : ViewModel() {
     val spotifyTokenResponse = MutableLiveData<SpotifyTokenResponse?>()
     val error = MutableLiveData<Throwable?>()
     val topTracks = MutableLiveData<TopTracksResponse?>()
+    val topArtists= MutableLiveData<TopArtistsResponse>()
     private var database: DatabaseReference = FirebaseDatabase.getInstance().reference.child("tracks")
 
 
@@ -38,9 +39,20 @@ class SpotifyViewModel : ViewModel() {
 
 
     fun fetchTopTracks(token: String) {
-        repository.getTopTracks(token) { response, error ->
+        repository.getTopTracks(token, "short_term",50) { response, error ->
             if (response != null) {
                 topTracks.postValue(response)
+            } else if (error != null) {
+                this.error.postValue(error)
+            }
+        }
+
+    }
+
+    fun fetchTopArtists(token: String) {
+        repository.getTopArtists(token, "short_term",50) { response, error ->
+            if (response != null) {
+                topArtists.postValue(response)
             } else if (error != null) {
                 this.error.postValue(error)
             }

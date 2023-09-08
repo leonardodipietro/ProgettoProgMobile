@@ -37,6 +37,9 @@ class SecondActivity : AppCompatActivity() {
         spotifyviewModel = ViewModelProvider(this)[SpotifyViewModel::class.java]
         firebaseViewModel = ViewModelProvider(this)[FirebaseViewModel::class.java]
 
+
+        firebaseViewModel.fetchTopTracksFromFirebase()
+
         val signOut = findViewById<Button>(R.id.signOut)
         val delete = findViewById<Button>(R.id.delete)
         val startAuthButton = findViewById<Button>(R.id.startAuthButton)
@@ -59,15 +62,10 @@ class SecondActivity : AppCompatActivity() {
 
 
         val userId = FirebaseAuth.getInstance().currentUser?.uid
+        // Recupera le ultime 50 tracce dal database Firebase e visualizzale nella RecyclerView
+        firebaseViewModel.fetchTopTracksFromFirebase()
 
-        spotifyviewModel.topTracks.observe(this) { tracksResponse ->
-            if (tracksResponse != null && userId != null) {
-                // Utilizza il FirebaseViewModel per salvare le tracce nel database Firebase
-                firebaseViewModel.saveTracksToFirebase(userId, tracksResponse.items)
-            } else {
-                Log.e("TopTrackError", "Errore durante il recupero delle tracce dal database Firebase")
-            }
-        }
+
 
         firebaseauthviewModel.signOutResult.observe(this) { result ->
             if (result == FirebaseAuthViewModel.SignOutResult.SUCCESS) {
@@ -103,33 +101,32 @@ class SecondActivity : AppCompatActivity() {
             Log.e("SpotifyTokenError", "Errore durante la richiesta del token", throwable)
         }
 
-// Recupera le ultime 50 tracce dal database Firebase e visualizzale nella RecyclerView
 
 
 
-        firebaseViewModel.fetchTopTracksFromFirebase()
+        spotifyviewModel.topTracks.observe(this) { tracksResponse ->
+            if (tracksResponse != null && userId != null) {
+                // Utilizza il FirebaseViewModel per salvare le tracce nel database Firebase
+                firebaseViewModel.saveTracksToFirebase(userId, tracksResponse.items)
+                firebaseViewModel.fetchTopTracksFromFirebase()
+            }
+        }
+
+        // Dopo aver chiamato fetchTopTracksFromFirebase, configura la RecyclerView e osserva topTracksfromdb
         recyclerView = findViewById(R.id.recyclerViewtopbrani)
         recyclerView.layoutManager = LinearLayoutManager(this)
         trackAdapter = TrackAdapter(emptyList()) // Inizialmente senza tracce
         recyclerView.adapter = trackAdapter
 
-        spotifyviewModel.topTracks.observe(this) { tracksResponse ->
-            if (tracksResponse != null) {
-                // Aggiorna l'adapter con le tracce recuperate dal database Firebase
-                trackAdapter = TrackAdapter(tracksResponse.items)
-                recyclerView.adapter = trackAdapter
-                trackAdapter.submitList(tracksResponse.items)
-
-                    // Salvare le tracce nel database Firebase
-                userId?.let { safeUserId ->
-                    tracksResponse.items.forEach { track ->
-                        firebaseViewModel.saveTracksToFirebase(safeUserId, listOf(track))
-                    }
-                }
-            } else {
-                Log.e("TopTrackError", "Errore durante il recupero delle tracce dal database Firebase")
-            }
+// Osserva la LiveData topTracksfromdb nel tuo FirebaseViewModel
+        firebaseViewModel.topTracksfromdb.observe(this) { tracks ->
+            // Aggiorna l'adapter con i nuovi dati
+            trackAdapter.submitList(tracks)
         }
+
+
+
+
 
         // Trova il componente BottomNavigationView nel layout XML e lo assegna ad una variabile
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
@@ -206,4 +203,4 @@ class SecondActivity : AppCompatActivity() {
              spotifyviewModel.getAccessToken(code)
         }
     }
-}
+    }
