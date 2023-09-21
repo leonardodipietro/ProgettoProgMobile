@@ -17,38 +17,39 @@ import com.example.progettoprogmobile.adapter.TrackAdapter
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.example.progettoprogmobile.viewModel.FirebaseAuthViewModel
 import com.example.progettoprogmobile.viewModel.FirebaseViewModel
+import com.example.progettoprogmobile.viewModel.SharedDataViewModel
 import com.google.firebase.auth.FirebaseAuth
 
 class SecondActivity : AppCompatActivity() {
 
-    private lateinit var spotifyviewModel: SpotifyViewModel
+
     // private lateinit var database: DatabaseReference
     private lateinit var recyclerView: RecyclerView
     private lateinit var trackAdapter: TrackAdapter
     private lateinit var firebaseViewModel:FirebaseViewModel
     private lateinit var firebaseauthviewModel: FirebaseAuthViewModel
-
+    private lateinit var spotifyViewModel: SpotifyViewModel
+    private lateinit var sharedViewModel: SharedDataViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_second)
+        val signOut = findViewById<Button>(R.id.signOut)
+        val delete = findViewById<Button>(R.id.delete)
 
         // Inizializza la ViewModel
         firebaseauthviewModel = ViewModelProvider(this)[FirebaseAuthViewModel::class.java]
-        spotifyviewModel = ViewModelProvider(this)[SpotifyViewModel::class.java]
+        spotifyViewModel = ViewModelProvider(this)[SpotifyViewModel::class.java]
         firebaseViewModel = ViewModelProvider(this)[FirebaseViewModel::class.java]
+        sharedViewModel = ViewModelProvider(this)[SharedDataViewModel::class.java]
 
-
-        firebaseViewModel.fetchTopTracksFromFirebase()
-
-        val signOut = findViewById<Button>(R.id.signOut)
-        val delete = findViewById<Button>(R.id.delete)
-        val startAuthButton = findViewById<Button>(R.id.startAuthButton)
-        startAuthButton.setOnClickListener {
-            startSpotifyAuthentication()
+        if (savedInstanceState == null) {
+            // Verifica che non sia un ripristino da stato salvato
+            val fragment = FirstFragment() // Crea un'istanza del tuo fragment
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.firstFragment, fragment) // Sostituisci il contenuto con il tuo fragment
+                .commit()
         }
 
-
-        handleIntent(intent)
 
 
 
@@ -64,8 +65,6 @@ class SecondActivity : AppCompatActivity() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         // Recupera le ultime 50 tracce dal database Firebase e visualizzale nella RecyclerView
         firebaseViewModel.fetchTopTracksFromFirebase()
-
-
 
         firebaseauthviewModel.signOutResult.observe(this) { result ->
             if (result == FirebaseAuthViewModel.SignOutResult.SUCCESS) {
@@ -84,48 +83,6 @@ class SecondActivity : AppCompatActivity() {
                 //eliminazione dell'account non riuscita
             }
         }
-
-
-       spotifyviewModel.spotifyTokenResponse.observe(this) { tokenResponse ->
-            if (tokenResponse?.access_token != null) {
-                Log.d("SpotifyToken", "Token ottenuto: ${tokenResponse.access_token}")
-
-                // Una volta ottenuto il token, recupera le tracce più ascoltate
-            spotifyviewModel.fetchTopTracks(tokenResponse.access_token)
-            } else {
-                Log.d("SpotifyToken", "Nessun token ottenuto!")
-            }
-        }
-
-        spotifyviewModel.error.observe(this) { throwable ->
-            Log.e("SpotifyTokenError", "Errore durante la richiesta del token", throwable)
-        }
-
-
-
-
-        spotifyviewModel.topTracks.observe(this) { tracksResponse ->
-            if (tracksResponse != null && userId != null) {
-                // Utilizza il FirebaseViewModel per salvare le tracce nel database Firebase
-                firebaseViewModel.saveTracksToFirebase(userId, tracksResponse.items)
-                firebaseViewModel.fetchTopTracksFromFirebase()
-            }
-        }
-
-        // Dopo aver chiamato fetchTopTracksFromFirebase, configura la RecyclerView e osserva topTracksfromdb
-        recyclerView = findViewById(R.id.recyclerViewtopbrani)
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        trackAdapter = TrackAdapter(emptyList()) // Inizialmente senza tracce
-        recyclerView.adapter = trackAdapter
-
-// Osserva la LiveData topTracksfromdb nel tuo FirebaseViewModel
-        firebaseViewModel.topTracksfromdb.observe(this) { tracks ->
-            // Aggiorna l'adapter con i nuovi dati
-            trackAdapter.submitList(tracks)
-        }
-
-
-
 
 
         // Trova il componente BottomNavigationView nel layout XML e lo assegna ad una variabile
@@ -186,21 +143,56 @@ class SecondActivity : AppCompatActivity() {
             else -> return super.onOptionsItemSelected(item)
         }
     }
-    private fun startSpotifyAuthentication() {
-        val authUrl = "https://accounts.spotify.com/authorize?client_id=f81649b34ef74684b08943e7ce931d23&response_type=code&redirect_uri=myapp://callback&scope=user-read-private%20user-top-read"
-        val intent = Intent (Intent.ACTION_VIEW, Uri.parse(authUrl))
-        startActivity(intent)
-    }
+
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-        handleIntent(intent)
-    }
-    private fun handleIntent(intent: Intent?) {
-        val uri = intent?.data
-            val code = uri?.getQueryParameter("code")
-            if (code != null) {
-             spotifyviewModel.getAccessToken(code)
+        Log.d("PRIMO LOG ACTIVITY", "ONNEWINTENTCHIAMATA")
+        // Verifica se l'Intent contiene dati
+        if (intent != null && intent.data != null) {
+            Log.d("SECONDO LOG ACTIVITY", "Intent contain data:  $intent")
+            // Passa l'Intent ricevuto al tuo Fragment corrente
+            val currentFragment = supportFragmentManager.findFragmentById(R.id.firstFragment)
+            Log.d("TERZO LOG ACTIVITY", "Intent contain data:  ${R.id.firstFragment}")
+            Log.d("QUARTO LOG ACTIVITY", "Intent contain data:  $currentFragment")
+            if (currentFragment is FirstFragment) {
+                currentFragment.handleIntent(intent)
+
+            }
+        } else {
+            Log.d("SECONDO LOG ACTIVITY", "Intent does not contain data")
         }
     }
-    }
+
+
+
+
+}
+
+
+/*   spotifyviewModel.spotifyTokenResponse.observe(this) { tokenResponse ->
+       if (tokenResponse?.access_token != null) {
+           Log.d("SpotifyToken", "Token ottenuto: ${tokenResponse.access_token}")
+
+           // Una volta ottenuto il token, recupera le tracce più ascoltate
+           spotifyviewModel.fetchTopTracks(tokenResponse.access_token)
+       } else {
+           Log.d("SpotifyToken", "Nessun token ottenuto!")
+       }
+   }
+
+   spotifyviewModel.error.observe(this) { throwable ->
+       Log.e("SpotifyTokenError", "Errore durante la richiesta del token", throwable)
+   }
+
+*/
+/*
+        spotifyviewModel.topTracks.observe(this) { tracksResponse ->
+            if (tracksResponse != null && userId != null) {
+                // Utilizza il FirebaseViewModel per salvare le tracce nel database Firebase
+                firebaseViewModel.saveTracksToFirebase(userId, tracksResponse.items)
+                firebaseViewModel.fetchTopTracksFromFirebase()
+            }
+        } */
+
+// Dopo aver chiamato fetchTopTracksFromFirebase, configura la RecyclerView e osserva topTracksfromdb

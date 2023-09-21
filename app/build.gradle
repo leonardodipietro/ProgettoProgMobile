@@ -61,6 +61,8 @@ dependencies {
 
     implementation 'com.google.firebase:firebase-database:20.2.2'
     implementation 'com.google.android.gms:play-services-auth:20.7.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.fragment:fragment:1.6.1'
 
     implementation 'androidx.navigation:navigation-fragment-ktx:2.7.2' //per utilizzare la libreria di navigazione
     implementation 'androidx.navigation:navigation-ui-ktx:2.7.2' //per utilizzare la libreria di navigazione

@@ -6,7 +6,8 @@
     android:orientation="vertical"
     android:padding="16dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/black">
+    android:background="@color/black"
+    >
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -20,12 +21,12 @@
             app:srcCompat="@android:drawable/btn_star_big_on" />
 
         <TextView
-            android:id="@+id/textview"
+            android:id="@+id/BranoTopbrani"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
-            android:text="brano 1"
+
             android:textSize="16sp"
             android:textColor="@color/dark_green"
             android:layout_marginLeft="10dp"/>
@@ -35,12 +36,24 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_gravity="center"
-            android:text="artista 1"
+            android:id="@+id/ArtistaTopbrani"
+            android:textSize="16sp"
+            android:layout_marginLeft="10dp"
+            android:textColor="@color/dark_green"
+            />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:id="@+id/AlbumTopbrani"
             android:textSize="16sp"
             android:layout_marginLeft="10dp"
             android:textColor="@color/dark_green"
             />
     </LinearLayout>
+
 
     <!-- Aggiungi un delimitatore tra gli elementi -->
     <View
@@ -48,79 +61,5 @@
         android:layout_height="1dp"
         android:background="@color/dark_gray"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <ImageView
-            android:id="@+id/imageview2"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            app:srcCompat="@android:drawable/btn_star_big_on" />
-
-        <TextView
-            android:id="@+id/textview2"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:text="brano 2"
-            android:textSize="16sp"
-            android:layout_marginLeft="10dp"
-            android:textColor="@color/dark_green" />
-
-        <TextView
-            android:id="@+id/textview4"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:text="artista2"
-            android:layout_marginLeft="10dp"
-            android:textSize="16sp"
-            android:textColor="@color/dark_green" />
-    </LinearLayout>
-
-    <!-- Aggiungi un altro delimitatore -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/light_gray" />
-
-    <!-- Ripeti il pattern per gli altri elementi -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <ImageView
-            android:id="@+id/imageView3"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            app:srcCompat="@android:drawable/btn_star_big_on" />
-
-        <TextView
-            android:id="@+id/textview3"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:text="brano 3"
-            android:textSize="16sp"
-            android:layout_marginLeft="10dp"
-            android:textColor="@color/dark_green" />
-
-        <TextView
-            android:id="@+id/textview6"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:text="artista 2"
-            android:textSize="16sp"
-            android:layout_marginLeft="10dp"
-            android:textColor="@color/dark_green" />
-    </LinearLayout>
 </LinearLayout>
 

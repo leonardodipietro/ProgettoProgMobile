@@ -1,4 +1,6 @@
 package com.example.progettoprogmobile.viewModel
+import android.os.Parcel
+import android.os.Parcelable
 import androidx.lifecycle.ViewModel
 import com.example.progettoprogmobile.api.SpotifyRepository
 import com.example.progettoprogmobile.model.SpotifyTokenResponse
@@ -8,8 +10,9 @@ import com.google.firebase.database.*
 import com.example.progettoprogmobile.model.*
 import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
+import java.io.Serializable
 
-class SpotifyViewModel : ViewModel() {
+class SpotifyViewModel : ViewModel(){
 
     private val repository = SpotifyRepository()
     val spotifyTokenResponse = MutableLiveData<SpotifyTokenResponse?>()
@@ -59,6 +62,7 @@ class SpotifyViewModel : ViewModel() {
         }
 
     }
+
 
 
 

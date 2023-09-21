@@ -8,6 +8,7 @@ import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 
 class FirebaseViewModel : ViewModel() {
+
     private val database: DatabaseReference = FirebaseDatabase.getInstance().reference
 
     private val user = FirebaseAuth.getInstance().currentUser
@@ -117,7 +118,7 @@ class FirebaseViewModel : ViewModel() {
        }
    }
 
-    fun deleteUserDataFromFirebase(userId: String) {
+   /* fun deleteUserDataFromFirebase(userId: String) {
        val userRef = FirebaseDatabase.getInstance().reference.child("users").child(userId)
 
        // Rimuovi tutti i dati dell'utente, inclusi i dati delle tracce
@@ -128,5 +129,5 @@ class FirebaseViewModel : ViewModel() {
            .addOnFailureListener {
                Log.e("Firebase", "Errore nell'eliminazione dei dati dell'utente da Firebase: ${it.message}")
            }
-   }
+   } */
 }
