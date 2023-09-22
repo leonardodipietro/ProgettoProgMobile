@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.navigation.Navigation
 import android.widget.TextView
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,34 +12,45 @@ import androidx.fragment.app.Fragment
 import android.widget.Button
 import androidx.lifecycle.ViewModelProvider
 import com.example.progettoprogmobile.viewModel.FirebaseAuthViewModel
+import com.example.progettoprogmobile.viewModel.FirebaseViewModel
 import com.google.firebase.auth.FirebaseAuth
 
 class ThirdFragment : Fragment() {
 
 
-
+private lateinit var firebaseauthviewModel: FirebaseAuthViewModel
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
        val rootView = inflater.inflate(R.layout.fragment_third, container, false)
 
+        val currentUser = FirebaseAuth.getInstance().currentUser
+
+        firebaseauthviewModel = ViewModelProvider(this)[FirebaseAuthViewModel::class.java]
 
 
 
-       /* val signOut:Button  = rootView.findViewById(R.id.signOut)
-        val delete:Button= rootView.findViewById(R.id.delete)*/
-      /*  val delete = requireView().findViewById<Button>(R.id.delete)
-       val appContext = requireContext().applicationContext */
+        val signOut:Button  = rootView.findViewById(R.id.signOut)
+        val deleteButton :Button= rootView.findViewById(R.id.delete)
+        //  val delete = requireView().findViewById<Button>(R.id.delete)
 
-    /*    signOut.setOnClickListener {
+
+      signOut.setOnClickListener {
             firebaseauthviewModel.signOut(requireContext().applicationContext)
         }
 
-        delete.setOnClickListener {
-            firebaseauthviewModel.delete(requireContext().applicationContext)
+        deleteButton.setOnClickListener {
+        currentUser?.delete()
+            ?.addOnSuccessListener {
+                val intent = Intent(context, MainActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                context?.startActivity(intent)
+                Log.d("MyApp", "Eliminazione account avvenuta")
+            }
+            ?.addOnFailureListener {  }
         }
-*/
+
     /*    signOut.setOnClickListener {
             if (userId != null) {
                 // Esegui il logout solo se userId non è null

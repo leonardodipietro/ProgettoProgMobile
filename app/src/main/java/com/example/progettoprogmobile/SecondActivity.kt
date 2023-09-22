@@ -1,40 +1,43 @@
 package com.example.progettoprogmobile
-
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.progettoprogmobile.viewModel.SpotifyViewModel
-import androidx.recyclerview.widget.RecyclerView
+import com.example.progettoprogmobile.FirstFragment
+import com.example.progettoprogmobile.SecondFragment
+import com.example.progettoprogmobile.ThirdFragment
 import com.example.progettoprogmobile.adapter.TrackAdapter
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.example.progettoprogmobile.viewModel.FirebaseAuthViewModel
 import com.example.progettoprogmobile.viewModel.FirebaseViewModel
 import com.example.progettoprogmobile.viewModel.SharedDataViewModel
+import com.example.progettoprogmobile.viewModel.SpotifyViewModel
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 
 class SecondActivity : AppCompatActivity() {
 
-
-    // private lateinit var database: DatabaseReference
-    private lateinit var recyclerView: RecyclerView
     private lateinit var trackAdapter: TrackAdapter
-    private lateinit var firebaseViewModel:FirebaseViewModel
+    private lateinit var firebaseViewModel: FirebaseViewModel
     private lateinit var firebaseauthviewModel: FirebaseAuthViewModel
     private lateinit var spotifyViewModel: SpotifyViewModel
     private lateinit var sharedViewModel: SharedDataViewModel
+    private val fragmentManager: FragmentManager = supportFragmentManager
+    private lateinit var currentFragment: Fragment
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_second)
-        val signOut = findViewById<Button>(R.id.signOut)
-        val delete = findViewById<Button>(R.id.delete)
+
 
         // Inizializza la ViewModel
         firebaseauthviewModel = ViewModelProvider(this)[FirebaseAuthViewModel::class.java]
@@ -42,77 +45,68 @@ class SecondActivity : AppCompatActivity() {
         firebaseViewModel = ViewModelProvider(this)[FirebaseViewModel::class.java]
         sharedViewModel = ViewModelProvider(this)[SharedDataViewModel::class.java]
 
+        // Verifica se l'activity è stata avviata per la prima volta (savedInstanceState == null)
+        // e se è così, sostituisci il contenuto con il tuo fragment iniziale (FirstFragment)
         if (savedInstanceState == null) {
-            // Verifica che non sia un ripristino da stato salvato
-            val fragment = FirstFragment() // Crea un'istanza del tuo fragment
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.firstFragment, fragment) // Sostituisci il contenuto con il tuo fragment
+            val fragment = FirstFragment()
+            fragmentManager.beginTransaction()
+                .add(R.id.nav_host_fragment, fragment, "firstFragment")
                 .commit()
-        }
-
-
-
-
-        signOut.setOnClickListener{
-            firebaseauthviewModel.signOut(applicationContext)
-        }
-
-        delete.setOnClickListener{
-            firebaseauthviewModel.delete(applicationContext)
-        }
-
-
-        val userId = FirebaseAuth.getInstance().currentUser?.uid
-        // Recupera le ultime 50 tracce dal database Firebase e visualizzale nella RecyclerView
-        firebaseViewModel.fetchTopTracksFromFirebase()
-
-        firebaseauthviewModel.signOutResult.observe(this) { result ->
-            if (result == FirebaseAuthViewModel.SignOutResult.SUCCESS) {
-                val intent = Intent(this, MainActivity::class.java)
-                startActivity(intent)
-            } else {
-                //logout non riuscito
-            }
-        }
-
-        firebaseauthviewModel.deleteResult.observe(this) { result ->
-            if (result == FirebaseAuthViewModel.DeleteResult.SUCCESS) {
-                val intent = Intent(this, MainActivity::class.java)
-                startActivity(intent)
-            } else {
-                //eliminazione dell'account non riuscita
-            }
+            currentFragment = fragment
         }
 
 
         // Trova il componente BottomNavigationView nel layout XML e lo assegna ad una variabile
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+
         // Imposta un listener per la selezione degli elementi nel BottomNavigationView
         bottomNavigationView.setOnItemSelectedListener { item ->
+            val transaction: FragmentTransaction = fragmentManager.beginTransaction()
+
+            // Nascondi il fragment corrente
+            transaction.hide(currentFragment)
+
             // Gestisci la selezione in base all'ID dell'elemento selezionato
             when (item.itemId) {
                 R.id.home -> {
-                    // Trova il NavController e naviga al primo fragment
-                    val navController = Navigation.findNavController(this, R.id.nav_host_fragment)
-                    navController.navigate(R.id.firstFragment)
-                    true // Indica che la selezione è stata gestita con successo
+                    // Se il fragment è già stato creato, mostra semplicemente il fragment
+                    val fragment = fragmentManager.findFragmentByTag("firstFragment")
+                    if (fragment != null) {
+                        transaction.show(fragment)
+                        currentFragment = fragment
+                    } else {
+                        // Altrimenti, crea un nuovo fragment e aggiungilo
+                        val newFragment = FirstFragment()
+                        transaction.add(R.id.nav_host_fragment, newFragment, "firstFragment")
+                        currentFragment = newFragment
+                    }
                 }
                 R.id.profile -> {
-                    // Trova il NavController e naviga al secondo fragment
-                    val navController = Navigation.findNavController(this, R.id.nav_host_fragment)
-                    navController.navigate(R.id.secondFragment)
-                    true // Indica che la selezione è stata gestita con successo
+                    val fragment = fragmentManager.findFragmentByTag("secondFragment")
+                    if (fragment != null) {
+                        transaction.show(fragment)
+                        currentFragment = fragment
+                    } else {
+                        val newFragment = SecondFragment()
+                        transaction.add(R.id.nav_host_fragment, newFragment, "secondFragment")
+                        currentFragment = newFragment
+                    }
                 }
                 R.id.settings -> {
-                    // Trova il NavController e naviga al terzo fragment
-                    val navController = Navigation.findNavController(this, R.id.nav_host_fragment)
-                    navController.navigate(R.id.thirdFragment)
-                    true // Indica che la selezione è stata gestita con successo
+                    val fragment = fragmentManager.findFragmentByTag("thirdFragment")
+                    if (fragment != null) {
+                        transaction.show(fragment)
+                        currentFragment = fragment
+                    } else {
+                        val newFragment = ThirdFragment()
+                        transaction.add(R.id.nav_host_fragment, newFragment, "thirdFragment")
+                        currentFragment = newFragment
+                    }
                 }
-                else -> false // Gestione predefinita nel caso in cui l'ID dell'elemento non corrisponda a nessuno dei casi precedenti
             }
+            transaction.commit()
+            true // Indica che la selezione è stata gestita con successo
         }
-
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -121,29 +115,48 @@ class SecondActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val transaction: FragmentTransaction = fragmentManager.beginTransaction()
+
         when (item.itemId) {
             // Naviga al primo fragment quando l'opzione del menu è selezionata
             R.id.menu_first_fragment -> {
-                val navController = Navigation.findNavController(this, R.id.nav_host_fragment)
-                navController.navigate(R.id.firstFragment)
-                return true
+                val fragment = fragmentManager.findFragmentByTag("firstFragment")
+                if (fragment != null) {
+                    transaction.show(fragment)
+                    currentFragment = fragment
+                } else {
+                    val newFragment = FirstFragment()
+                    transaction.add(R.id.nav_host_fragment, newFragment, "firstFragment")
+                    currentFragment = newFragment
+                }
             }
             R.id.menu_second_fragment -> {
-                // Naviga al secondo fragment quando l'opzione del menu è selezionata
-                val navController = Navigation.findNavController(this, R.id.nav_host_fragment)
-                navController.navigate(R.id.secondFragment)
-                return true
+                val fragment = fragmentManager.findFragmentByTag("secondFragment")
+                if (fragment != null) {
+                    transaction.show(fragment)
+                    currentFragment = fragment
+                } else {
+                    val newFragment = SecondFragment()
+                    transaction.add(R.id.nav_host_fragment, newFragment, "secondFragment")
+                    currentFragment = newFragment
+                }
             }
             R.id.menu_third_fragment -> {
-                // Naviga al terzo fragment quando l'opzione del menu è selezionata
-                val navController = Navigation.findNavController(this, R.id.nav_host_fragment)
-                navController.navigate(R.id.thirdFragment)
-                return true
+                val fragment = fragmentManager.findFragmentByTag("thirdFragment")
+                if (fragment != null) {
+                    transaction.show(fragment)
+                    currentFragment = fragment
+                } else {
+                    val newFragment = ThirdFragment()
+                    transaction.add(R.id.nav_host_fragment, newFragment, "thirdFragment")
+                    currentFragment = newFragment
+                }
             }
             else -> return super.onOptionsItemSelected(item)
         }
+        transaction.commit()
+        return true
     }
-
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
@@ -152,22 +165,20 @@ class SecondActivity : AppCompatActivity() {
         if (intent != null && intent.data != null) {
             Log.d("SECONDO LOG ACTIVITY", "Intent contain data:  $intent")
             // Passa l'Intent ricevuto al tuo Fragment corrente
-            val currentFragment = supportFragmentManager.findFragmentById(R.id.firstFragment)
+            val currentFragment = fragmentManager.findFragmentByTag("firstFragment")
             Log.d("TERZO LOG ACTIVITY", "Intent contain data:  ${R.id.firstFragment}")
             Log.d("QUARTO LOG ACTIVITY", "Intent contain data:  $currentFragment")
             if (currentFragment is FirstFragment) {
                 currentFragment.handleIntent(intent)
-
             }
         } else {
             Log.d("SECONDO LOG ACTIVITY", "Intent does not contain data")
         }
     }
-
-
-
-
 }
+
+
+
 
 
 /*   spotifyviewModel.spotifyTokenResponse.observe(this) { tokenResponse ->

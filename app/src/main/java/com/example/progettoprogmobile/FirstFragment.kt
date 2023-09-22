@@ -36,6 +36,7 @@ class FirstFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
 
         spotifyViewModel = ViewModelProvider(this)[SpotifyViewModel::class.java]
         firebaseViewModel = ViewModelProvider(this)[FirebaseViewModel::class.java]

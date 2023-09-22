@@ -56,7 +56,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.194" />
 -->
-
+<!--
         <Button
             android:id="@+id/signOut"
             android:layout_width="wrap_content"
@@ -83,6 +83,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.501"
             app:layout_constraintStart_toStartOf="parent"/>
+
+            -->
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/nav_host_fragment"
             android:name="androidx.navigation.fragment.NavHostFragment"
@@ -92,7 +94,6 @@
             app:layout_constraintTop_toTopOf="@+id/bottomNavigationView"
             app:navGraph="@navigation/my_nav"
             tools:layout_editor_absoluteX="0dp" />
-
         <FrameLayout
             android:id="@+id/frame_layout"
             android:layout_width="0dp"
@@ -112,6 +113,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:menu="@menu/nav_bar">
+
+
 
         </com.google.android.material.bottomnavigation.BottomNavigationView>
 
