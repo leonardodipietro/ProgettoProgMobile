@@ -1,78 +1,95 @@
 package com.example.progettoprogmobile
 
 
-
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import android.util.Log
-import android.widget.Button
-import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
 import com.example.progettoprogmobile.adapter.TrackAdapter
-import com.example.progettoprogmobile.viewModel.FirebaseAuthViewModel
 import com.example.progettoprogmobile.viewModel.FirebaseViewModel
 import com.example.progettoprogmobile.viewModel.SharedDataViewModel
-import com.example.progettoprogmobile.viewModel.SpotifyViewModel
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
-
+import com.example.progettoprogmobile.SecondActivity
 
 class FirstFragment : Fragment() {
 
     private lateinit var firebaseViewModel: FirebaseViewModel
-    private lateinit var spotifyViewModel: SpotifyViewModel
-    private lateinit var recyclerView: RecyclerView
     private lateinit var trackAdapter: TrackAdapter
-    private lateinit var dataviewmodel:SharedDataViewModel
+    private lateinit var dataviewmodel: SharedDataViewModel
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
 
         val userId = FirebaseAuth.getInstance().currentUser?.uid
-
-        spotifyViewModel = ViewModelProvider(this)[SpotifyViewModel::class.java]
-        firebaseViewModel = ViewModelProvider(this)[FirebaseViewModel::class.java]
         dataviewmodel = ViewModelProvider(this)[SharedDataViewModel::class.java]
+        val rootView = inflater.inflate(R.layout.fragment_first, container, false)
+        lateinit var navControllerStats: NavController
 
-        firebaseViewModel.fetchTopTracksFromFirebase()
+        val navHostFragment = childFragmentManager.findFragmentById(R.id.nav_host_fragment_stats) as NavHostFragment
+        val navController = navHostFragment.navController
+        val bottomNavigationView = rootView.findViewById<BottomNavigationView>(R.id.bottomNavigationStatsGen)
 
-
-
-
-       val rootView = inflater.inflate(R.layout.fragment_first, container, false)
-       val startAuthButton: Button = rootView.findViewById(R.id.startAuthButton)
-
-       startAuthButton.setOnClickListener {
-            startSpotifyAuthentication()
-
+        bottomNavigationView?.setOnNavigationItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.menu_track_gen -> {
+                    // Naviga al fragment delle tracce
+                    navController.navigate(R.id.trackGen)
+                    return@setOnNavigationItemSelectedListener true
+                }
+                R.id.menu_artist_gen -> {
+                    // Naviga al fragment degli artisti
+                    navController.navigate(R.id.artistGen)
+                    return@setOnNavigationItemSelectedListener true
+                }
+                else -> false
+            }
         }
 
-        gestionedati()
-
-
-        // Inizializza il RecyclerView e l'adapter
-        recyclerView = rootView.findViewById(R.id.recyclerViewtopbrani)
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        trackAdapter = TrackAdapter(emptyList()) // Inizialmente senza tracce
-        recyclerView.adapter = trackAdapter
-
-        // Aggiorna l'adapter con i nuovi dati
-        firebaseViewModel.topTracksfromdb.observe(viewLifecycleOwner) { tracks ->
-            trackAdapter.submitList(tracks)
-        }
         return rootView
     }
+}
 
 
-    private fun gestionedati() {
+
+
+
+
+
+
+
+
+    /* ONCREATE
+ firebaseViewModel.fetchTopTracksFromFirebase()
+ val startAuthButton: Button = rootView.findViewById(R.id.startAuthButton)
+
+  startAuthButton.setOnClickListener {
+       startSpotifyAuthentication()
+
+   }
+
+   gestionedati()
+
+
+   // Inizializza il RecyclerView e l'adapter
+   recyclerView = rootView.findViewById(R.id.recyclerViewtopbrani)
+   recyclerView.layoutManager = LinearLayoutManager(requireContext())
+   trackAdapter = TrackAdapter(emptyList()) // Inizialmente senza tracce
+   recyclerView.adapter = trackAdapter
+
+   // Aggiorna l'adapter con i nuovi dati
+   firebaseViewModel.topTracksfromdb.observe(viewLifecycleOwner) { tracks ->
+       trackAdapter.submitList(tracks)
+   } */
+
+
+  /*  private fun gestionedati() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid
 
         // Recupera le tracce più ascoltate da Spotify
@@ -138,7 +155,9 @@ class FirstFragment : Fragment() {
             Log.d("secondo LOG FRAGMENT", "INTENT VUOTO")
     }
 
-}
+   */
+
+
 
 
 

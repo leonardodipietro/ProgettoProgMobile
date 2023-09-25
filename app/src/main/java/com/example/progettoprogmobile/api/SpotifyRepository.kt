@@ -58,9 +58,9 @@ class SpotifyRepository {
         spotifyApiTrackService.getTopTracks("Bearer $token",timeRange,limit).enqueue(object : Callback<TopTracksResponse> {
             override fun onResponse(call: Call<TopTracksResponse>, response: Response<TopTracksResponse>) {
                 if (response.isSuccessful) {
-                    Log.d("SpotifyRepo", "Risposta ricevuta con successo: ${response.body()}")  // Log in caso di risposta di successo
+                    Log.d("SpotifyRepo", "Risposta ricevuta con successo: ")
                 } else {
-                    Log.d("SpotifyRepo", "Risposta con errore. Codice: ${response.code()}, Messaggio: ${response.message()}")  // Log in caso di risposta con codice d'errore
+                    Log.d("SpotifyRepo", "Risposta con errore. Codice:  Messaggio:")
                 }
                 callback(response.body(), null)
             }

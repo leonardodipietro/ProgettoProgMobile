@@ -1,8 +1,6 @@
 package com.example.progettoprogmobile
 
 import android.content.Intent
-import androidx.navigation.Navigation
-import android.widget.TextView
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -12,7 +10,6 @@ import androidx.fragment.app.Fragment
 import android.widget.Button
 import androidx.lifecycle.ViewModelProvider
 import com.example.progettoprogmobile.viewModel.FirebaseAuthViewModel
-import com.example.progettoprogmobile.viewModel.FirebaseViewModel
 import com.google.firebase.auth.FirebaseAuth
 
 class ThirdFragment : Fragment() {

@@ -2,27 +2,18 @@ package com.example.progettoprogmobile
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
-import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.Navigation
-import com.example.progettoprogmobile.FirstFragment
-import com.example.progettoprogmobile.SecondFragment
-import com.example.progettoprogmobile.ThirdFragment
+import androidx.navigation.fragment.NavHostFragment
 import com.example.progettoprogmobile.adapter.TrackAdapter
 import com.example.progettoprogmobile.viewModel.FirebaseAuthViewModel
 import com.example.progettoprogmobile.viewModel.FirebaseViewModel
 import com.example.progettoprogmobile.viewModel.SharedDataViewModel
 import com.example.progettoprogmobile.viewModel.SpotifyViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
 
 class SecondActivity : AppCompatActivity() {
 
@@ -45,12 +36,22 @@ class SecondActivity : AppCompatActivity() {
         firebaseViewModel = ViewModelProvider(this)[FirebaseViewModel::class.java]
         sharedViewModel = ViewModelProvider(this)[SharedDataViewModel::class.java]
 
+
+
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navControllerHome = navHostFragment.navController
+
+
+
+
+
+
         // Verifica se l'activity è stata avviata per la prima volta (savedInstanceState == null)
         // e se è così, sostituisci il contenuto con il tuo fragment iniziale (FirstFragment)
         if (savedInstanceState == null) {
-            val fragment = FirstFragment()
+            val fragment = TrackGen()
             fragmentManager.beginTransaction()
-                .add(R.id.nav_host_fragment, fragment, "firstFragment")
+                .add(R.id.nav_host_fragment, fragment, "trackGen")
                 .commit()
             currentFragment = fragment
         }
@@ -58,6 +59,7 @@ class SecondActivity : AppCompatActivity() {
 
         // Trova il componente BottomNavigationView nel layout XML e lo assegna ad una variabile
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+
 
         // Imposta un listener per la selezione degli elementi nel BottomNavigationView
         bottomNavigationView.setOnItemSelectedListener { item ->
@@ -107,9 +109,33 @@ class SecondActivity : AppCompatActivity() {
             transaction.commit()
             true // Indica che la selezione è stata gestita con successo
         }
+
+
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        Log.d("PRIMO LOG ACTIVITY", "ONNEWINTENTCHIAMATA")
+        // Verifica se l'Intent contiene dati
+        if (intent != null && intent.data != null) {
+            Log.d("SECONDO LOG ACTIVITY", "Intent contain data:  $intent")
+            // Passa l'Intent ricevuto al tuo Fragment corrente
+            val currentFragment = fragmentManager.findFragmentByTag("trackGen")
+            Log.d("TERZO LOG ACTIVITY", "Intent contain data:  ${R.id.trackGen}")
+            Log.d("QUARTO LOG ACTIVITY", "Intent contain data:  $currentFragment")
+            if (currentFragment is TrackGen) {
+                currentFragment.handleIntent(intent)
+            }
+        } else {
+            Log.d("SECONDO LOG ACTIVITY", "Intent does not contain data")
+        }
+    }
+}
+
+
+
+    //SEMMAI SI RIUSA QUESTA PARTE SUCCESSIVAMENTE
+   /* override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.drawer_menu, menu)
         return true
     }
@@ -157,25 +183,10 @@ class SecondActivity : AppCompatActivity() {
         transaction.commit()
         return true
     }
+*/
 
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-        Log.d("PRIMO LOG ACTIVITY", "ONNEWINTENTCHIAMATA")
-        // Verifica se l'Intent contiene dati
-        if (intent != null && intent.data != null) {
-            Log.d("SECONDO LOG ACTIVITY", "Intent contain data:  $intent")
-            // Passa l'Intent ricevuto al tuo Fragment corrente
-            val currentFragment = fragmentManager.findFragmentByTag("firstFragment")
-            Log.d("TERZO LOG ACTIVITY", "Intent contain data:  ${R.id.firstFragment}")
-            Log.d("QUARTO LOG ACTIVITY", "Intent contain data:  $currentFragment")
-            if (currentFragment is FirstFragment) {
-                currentFragment.handleIntent(intent)
-            }
-        } else {
-            Log.d("SECONDO LOG ACTIVITY", "Intent does not contain data")
-        }
-    }
-}
+
+
 
 
 

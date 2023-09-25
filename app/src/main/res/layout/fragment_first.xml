@@ -1,154 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:id="@+id/firstFragment"
->
+     >
+    <!-- Includi il FragmentContainerView per il NavHostFragment -->
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/nav_host_fragment_stats"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:defaultNavHost="true"
+        app:navGraph="@navigation/nav_stats" />
 
-<!--
-    <Button
-        android:id="@+id/nextButton1"
-        android:layout_marginStart="172dp"
-        android:layout_marginTop="357dp"
-        android:layout_marginEnd="180dp"
-        android:layout_marginBottom="355dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Passa al Fragment 2"
-        android:textColor="@color/dark_green"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintVertical_bias="0.5"
-        tools:ignore="MissingConstraints" />
+    <com.google.android.material.bottomnavigation.BottomNavigationView
 
-    <Button
-        android:id="@+id/nextButton3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Passa al Fragment 3"
-        android:textColor="@color/dark_green"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/nextButton1" />
--->
-
-    <include layout="@layout/genitore"></include>
-
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar2"
+        android:id="@+id/bottomNavigationStatsGen"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/dark_gray"
-        android:minHeight="?attr/actionBarSize"
-        android:theme="?attr/actionBarTheme"
-    >
-        <LinearLayout
-            android:id="@+id/bottomBar"
-            android:layout_width="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/stats_menu">
+    </com.google.android.material.bottomnavigation.BottomNavigationView>
+</FrameLayout>
+
+
+    <!--
+        <Button
+            android:id="@+id/nextButton1"
+            android:layout_marginStart="172dp"
+            android:layout_marginTop="357dp"
+            android:layout_marginEnd="180dp"
+            android:layout_marginBottom="355dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            >
-            <!--
-            <ImageButton
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="50sp"
-                android:background="@color/dark_gray"
-                android:textColor="@color/black"
-                android:src="@drawable/time"
-                app:tint="@color/black"/>
--->
-            <View
-                android:id="@+id/divider2"
-                android:layout_width="6dp"
+            android:text="Passa al Fragment 2"
+            android:textColor="@color/dark_green"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintVertical_bias="0.5"
+            tools:ignore="MissingConstraints" />
+
+        <Button
+            android:id="@+id/nextButton3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Passa al Fragment 3"
+            android:textColor="@color/dark_green"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/nextButton1" />
+    -->
+
+    <!--<include layout="@layout/genitore"></include> -->
+
+
+    <!--
+        <Button
+            android:id="@+id/startAuthButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/verde_spotify"
+            android:text="@string/inizia_autenticazione_spotify"
+            android:textColor="@color/black"
+           android:layout_below="@+id/toolbar2"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_marginTop="10dp"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/iniziolistabrani"
+            android:layout_below="@+id/startAuthButton"
+            android:text="Lista"
+            android:textSize="40sp"
+            android:textColor="@color/white"/>
+
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="?android:attr/listDivider" />
+                android:layout_below="@+id/iniziolistabrani"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="90dp"
+                android:id="@+id/recyclerViewtopbrani">
 
-            <Button
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="50sp"
-                android:text="bottone 1 "
-                android:layout_gravity="center"
-                android:textColor="@color/black"
-                app:tint="@color/dark_gray"
-                android:background="@drawable/buttonstyle"
-                android:includeFontPadding="false"
-                />
-
-            <View
-                android:id="@+id/divider3"
-                android:layout_width="6dp"
-                android:layout_height="match_parent"
-                android:background="?android:attr/listDivider" />
-
-
-            <Button
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="50sp"
-                android:text="bottone 2 "
-                android:layout_gravity="center"
-                android:textColor="@color/black"
-                android:background="@drawable/buttonstyle"
-                android:includeFontPadding="false"/>
-
-            <View
-                android:id="@+id/divider1"
-                android:layout_width="6dp"
-                android:layout_height="match_parent"
-                android:background="?android:attr/listDivider" />
-
-     <!--       <ImageButton
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="50sp"
-                android:background="@color/dark_gray"
-                android:textColor="@color/black"
-                android:src="@drawable/data"
-                app:tint="@color/black"/> -->
-
-
-
-        </LinearLayout>
-
-
-
-    </androidx.appcompat.widget.Toolbar>
-
-    <Button
-        android:id="@+id/startAuthButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:backgroundTint="@color/verde_spotify"
-        android:text="@string/inizia_autenticazione_spotify"
-        android:textColor="@color/black"
-       android:layout_below="@+id/toolbar2"/>
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:layout_marginTop="10dp"
-        android:layout_centerHorizontal="true"
-        android:id="@+id/iniziolistabrani"
-        android:layout_below="@+id/startAuthButton"
-        android:text="Lista"
-        android:textSize="40sp"
-        android:textColor="@color/white"/>
-
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@+id/iniziolistabrani"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="90dp"
-            android:id="@+id/recyclerViewtopbrani">
-
-        </androidx.recyclerview.widget.RecyclerView>
-
-
-
-</RelativeLayout>
+            </androidx.recyclerview.widget.RecyclerView>
+    -->

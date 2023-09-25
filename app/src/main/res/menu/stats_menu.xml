@@ -1,0 +1,15 @@
+<!-- File: res/menu/nav_menu.xml -->
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/menu_track_gen"
+            android:title="tracce"
+            android:text="tracce"/>
+        <item
+            android:id="@+id/menu_artist_gen"
+            android:title="artista"
+            android:text="artista"/>
+
+    </group>
+</menu>
