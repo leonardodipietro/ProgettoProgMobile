@@ -19,6 +19,10 @@
             app:destination="@id/thirdFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim" />
+<!--        <argument
+            android:name="myArg"
+            app:argType="string"
+            android:defaultValue="default_value" />  -->
     </fragment>
     <fragment
         android:id="@+id/secondFragment"

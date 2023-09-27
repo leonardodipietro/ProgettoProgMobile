@@ -19,4 +19,13 @@
     <string name="Click_to_login">Register</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="brani">Brani</string>
+    <string name="Artisti">Artisti</string>
+    <string name="second_activity">SECOND ACTIVITY</string>
+    <string name="torna_al_fragment_1">Torna al Fragment 1</string>
+    <string name="home">Home</string>
+    <string name="cerca">Cerca</string>
+    <string name="settings">Settings</string>
+    <string name="cerca_utenti">Cerca utenti</string>
+    <string name="cerca2">Cerca</string>
 </resources>

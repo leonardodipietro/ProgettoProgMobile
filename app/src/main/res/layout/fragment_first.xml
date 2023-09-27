@@ -2,33 +2,62 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent" android:layout_height="match_parent"
-    tools:context=".FirstFragment" android:background="@color/design_default_color_primary">
-
-
-    <Button
-        android:id="@+id/nextButton1"
-        android:layout_marginStart="172dp"
-        android:layout_marginTop="357dp"
-        android:layout_marginEnd="180dp"
-        android:layout_marginBottom="355dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Passa al Fragment 2"
-        android:textColor="@color/dark_green"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintVertical_bias="0.5"
-        tools:ignore="MissingConstraints" />
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/gray"
+    tools:context=".FirstFragment" >
 
     <Button
-        android:id="@+id/nextButton3"
+        android:id="@+id/btnBrani"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Passa al Fragment 3"
-        android:textColor="@color/dark_green"
+        android:text="@string/brani"
+        android:textColor="@color/white"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/button"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/nextButton1" />
+        app:layout_constraintHorizontal_bias="0.5" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <Space
+        android:id="@+id/spacer"
+        android:layout_width="16dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/btnBrani"
+        app:layout_constraintEnd_toStartOf="@+id/btnArtisti" />
+
+    <Button
+        android:id="@+id/btnArtisti"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button"
+        android:text="@string/Artisti"
+        android:textColor="@color/white"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/btnBrani"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/startAuthButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/verde_spotify"
+        android:text="@string/inizia_autenticazione_spotify"
+        android:textColor="@color/black"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.647" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewtopbrani"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/startAuthButton" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
