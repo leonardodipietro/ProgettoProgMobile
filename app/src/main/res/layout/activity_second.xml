@@ -54,6 +54,3 @@
         app:menu="@menu/drawer_menu" />
 
 </androidx.drawerlayout.widget.DrawerLayout>
-
-
-<!--COMMENTO-->

@@ -17,8 +17,6 @@ import com.example.progettoprogmobile.viewModel.FirebaseViewModel
 import com.example.progettoprogmobile.viewModel.SpotifyViewModel
 import com.google.firebase.auth.FirebaseAuth
 
-//COMMENTO
-
 class FirstFragment : Fragment() {
     private lateinit var firebaseViewModel: FirebaseViewModel
     private lateinit var spotifyViewModel: SpotifyViewModel

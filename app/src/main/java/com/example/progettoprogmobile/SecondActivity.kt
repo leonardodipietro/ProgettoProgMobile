@@ -9,8 +9,6 @@ import androidx.core.view.forEach
 import androidx.navigation.Navigation
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
-//COMMENTO
-
 class SecondActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
