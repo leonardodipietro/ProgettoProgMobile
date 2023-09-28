@@ -46,4 +46,7 @@
             app:enterAnim="@android:anim/slide_in_left"
             app:exitAnim="@android:anim/slide_out_right" />
     </fragment>
+
+    <!-- Inclusione del file di navigazione secondario -->
+    <include app:graph="@navigation/nav_stats" />
 </navigation>

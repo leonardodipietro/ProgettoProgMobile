@@ -11,7 +11,7 @@ import com.example.progettoprogmobile.R
 class TrackAdapter(private var tracks: List<Track>) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_toptrack, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.recycle_view_top_brani, parent, false)
         return TrackViewHolder(view)
     }
 
@@ -25,13 +25,14 @@ class TrackAdapter(private var tracks: List<Track>) : RecyclerView.Adapter<Track
     }
 
     inner class TrackViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val trackNameTextView: TextView = itemView.findViewById(R.id.trackNameTextView)
-        private val albumAndArtistsTextView: TextView = itemView.findViewById(R.id.albumAndArtistsTextView)
-//TODO INSERIRE VISUALIZZAZIONE DEI BRANI NELLA RECYCLER
+        private val BranoTopBrani: TextView = itemView.findViewById(R.id.BranoTopbrani)
+        private val ArtistaTopbrani: TextView = itemView.findViewById(R.id.ArtistaTopbrani)
+        private val ALbumTopbrani: TextView = itemView.findViewById(R.id.AlbumTopbrani)
+
         fun bind(track: Track) {
-            trackNameTextView.text = track.name
-            val artistNames = track.artists.joinToString(", ") { it.name }
-            albumAndArtistsTextView.text = "${track.album} - $artistNames"
+            BranoTopBrani.text = track.name
+            ArtistaTopbrani.text = track.artists.toString()
+            ALbumTopbrani.text= track.album.toString()
         }
     }
 

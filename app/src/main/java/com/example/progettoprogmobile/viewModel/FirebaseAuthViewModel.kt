@@ -98,20 +98,31 @@ class FirebaseAuthViewModel : ViewModel() {
 
     fun delete(context:Context) {
         Log.d("MyApp", "Before delete")
+        val user = FirebaseAuth.getInstance().currentUser
+        if (user != null) {
+            // L'utente è autenticato, quindi puoi procedere con l'eliminazione
         AuthUI.getInstance()
             .delete(context)
             .addOnCompleteListener { task ->
                 Log.d("MyApp", "Delete completed")
+                Log.d("MyApp","valore task $task")
                 if (task.isSuccessful) {
                     deleteResult.value = DeleteResult.SUCCESS
                     val intent = Intent(context, MainActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     context.startActivity(intent)
-                } else {
-                    deleteResult.value = DeleteResult.FAILURE
+                    Log.d("MyApp", "Eliminazione account avvenuta")
+                } else  {
+                // L'eliminazione dell'account è fallita
+                val exception = task.exception
+                if (exception != null) {
+                    // Gestisci l'errore
+                    Log.e("MyApp", "Eliminazione account fallita: ${exception.message}")
                 }
+            }
             }
         Log.d("MyApp", "After delete")
     }
+}
 
 }
