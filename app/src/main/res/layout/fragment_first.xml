@@ -61,3 +61,6 @@
         app:layout_constraintBottom_toTopOf="@id/startAuthButton" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+<!--COMMENTO-->
