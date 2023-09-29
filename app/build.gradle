@@ -4,6 +4,7 @@ plugins {
     id 'com.google.gms.google-services'
     id 'androidx.navigation.safeargs.kotlin'
     id 'kotlin-parcelize' //non so se ci serve
+    id 'kotlin-kapt'
 
 }
 
@@ -66,7 +67,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.fragment:fragment-ktx:1.6.1'
 
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.7.3' //per utilizzare la libreria di navigazione
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.7.3' //per utilizzare la libreria di navigation
     implementation 'androidx.navigation:navigation-ui-ktx:2.7.3' //per utilizzare la libreria di navigazione
     implementation 'com.google.firebase:firebase-auth-ktx:22.1.2'
     implementation 'com.google.firebase:firebase-auth:22.1.2'
@@ -74,5 +75,9 @@ dependencies {
     implementation 'com.google.firebase:firebase-firestore:24.8.1'
 
     implementation 'com.google.firebase:firebase-storage:20.2.1' //per l'inizializzazione dello storage di firebase
+    //noinspection GradleDependency
     implementation 'com.squareup.picasso:picasso:2.8' //Picasso per salvataggio immagine profilo
+
+    implementation 'com.github.bumptech.glide:glide:4.12.0'
+    kapt 'com.github.bumptech.glide:compiler:4.12.0'
 }

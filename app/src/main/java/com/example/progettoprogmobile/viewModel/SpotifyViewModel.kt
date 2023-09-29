@@ -45,8 +45,10 @@ class SpotifyViewModel : ViewModel(){
         repository.getTopTracks(token, "short_term",50) { response, error ->
             if (response != null) {
                 topTracks.postValue(response)
+                Log.d("SpotifyViewModel", "Tracce ottenute con successo: ${response.items}")
             } else if (error != null) {
                 this.error.postValue(error)
+                Log.e("SpotifyViewModel", "Errore nel recupero delle tracce da Spotify", error)
             }
         }
 

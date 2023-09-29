@@ -1,5 +1,6 @@
 package com.example.progettoprogmobile
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
@@ -50,6 +51,7 @@ class SecondActivity : AppCompatActivity() {
             }
             true
         }
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -80,6 +82,26 @@ class SecondActivity : AppCompatActivity() {
             else -> return super.onOptionsItemSelected(item)
         }
     }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        Log.d("PRIMO LOG ACTIVITY", "ONNEWINTENT is called with intent: $intent")
+        // Verifica se l'Intent contiene dati
+        if (intent != null && intent.data != null) {
+            Log.d("SECONDO LOG ACTIVITY", "Intent contain data:  $intent")
+            // Passa l'Intent ricevuto al tuo Fragment corrente
+            val currentFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
+            //Log.d("TERZO LOG ACTIVITY", "Intent contain data:  ${R.id.firstFragment}")
+            //Log.d("QUARTO LOG ACTIVITY", "Intent contain data:  $currentFragment")
+            if (currentFragment is FirstFragment) {
+                currentFragment.handleIntent(intent)
+
+            }
+        } else {
+            Log.d("SECONDO LOG ACTIVITY", "Intent does not contain data")
+        }
+    }
+
 }
 
 

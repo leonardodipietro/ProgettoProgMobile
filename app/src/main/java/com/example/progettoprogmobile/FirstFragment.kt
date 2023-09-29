@@ -15,6 +15,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.progettoprogmobile.adapter.TrackAdapter
 import com.example.progettoprogmobile.viewModel.FirebaseViewModel
 import com.example.progettoprogmobile.viewModel.SpotifyViewModel
+import com.example.progettoprogmobile.model.TopTracksResponse // Assicurati che il percorso sia corretto
+import com.example.progettoprogmobile.model.Track
 import com.google.firebase.auth.FirebaseAuth
 
 class FirstFragment : Fragment() {
@@ -25,7 +27,8 @@ class FirstFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?): View?     {
+        savedInstanceState: Bundle?
+    ): View? {
 
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         spotifyViewModel = ViewModelProvider(this)[SpotifyViewModel::class.java]
@@ -50,15 +53,17 @@ class FirstFragment : Fragment() {
         // Aggiorna l'adapter con i nuovi dati
         firebaseViewModel.topTracksfromdb.observe(viewLifecycleOwner) { tracks ->
             trackAdapter.submitList(tracks)
-            Log.d("LISTA RECYCLER VIEW","LISTA INSERITA CON SUCCESSO")
+            Log.d("LISTA RECYCLER VIEW", "LISTA INSERITA CON SUCCESSO")
+
         }
 
         return rootView
     }
 
     private fun startSpotifyAuthentication() {
-        val authUrl = "https://accounts.spotify.com/authorize?client_id=f81649b34ef74684b08943e7ce931d23&response_type=code&redirect_uri=myapp://callback&scope=user-read-private%20user-top-read"
-        val intent = Intent (Intent.ACTION_VIEW, Uri.parse(authUrl))
+        val authUrl =
+            "https://accounts.spotify.com/authorize?client_id=f81649b34ef74684b08943e7ce931d23&response_type=code&redirect_uri=myapp://callback&scope=user-read-private%20user-top-read"
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(authUrl))
         activity?.startActivity(intent)
     }
 
