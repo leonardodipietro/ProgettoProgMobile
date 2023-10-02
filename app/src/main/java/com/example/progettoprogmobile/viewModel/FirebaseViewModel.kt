@@ -1,25 +1,66 @@
 package com.example.progettoprogmobile.viewModel
 
+import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.database.*
 import com.example.progettoprogmobile.model.*
 import android.util.Log
+import androidx.lifecycle.AndroidViewModel
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import android.content.Context
 
-class FirebaseViewModel : ViewModel() {
+
+
+class FirebaseViewModel (application: Application): AndroidViewModel(application) {
 
     private val database: DatabaseReference = FirebaseDatabase.getInstance().reference
 
     private val user = FirebaseAuth.getInstance().currentUser
     private val userId = user?.uid
     val topTracksfromdb: MutableLiveData<List<Track>> = MutableLiveData()
-    init {
-        // Inizializza il database Firebase solo se userId non è nullo
-        userId?.let { saveUserIdToFirebase(it) }
-    }
 
-    private fun saveUserIdToFirebase(userId: String) {
+//    init {
+//        // Inizializza il database Firebase solo se userId non è nullo
+//        userId?.let { saveUserIdToFirebase(it) }
+//    }
+
+//    private fun isUserRegistered(context: Context): Boolean {
+//        val sharedPreferences =
+//            context.getSharedPreferences("RegistrationStatus", Context.MODE_PRIVATE)
+//        return sharedPreferences.getBoolean("isRegistered", false)
+//    }
+//
+//    fun checkUserIdInFirebase(context:Context, userId: String, onComplete: (Boolean) -> Unit) {
+//        // Verifica se l'utente è registrato
+//        if (isUserRegistered(context)) {
+//            val db = FirebaseFirestore.getInstance()
+//            val query = db.collection("users").whereEqualTo("userId", userId)
+//
+//            query.get()
+//                .addOnCompleteListener { task ->
+//                    if (task.isSuccessful) {
+//                        val querySnapshot = task.result
+//                        val userExists = !querySnapshot.isEmpty
+//                        onComplete(userExists)
+//                    } else {
+//                        // Gestisci l'errore qui se la query non è riuscita
+//                        Log.e(
+//                            "Firebase",
+//                            "Errore durante la query a Firebase: ${task.exception?.message}"
+//                        )
+//                        onComplete(false) // Indica che l'utente non esiste (per errore)
+//                    }
+//                }
+//        } else {
+//            // L'utente non è registrato, quindi salva le sue credenziali
+//            userId?.let { saveUserIdToFirebase(it) }
+//            onComplete(false) // Indica che l'utente non esiste ma le credenziali sono state salvate
+//        }
+//    }
+
+    fun saveUserIdToFirebase(userId: String) {
         val userRef = FirebaseDatabase.getInstance().reference.child("users").child(userId)
 
         val user = FirebaseAuth.getInstance().currentUser

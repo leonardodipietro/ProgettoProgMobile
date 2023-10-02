@@ -1,16 +1,14 @@
 <resources>
     <string name="app_name">See Your Music</string>
-    <string name="accedi_con_email">Accedi con email</string>
-    <string name="inizia_autenticazione_spotify">Inizia Autenticazione Spotify</string>
-    <string name="per_continuare_su_see_your_music">Per continuare su See Your Music</string>
+
+<!-- Stringhe activity main-->
     <string name="benvenuto_su_see_your_music">Benvenuto su See Your Music</string>
-    <string name="logOut">logOut</string>
-    <string name="signOut">signOut\n</string>
-    <string name="Elimina_account">Elimina Account</string>
-    <string name="logout">LogOut</string>
+    <string name="accedi">Accedi</string>/>
+
+    <string name="per_continuare_su_see_your_music">Per continuare su See Your Music</string>
     <string name="iscriviti_con_email">Iscriviti con Email</string>
     <string name="accedi_con_google">Accedi con Google</string>
-    <string name="accedi">Accedi</string>/>
+
     <!--    <string name="app_name">Firebase Auth</string>-->
 
     <string name="login">Login</string>
@@ -19,25 +17,56 @@
     <string name="register">Register</string>
     <string name="Click_to_login">Register</string>
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="brani">Brani</string>
-    <string name="Artisti">Artisti</string>
-    <string name="second_activity">SECOND ACTIVITY</string>
-    <string name="torna_al_fragment_1">Torna al Fragment 1</string>
+
+    <!-- Stringhe navigation bar-->
     <string name="home">Home</string>
     <string name="cerca">Cerca</string>
-    <string name="settings">Settings</string>
+    <string name="settings">Impostazioni</string>
     <string name="cerca_utenti">Cerca utenti</string>
     <string name="cerca2">Cerca</string>
+
+    <!-- Stringhe fragment first-->
+    <string name="brani">Brani</string>
+    <string name="Artisti">Artisti</string>
+    <string name="inizia_autenticazione_spotify">Inizia Autenticazione Spotify</string>
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="second_activity">SECOND ACTIVITY</string>
+    <string name="torna_al_fragment_1">Torna al Fragment 1</string>
+
+
+    <!-- Stringhe fragment third-->
+    <!-- Stringhe text e button Immagine profilo-->
+    <string name="userImage" />
+    <string name="editImageButton">Modifica l\'immagine del profilo</string>
+
+
+    <!-- Stringhe text e button Username-->
+    <string name="username">"Username: "</string>
+    <string name="editNameButton">Modifica l\'username</string>
     <string name="enter_your_name">Enter Your Name</string>
-    <string name="cancel">Cancel</string>
     <string name="save">Save</string>
-    <string name="editimagebutton" />
-    <string name="modifica" />
-    <string name="username" />
-    <string name="immagineprofilo" />
-    <string name="editImageButton" />
-    <string name="edit_name_button_description">Modifica il nome</string>
-    <string name="edit_image_button_description">Modifica l\'immagine del profilo</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- Stringhe text e button Lingua-->
+    <string name="language">"Lingua: "</string>
+    <string name="italian">Italiano</string>
+    <string name="editLanguageButton">editLanguageButton</string>
+
+
+    <!-- Stringhe text e button Lingua-->
+    <string name="notification">Notification</string>
+
+
+
+    <string name="newfollowers">"Nuovi seguaci: "</string>
+    <string name="newreviews">"Nuove recensioni seguiti: "</string>
+    <string name="privacy">Privacy</string>
+    <string name="account">"Account: "</string>
+    <string name="review">"Recensioni: "</string>
+
+    <string name="signOut">LogOut</string>
+    <string name="delete">Elimina Account</string>
+    />
 
 </resources>

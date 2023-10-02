@@ -36,7 +36,6 @@
             <!-- Intent filter per gestire l'URL di reindirizzamento -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
-                <action android:name="com.example.progettoprogmobile.ACTION_SPOTIFY_REDIRECT" />
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
@@ -52,13 +51,14 @@
             android:launchMode="singleTop">
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
+                <action android:name="com.example.progettoprogmobile.ACTION_SPOTIFY_REDIRECT" />
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="callback"
-                    android:scheme="myapp" />
+                    android:scheme="myapp"
+                    android:host="callback" />
             </intent-filter>
         </activity>
         <provider

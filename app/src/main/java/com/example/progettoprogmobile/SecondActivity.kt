@@ -7,50 +7,86 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.forEach
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
 import androidx.navigation.Navigation
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import androidx.lifecycle.ViewModelProvider
+import com.example.progettoprogmobile.viewModel.FirebaseViewModel
+import com.google.firebase.auth.FirebaseAuth
 
 class SecondActivity : AppCompatActivity() {
 
+    private val fragmentManager: FragmentManager = supportFragmentManager
+    private lateinit var currentFragment: Fragment
+    private lateinit var bottomNavigationView: BottomNavigationView
+    //private lateinit var firebaseViewModel: FirebaseViewModel // Dichiarazione del tuo ViewModel
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_second)
 
+        // Inizializza il tuo ViewModel
+        //firebaseViewModel = ViewModelProvider(this).get(FirebaseViewModel::class.java)
+
+        // Verifica se l'activity è stata avviata per la prima volta (savedInstanceState == null)
+        // e se è così, sostituisci il contenuto con il tuo fragment iniziale (FirstFragment)
+        if (savedInstanceState == null) {
+            val fragment = FirstFragment()
+            fragmentManager.beginTransaction()
+                .replace(R.id.nav_host_fragment, fragment, "firstFragment")
+                .commit()
+            currentFragment = fragment
+        }
+
         // Trova il componente BottomNavigationView nel layout XML e lo assegna ad una variabile
-        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+        bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+
         // Imposta un listener per la selezione degli elementi nel BottomNavigationView
         bottomNavigationView.setOnItemSelectedListener { item ->
+            val transaction: FragmentTransaction = fragmentManager.beginTransaction()
 
-            // Imposta un listener per la selezione degli elementi nel BottomNavigationView
-            val navController = Navigation.findNavController(this, R.id.nav_host_fragment)
+            // Rimuovi il fragment corrente
+            transaction.remove(currentFragment)
 
-            // Gestisce la selezione in base all'ID dell'elemento selezionato
+
+            // Gestisci la selezione in base all'ID dell'elemento selezionato
             when (item.itemId) {
                 R.id.home -> {
-                    navController.navigate(R.id.firstFragment)// Naviga al primo fragment
+                    // Crea un nuovo fragment e sostituiscilo
+                    val newFragment = FirstFragment()
+                    transaction.replace(R.id.nav_host_fragment, newFragment, "firstFragment")
+                    currentFragment = newFragment
                 }
-
                 R.id.cerca -> {
-                    navController.navigate(R.id.secondFragment) // Naviga al secondo fragment
+                    val newFragment = SecondFragment()
+                    transaction.replace(R.id.nav_host_fragment, newFragment, "secondFragment")
+                    currentFragment = newFragment
                 }
-
                 R.id.settings -> {
-                    navController.navigate(R.id.thirdFragment) // Naviga al terzo fragment
+                    val newFragment = ThirdFragment()
+                    transaction.replace(R.id.nav_host_fragment, newFragment, "thirdFragment")
+                    currentFragment = newFragment
                 }
             }
-
-            // Aggiungo un listener per i cambiamenti di destinazione
-            navController.addOnDestinationChangedListener { _, destination, _ ->
-
-                Log.d("Debug", "Destination ID: ${destination.id}")
-
-                // Aggiorna la selezione dell'icona nella barra di navigazione in base alla destinazione
-                bottomNavigationView.menu.forEach { menuItem ->
-                    menuItem.isChecked = menuItem.itemId == destination.id
-                }
-            }
-            true
+            transaction.commit()
+            true // Indica che la selezione è stata gestita con successo
         }
+
+
+        // Verifica se l'utente è registrato e salva le credenziali se necessario
+//        val userId = FirebaseAuth.getInstance().currentUser?.uid
+//        if (userId != null) {
+//            firebaseViewModel.checkUserIdInFirebase(this, userId) { isUserRegistered ->
+//                if (!isUserRegistered) {
+//                    // L'utente non è registrato, quindi salva le sue credenziali
+//                    firebaseViewModel.saveUserIdToFirebase(userId)
+//                }
+//            }
+//        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -59,27 +95,35 @@ class SecondActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val transaction: FragmentTransaction = fragmentManager.beginTransaction()
+
+        // Rimuovi il fragment corrente
+        transaction.remove(currentFragment)
+
         when (item.itemId) {
-            // Naviga al primo fragment quando l'opzione del menu è selezionata
             R.id.menu_first_fragment -> {
-                val navController = Navigation.findNavController(this, R.id.nav_host_fragment)
-                navController.navigate(R.id.firstFragment)
-                return true
+                val newFragment = FirstFragment()
+                transaction.replace(R.id.nav_host_fragment, newFragment, "firstFragment")
+                currentFragment = newFragment
+                bottomNavigationView.selectedItemId = R.id.home
             }
             R.id.menu_second_fragment -> {
-                // Naviga al secondo fragment quando l'opzione del menu è selezionata
-                val navController = Navigation.findNavController(this, R.id.nav_host_fragment)
-                navController.navigate(R.id.secondFragment)
-                return true
+                val newFragment = SecondFragment()
+                transaction.replace(R.id.nav_host_fragment, newFragment, "secondFragment")
+                currentFragment = newFragment
+                bottomNavigationView.selectedItemId = R.id.cerca
+
             }
             R.id.menu_third_fragment -> {
-                // Naviga al terzo fragment quando l'opzione del menu è selezionata
-                val navController = Navigation.findNavController(this, R.id.nav_host_fragment)
-                navController.navigate(R.id.thirdFragment)
-                return true
+                val newFragment = ThirdFragment()
+                transaction.replace(R.id.nav_host_fragment, newFragment, "thirdFragment")
+                currentFragment = newFragment
+                bottomNavigationView.selectedItemId = R.id.settings
             }
             else -> return super.onOptionsItemSelected(item)
         }
+        transaction.commit()
+        return true
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -87,10 +131,16 @@ class SecondActivity : AppCompatActivity() {
         Log.d("PRIMO LOG ACTIVITY", "ONNEWINTENTCHIAMATA")
         // Verifica se l'Intent contiene dati
         if (intent != null && intent.data != null) {
-            Log.d("SECONDO LOG ACTIVITY", "Intent contain data: $intent")
+            Log.d("SECONDO LOG ACTIVITY", "Intent contain data:  $intent")
             // Passa l'Intent ricevuto al tuo Fragment corrente
-            val currentFragment = supportFragmentManager.findFragmentByTag("firstFragment") as? FirstFragment
-            currentFragment?.handleIntent(intent)
+            val currentFragment = fragmentManager.findFragmentByTag("firstFragment")
+            Log.d("TERZO LOG ACTIVITY", "Intent contain data:  ${R.id.firstFragment}")
+            Log.d("QUARTO LOG ACTIVITY", "Intent contain data:  $currentFragment")
+            if (currentFragment is FirstFragment) {
+                currentFragment.handleIntent(intent)
+            } else {
+                Log.d("QUINTO LOG ACTIVITY", "NIENTE")
+            }
         } else {
             Log.d("SECONDO LOG ACTIVITY", "Intent does not contain data")
         }

@@ -74,7 +74,7 @@ class ThirdFragment : Fragment() {
         // Carica l'URL dell'immagine di profilo dalle SharedPreferences
         val sharedPreferences =
             requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
-        val imageUrl = sharedPreferences.getString("profileImageUrl", null)
+        val imageUrl = sharedPreferences.getString("immagine profilo", null)
 
 
         val database: FirebaseDatabase = FirebaseDatabase.getInstance()
@@ -313,7 +313,7 @@ class ThirdFragment : Fragment() {
         val sharedPreferences =
             requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
-        editor.putString("profileImageUrl", imageUrl)
+        editor.putString("immagine profilo", imageUrl)
         editor.apply()
     }
 
@@ -330,7 +330,7 @@ class ThirdFragment : Fragment() {
                         // Salva l'URL dell'immagine nel database Firebase sotto il nodo dell'utente corrente
                         val userRef: DatabaseReference =
                             FirebaseDatabase.getInstance().reference.child("users").child(userId)
-                        userRef.child("profileImageUrl").setValue(imageUrl)
+                        userRef.child("immagine profilo").setValue(imageUrl)
                             .addOnSuccessListener {
                                 // URL dell'immagine di profilo salvato con successo nel database
                                 saveProfileImageURL(imageUrl) // Salva l'URL nell SharedPreferences
