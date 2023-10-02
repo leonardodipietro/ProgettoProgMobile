@@ -21,44 +21,9 @@ class FirebaseViewModel (application: Application): AndroidViewModel(application
     private val userId = user?.uid
     val topTracksfromdb: MutableLiveData<List<Track>> = MutableLiveData()
 
-//    init {
-//        // Inizializza il database Firebase solo se userId non è nullo
-//        userId?.let { saveUserIdToFirebase(it) }
-//    }
+    // Dichiarazione della variabile per il controllo dello stato di registrazione dell'utente
+    private var isUserRegistered = false
 
-//    private fun isUserRegistered(context: Context): Boolean {
-//        val sharedPreferences =
-//            context.getSharedPreferences("RegistrationStatus", Context.MODE_PRIVATE)
-//        return sharedPreferences.getBoolean("isRegistered", false)
-//    }
-//
-//    fun checkUserIdInFirebase(context:Context, userId: String, onComplete: (Boolean) -> Unit) {
-//        // Verifica se l'utente è registrato
-//        if (isUserRegistered(context)) {
-//            val db = FirebaseFirestore.getInstance()
-//            val query = db.collection("users").whereEqualTo("userId", userId)
-//
-//            query.get()
-//                .addOnCompleteListener { task ->
-//                    if (task.isSuccessful) {
-//                        val querySnapshot = task.result
-//                        val userExists = !querySnapshot.isEmpty
-//                        onComplete(userExists)
-//                    } else {
-//                        // Gestisci l'errore qui se la query non è riuscita
-//                        Log.e(
-//                            "Firebase",
-//                            "Errore durante la query a Firebase: ${task.exception?.message}"
-//                        )
-//                        onComplete(false) // Indica che l'utente non esiste (per errore)
-//                    }
-//                }
-//        } else {
-//            // L'utente non è registrato, quindi salva le sue credenziali
-//            userId?.let { saveUserIdToFirebase(it) }
-//            onComplete(false) // Indica che l'utente non esiste ma le credenziali sono state salvate
-//        }
-//    }
 
     fun saveUserIdToFirebase(userId: String) {
         val userRef = FirebaseDatabase.getInstance().reference.child("users").child(userId)
@@ -69,18 +34,41 @@ class FirebaseViewModel (application: Application): AndroidViewModel(application
         user?.displayName?.let { userData["name"] = it }
         user?.email?.let { userData["email"] = it }
 
+        // Verifica se l'utente è già registrato prima di salvare le credenziali
+        if (!isUserRegistered) {
+            // Salva l'ID dell'utente nel database Firebase
+            userRef.setValue(userData)
+                .addOnSuccessListener {
+                    Log.d("Firebase", "ID utente salvato su Firebase: $userData")
 
-        // Salva l'ID dell'utente nel database Firebase
-        userRef.setValue(userData)
-            .addOnSuccessListener {
-                Log.d("Firebase", "ID utente salvato su Firebase: $userData")
+                    // Imposta la variabile isUserRegistered su true quando l'utente si registra per la prima volta
+                    isUserRegistered = true
+                }
+                .addOnFailureListener {
+                    Log.e(
+                        "Firebase",
+                        "Errore nel salvataggio dell'ID utente su Firebase: ${it.message}"
+                    )
+                }
+        }
+    }
+
+    fun checkUserIdInFirebase(context: Context, userId: String, onComplete: (Boolean) -> Unit) {
+        val userRef = FirebaseDatabase.getInstance().reference.child("users").child(userId)
+
+        // Controlla se l'utente è già registrato nel tuo database Firebase
+        userRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val isRegistered = snapshot.exists()
+                onComplete(isRegistered)
             }
-            .addOnFailureListener {
-                Log.e(
-                    "Firebase",
-                    "Errore nel salvataggio dell'ID utente su Firebase: ${it.message}"
-                )
+
+            override fun onCancelled(error: DatabaseError) {
+                // Gestisci l'errore in caso di problemi nella lettura dal database
+                Log.e("FirebaseError", "Errore durante la lettura dal database Firebase: ${error.message}")
+                onComplete(false) // Indica che non è stato possibile verificare lo stato di registrazione
             }
+        })
     }
 
     fun saveTracksToFirebase(userId: String, topTrack: List<Track>) {

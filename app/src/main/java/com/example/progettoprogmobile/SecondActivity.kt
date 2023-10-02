@@ -21,7 +21,7 @@ class SecondActivity : AppCompatActivity() {
     private val fragmentManager: FragmentManager = supportFragmentManager
     private lateinit var currentFragment: Fragment
     private lateinit var bottomNavigationView: BottomNavigationView
-    //private lateinit var firebaseViewModel: FirebaseViewModel // Dichiarazione del tuo ViewModel
+    private lateinit var firebaseViewModel: FirebaseViewModel // Dichiarazione del tuo ViewModel
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,7 +30,7 @@ class SecondActivity : AppCompatActivity() {
         setContentView(R.layout.activity_second)
 
         // Inizializza il tuo ViewModel
-        //firebaseViewModel = ViewModelProvider(this).get(FirebaseViewModel::class.java)
+        firebaseViewModel = ViewModelProvider(this).get(FirebaseViewModel::class.java)
 
         // Verifica se l'activity è stata avviata per la prima volta (savedInstanceState == null)
         // e se è così, sostituisci il contenuto con il tuo fragment iniziale (FirstFragment)
@@ -76,17 +76,20 @@ class SecondActivity : AppCompatActivity() {
             true // Indica che la selezione è stata gestita con successo
         }
 
-
         // Verifica se l'utente è registrato e salva le credenziali se necessario
-//        val userId = FirebaseAuth.getInstance().currentUser?.uid
-//        if (userId != null) {
-//            firebaseViewModel.checkUserIdInFirebase(this, userId) { isUserRegistered ->
-//                if (!isUserRegistered) {
-//                    // L'utente non è registrato, quindi salva le sue credenziali
-//                    firebaseViewModel.saveUserIdToFirebase(userId)
-//                }
-//            }
-//        }
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        if (userId != null) {
+            // Utilizza il FirebaseViewModel per verificare lo stato di registrazione
+            firebaseViewModel.checkUserIdInFirebase(this, userId) { isRegistered ->
+                if (!isRegistered) {
+                    // L'utente non è registrato, quindi salva le sue credenziali
+                    firebaseViewModel.saveUserIdToFirebase(userId)
+
+                    // Aggiorna la UI o esegui altre azioni necessarie
+                }
+            }
+        }
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
