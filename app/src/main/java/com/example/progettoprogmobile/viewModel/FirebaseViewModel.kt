@@ -10,7 +10,11 @@ import androidx.lifecycle.AndroidViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import android.content.Context
-
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 
 
 class FirebaseViewModel (application: Application): AndroidViewModel(application) {
@@ -98,8 +102,94 @@ class FirebaseViewModel (application: Application): AndroidViewModel(application
             }
         })
     }
+    fun saveTracksToMainNode(topTrack: List<Track>) {
+        val tracksRef = FirebaseDatabase.getInstance().reference.child("tracks")
 
-    fun saveTracksToFirebase(userId: String, topTrack: List<Track>) {
+        topTrack.forEachIndexed { _, track ->
+            val imageUrl = track.album.images.getOrNull(0)?.url ?: ""
+            val trackData = mapOf(
+                "trackName" to track.name,
+                "album" to track.album.name,
+                "artists" to track.artisttrack,
+                "id" to track.id,  // Questo è l'ID fornito da Spotify
+                "genres" to track.genres,
+                "release_date" to track.releaseDate,
+                "duration_ms" to track.durationMs,
+                "image_url" to imageUrl
+            )
+
+            // Usiamo l'ID della traccia fornito da Spotify come chiave
+            tracksRef.child(track.id).setValue(trackData)
+                .addOnSuccessListener {
+                    Log.d("Firebase", "Traccia ${track.id} salvata su Firebase nel nodo principale.")
+                }
+                .addOnFailureListener {
+                    Log.e("Firebase", "Errore nel salvataggio della traccia ${track.id} su Firebase: ${it.message}")
+                }
+        }
+    }
+
+    fun saveUserTopTracks(userId: String, topTrack: List<Track>) {
+        val userTopTracksRef = FirebaseDatabase.getInstance().reference.child("users").child(userId).child("topTracks")
+
+        // Creiamo una lista solo degli ID delle tracce nell'ordine in cui sono state passate
+        val trackIds = topTrack.map { it.id }
+
+        userTopTracksRef.setValue(trackIds)
+            .addOnSuccessListener {
+                Log.d("Firebase", "IDs delle tracce salvate per l'utente $userId.")
+            }
+            .addOnFailureListener {
+                Log.e("Firebase", "Errore nel salvataggio degli IDs delle tracce per l'utente $userId: ${it.message}")
+            }
+    }
+
+}
+ /*   fun saveTracksToMainNode(topTrack: List<Track>) {
+        val tracksRef = FirebaseDatabase.getInstance().reference.child("tracks")
+        topTrack.forEachIndexed { _, track ->
+            val imageUrl = track.album.images.getOrNull(0)?.url ?: ""
+            val trackData = mapOf(
+                "trackName" to track.name,
+                "album" to track.album.name,
+                "artists" to track.artisttrack,
+                "id" to track.id,
+                "genres" to track.genres,
+                "release_date" to track.releaseDate,
+                "duration_ms" to track.durationMs,
+                "image_url" to imageUrl
+            )
+            val trackKey = tracksRef.push().key
+            if (trackKey != null) {
+                val update = mapOf<String, Any>("$trackKey" to trackData)
+                tracksRef.updateChildren(update)
+                    .addOnSuccessListener {
+                        Log.d("Firebase", "Traccia salvata su Firebase nel nodo principale.")
+                    }
+                    .addOnFailureListener {
+                        Log.e("Firebase", "Errore nel salvataggio della traccia su Firebase: ${it.message}")
+                    }
+            } else {
+                Log.e("Firebase", "Errore nel generare una chiave univoca per la traccia.")
+            }
+        }
+    }
+
+
+    fun saveTrackIdsToUser(userId: String, topTrack: List<Track>) {
+        val userRef = FirebaseDatabase.getInstance().reference.child("users").child(userId)
+        val trackIds = topTrack.map { it.id }
+
+        userRef.child("userTracks").setValue(trackIds)
+            .addOnSuccessListener {
+                Log.d("Firebase", "IDs delle tracce salvate su Firebase per l'utente: $userId")
+            }
+            .addOnFailureListener {
+                Log.e("Firebase", "Errore nel salvataggio degli IDs delle tracce su Firebase per l'utente $userId: ${it.message}")
+            }
+    }
+*/
+    /*fun saveTracksToFirebase(userId: String, topTrack: List<Track>) {
         val userRef = FirebaseDatabase.getInstance().reference.child("users").child(userId)
         topTrack.forEachIndexed { _, track ->
             val imageUrl = track.album.images.getOrNull(0)?.url ?: ""
@@ -127,8 +217,8 @@ class FirebaseViewModel (application: Application): AndroidViewModel(application
                 Log.e("Firebase", "Errore nel generare una chiave univoca per la traccia.")
             }
         }
-    }
-    fun fetchTopTracksFromFirebase() {
+    }*/
+  /*  fun fetchTopTracksFromFirebase() {
         Log.d("FirebaseData", "Inizio recupero dati da Firebase")
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         if (userId != null) {
@@ -198,7 +288,7 @@ class FirebaseViewModel (application: Application): AndroidViewModel(application
                 Log.e("SaveArtistsDebug", "Errore nel generare una chiave univoca per l'artista ${artist.name}.")
             }
         }
-    }
+    }*/
 
    /* fun getSpecificArtistInfoByName(name: String): Artist? {
         // Cerca la traccia con l'ID specificato
@@ -222,7 +312,7 @@ class FirebaseViewModel (application: Application): AndroidViewModel(application
         return null // Restituisci null se l'ID non è valido
     }
 */
-    fun fetchTopArtistsFromFirebase() {
+   /* fun fetchTopArtistsFromFirebase() {
         Log.d("FirebaseData", "Inizio recupero dati artisti da Firebase")
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         if (userId != null) {
@@ -258,7 +348,7 @@ class FirebaseViewModel (application: Application): AndroidViewModel(application
         }
     }
 
-}
+}*/
 
    /* fun deleteUserDataFromFirebase(userId: String) {
        val userRef = FirebaseDatabase.getInstance().reference.child("users").child(userId)

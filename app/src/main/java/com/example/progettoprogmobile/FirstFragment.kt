@@ -66,7 +66,7 @@ class FirstFragment : Fragment() {
 
             artistRecyclerView.visibility = View.GONE // Nasconde la RecyclerView degli artisti
             recyclerView.visibility = View.VISIBLE // Mostra la RecyclerView delle tracce
-            firebaseViewModel.fetchTopTracksFromFirebase()
+        //    firebaseViewModel.fetchTopTracksFromFirebase()
 
         }
 
@@ -74,7 +74,7 @@ class FirstFragment : Fragment() {
 
             recyclerView.visibility = View.GONE // Nasconde la RecyclerView delle tracce
             artistRecyclerView.visibility = View.VISIBLE // Mostra la RecyclerView degli artisti
-            firebaseViewModel.fetchTopArtistsFromFirebase()
+           // firebaseViewModel.fetchTopArtistsFromFirebase()
         }
 
 
@@ -142,7 +142,9 @@ class FirstFragment : Fragment() {
                 Log.d("TOP ITEMS", "TOP ITEMS $tracksResponse")
                 if (tracksResponse != null && userId != null) {
                     if (tracksResponse.items.isNotEmpty()) {
-                        firebaseViewModel.saveTracksToFirebase(userId, tracksResponse.items)
+                        firebaseViewModel.saveTracksToMainNode( tracksResponse.items)
+                        firebaseViewModel.saveUserTopTracks(userId,tracksResponse.items)
+                       // firebaseViewModel.saveTrackIdsToUser(userId,tracksResponse.items)
                         //firebaseViewModel.fetchTopTracksFromFirebase()
                     }
                 }
@@ -164,7 +166,7 @@ class FirstFragment : Fragment() {
                 if (artistsResponse != null && userId != null) {
                     if (artistsResponse.items.isNotEmpty()) {
                         Log.d("SaveArtistsDebug", "saveArtistsToFirebase sta per essere chiamato da [NomeDelMetodoODellaFunzione]")
-                        firebaseViewModel.saveArtistsToFirebase(userId, artistsResponse.items)
+                     //   firebaseViewModel.saveArtistsToFirebase(userId, artistsResponse.items)
                         //firebaseViewModel.fetchTopArtistsFromFirebase()
                         // firebaseViewModel.getSpecificTrackInfoById("20")*/
                     }
