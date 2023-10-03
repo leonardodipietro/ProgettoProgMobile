@@ -166,7 +166,11 @@ class FirstFragment : Fragment() {
                 if (artistsResponse != null && userId != null) {
                     if (artistsResponse.items.isNotEmpty()) {
                         Log.d("SaveArtistsDebug", "saveArtistsToFirebase sta per essere chiamato da [NomeDelMetodoODellaFunzione]")
-                     //   firebaseViewModel.saveArtistsToFirebase(userId, artistsResponse.items)
+                     firebaseViewModel.saveArtistsToMainNode(artistsResponse.items)
+                        firebaseViewModel.saveUserTopArtists(userId,artistsResponse.items)
+
+
+                    //   firebaseViewModel.saveArtistsToFirebase(userId, artistsResponse.items)
                         //firebaseViewModel.fetchTopArtistsFromFirebase()
                         // firebaseViewModel.getSpecificTrackInfoById("20")*/
                     }

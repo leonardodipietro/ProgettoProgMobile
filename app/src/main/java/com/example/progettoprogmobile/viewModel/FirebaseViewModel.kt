@@ -128,6 +128,44 @@ class FirebaseViewModel (application: Application): AndroidViewModel(application
                 }
         }
     }
+    fun saveArtistsToMainNode(topArtists: List<Artist>) {
+        val artistsRef = FirebaseDatabase.getInstance().reference.child("artists")
+
+        topArtists.forEach { artist ->
+            val imageUrl = artist.images.getOrNull(0)?.url ?: ""
+            val artistData = mapOf(
+                "name" to artist.name,
+                "genres" to artist.genres,
+                "id" to artist.id,  // Questo è l'ID fornito da Spotify
+                "followers_total" to artist.followers.total,
+                "image_url" to imageUrl
+            )
+
+            // Usiamo l'ID dell'artista fornito da Spotify come chiave
+            artistsRef.child(artist.id).setValue(artistData)
+                .addOnSuccessListener {
+                    Log.d("Firebase", "Artista ${artist.id} salvato su Firebase nel nodo principale.")
+                }
+                .addOnFailureListener {
+                    Log.e("Firebase", "Errore nel salvataggio dell'artista ${artist.id} su Firebase: ${it.message}")
+                }
+        }
+    }
+
+    fun saveUserTopArtists(userId: String, topArtists: List<Artist>) {
+        val userTopArtistsRef = FirebaseDatabase.getInstance().reference.child("users").child(userId).child("topArtists")
+
+        // Creiamo una lista solo degli ID degli artisti nell'ordine in cui sono stati passati
+        val artistIds = topArtists.map { it.id }
+
+        userTopArtistsRef.setValue(artistIds)
+            .addOnSuccessListener {
+                Log.d("Firebase", "IDs degli artisti salvati per l'utente $userId.")
+            }
+            .addOnFailureListener {
+                Log.e("Firebase", "Errore nel salvataggio degli IDs degli artisti per l'utente $userId: ${it.message}")
+            }
+    }
 
     fun saveUserTopTracks(userId: String, topTrack: List<Track>) {
         val userTopTracksRef = FirebaseDatabase.getInstance().reference.child("users").child(userId).child("topTracks")
