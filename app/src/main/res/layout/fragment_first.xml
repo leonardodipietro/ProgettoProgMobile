@@ -7,57 +7,74 @@
     android:background="@color/gray"
     tools:context=".FirstFragment" >
 
-    <Button
-        android:id="@+id/btnBrani"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/brani"
-        android:textColor="@color/white"
-        android:layout_marginEnd="8dp"
-        android:background="@drawable/button"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5" />
-
-    <Space
-        android:id="@+id/spacer"
-        android:layout_width="16dp"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/btnBrani"
-        app:layout_constraintEnd_toStartOf="@+id/btnArtisti" />
-
-    <Button
-        android:id="@+id/btnArtisti"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/button"
-        android:text="@string/Artisti"
-        android:textColor="@color/white"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/btnBrani"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Button
-        android:id="@+id/startAuthButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:backgroundTint="@color/verde_spotify"
-        android:text="@string/inizia_autenticazione_spotify"
-        android:textColor="@color/black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.496"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.647" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewtopbrani"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/startAuthButton" />
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="trackgen"
+            android:textSize="15dp" />
+
+        <Button
+            android:id="@+id/startAuthButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/verde_spotify"
+            android:text="inizia_autenticazione_spotify"
+            android:textColor="@color/black"
+            android:layout_marginTop="50dp"/>
+
+        <Button
+            android:id="@+id/gettoptrack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/verde_spotify"
+            android:text="top track"
+            android:textColor="@color/black"
+            android:layout_below="@id/startAuthButton"
+            />
+
+        <Button
+            android:id="@+id/gettopartist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/verde_spotify"
+            android:text="top artists"
+            android:textColor="@color/black"
+            android:layout_toRightOf="@id/gettoptrack"
+            android:layout_below="@id/startAuthButton"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_marginTop="10dp"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/iniziolistabrani"
+            android:layout_below="@+id/startAuthButton"
+            android:text="Lista"
+            android:textSize="40sp"
+            android:textColor="@color/white"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/iniziolistabrani"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="90dp"
+            android:id="@+id/recyclerViewtopbrani">
+
+        </androidx.recyclerview.widget.RecyclerView>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewTopArtists"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="20dp"
+            android:layout_below="@+id/iniziolistabrani"
+            android:layout_marginBottom="90dp"
+            android:visibility="gone"/>
+    </RelativeLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>

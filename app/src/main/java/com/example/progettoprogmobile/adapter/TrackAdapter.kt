@@ -1,12 +1,16 @@
 package com.example.progettoprogmobile.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.progettoprogmobile.model.Track
 import com.example.progettoprogmobile.R
+
 
 class TrackAdapter(private var tracks: List<Track>) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
 
@@ -18,6 +22,7 @@ class TrackAdapter(private var tracks: List<Track>) : RecyclerView.Adapter<Track
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
         val track = tracks[position]
         holder.bind(track)
+
     }
 
     override fun getItemCount(): Int {
@@ -28,11 +33,18 @@ class TrackAdapter(private var tracks: List<Track>) : RecyclerView.Adapter<Track
         private val BranoTopBrani: TextView = itemView.findViewById(R.id.BranoTopbrani)
         private val ArtistaTopbrani: TextView = itemView.findViewById(R.id.ArtistaTopbrani)
         private val ALbumTopbrani: TextView = itemView.findViewById(R.id.AlbumTopbrani)
-
+        private val albumImageView: ImageView = itemView.findViewById(R.id.imageviewtopbrani)
         fun bind(track: Track) {
             BranoTopBrani.text = track.name
-            ArtistaTopbrani.text = track.artists.toString()
-            ALbumTopbrani.text= track.album.toString()
+            ArtistaTopbrani.text = track.artisttrack.joinToString{it.name}
+            ALbumTopbrani.text= track.album.name
+            Log.d("TrackAdapter", "Album: ${track.album.name}, Images: ${track.album.images}")
+            if (track.album.images.isNotEmpty()) {
+                Log.d("TrackAdapter", "Album images: ${track.album.images}")
+                Glide.with(itemView)
+                    .load(track.album.images[0].url)
+                    .into(albumImageView)
+            }
         }
     }
 

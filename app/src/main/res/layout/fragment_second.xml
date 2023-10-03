@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -7,12 +7,10 @@
     android:orientation="horizontal"
     android:padding="16dp">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        tools:ignore="MissingConstraints">
 
-        <EditText
+
+
+      <!--  <EditText
             android:id="@+id/editTextSearch"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -31,7 +29,19 @@
             android:background="@drawable/buttonstyle"
             android:text="@string/cerca2"
             tools:ignore="TouchTargetSizeCheck" />
+    -->
+    <androidx.appcompat.widget.SearchView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/searchviewuser"/>
 
-        </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="70dp"
+        android:id="@+id/recyclerViewsearchuser">
+
+    </androidx.recyclerview.widget.RecyclerView>
+</RelativeLayout>
+

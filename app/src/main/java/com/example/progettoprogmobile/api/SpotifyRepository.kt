@@ -1,6 +1,4 @@
 package com.example.progettoprogmobile.api
-
-
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.Call
@@ -115,7 +113,7 @@ class SpotifyRepository {
             @Header("Authorization") authToken: String,
             @Query("time_range") timeRange:String,
             @Query("limit")limit:Int
-            ): Call<TopTracksResponse>
+        ): Call<TopTracksResponse>
     }
 
     interface SpotifyApiArtistService {
