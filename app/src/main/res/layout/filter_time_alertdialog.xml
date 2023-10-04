@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    >
+
+
+    <Button
+        android:id="@+id/seelast4weeks"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/white"
+        android:text="ultimo mese"
+        android:textColor="@color/black"/>
+
+    <Button
+        android:id="@+id/seelast6month"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/white"
+        android:text="ultimi 6 mesi"
+        android:textColor="@color/black"/>
+
+    <Button
+        android:id="@+id/seeAlltime"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/white"
+        android:textColor="@color/black"
+        android:text="sempre" />
+
+</LinearLayout>

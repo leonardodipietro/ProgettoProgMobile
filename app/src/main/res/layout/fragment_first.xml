@@ -24,7 +24,18 @@
             android:layout_below="@id/startAuthButton"
             android:layout_centerHorizontal="true"
             android:id="@+id/sceglicosavedere">
-
+            <Button
+                android:id="@+id/apriilmenudifiltraggio"
+                android:layout_width="40dp"
+                android:layout_height="50dp"
+                android:background="@drawable/time"
+                android:layout_centerInParent="true"
+                android:backgroundTint="@color/verde_spotify"
+               />
+            <View
+                android:layout_width="10dp"
+                android:layout_height="match_parent"
+                android:background="#000000"/>
             <Button
             android:id="@+id/gettoptrack"
             android:layout_width="wrap_content"

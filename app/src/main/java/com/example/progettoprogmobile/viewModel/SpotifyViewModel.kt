@@ -18,6 +18,12 @@ class SpotifyViewModel : ViewModel(){
     val spotifyTokenResponse = MutableLiveData<SpotifyTokenResponse?>()
     val error = MutableLiveData<Throwable?>()
     val topTracks = MutableLiveData<TopTracksResponse?>()
+    val shortTermTracks = MutableLiveData<TopTracksResponse>()
+    val mediumTermTracks = MutableLiveData<TopTracksResponse>()
+    val longTermTracks = MutableLiveData<TopTracksResponse>()
+    val shortTermArtists=MutableLiveData<TopArtistsResponse>()
+    val mediumTermArtists=MutableLiveData<TopArtistsResponse>()
+    val longTermArtists=MutableLiveData<TopArtistsResponse>()
     val topArtists= MutableLiveData<TopArtistsResponse>()
     private var database: DatabaseReference = FirebaseDatabase.getInstance().reference.child("tracks")
 
@@ -77,9 +83,14 @@ class SpotifyViewModel : ViewModel(){
          Log.d("SpotifyRepo", "Nessun ID di traccia trovato all'indice $index.")
          return null // Restituisci null se l'indice è fuori dai limiti
      }*/
-    fun fetchTopTracks(token: String) {
-        repository.getTopTracks(token, "short_term", 50) { response, error ->
+    fun fetchTopTracks(token: String, timeRange: String = "short_term") {
+        repository.getTopTracks(token, timeRange, 50) { response, error ->
             if (response != null) {
+                when (timeRange) {
+                    "short_term" -> shortTermTracks.postValue(response)
+                    "medium_term" -> mediumTermTracks.postValue(response)
+                    "long_term" -> longTermTracks.postValue(response)
+                }
                 Log.d("FetchTopTracks", "Risposta non null ricevuta: ${response.items.size} tracce")
                 topTracks.postValue(response)
                 //  extractTracks(response)
@@ -90,9 +101,14 @@ class SpotifyViewModel : ViewModel(){
             }
         }
     }
-    fun fetchTopArtists(token: String) {
-        repository.getTopArtists(token, "short_term",50) { response, error ->
+    fun fetchTopArtists(token: String,timeRange: String="short_term") {
+        repository.getTopArtists(token, timeRange,50) { response, error ->
             if (response != null) {
+                when (timeRange) {
+                    "short_term" -> shortTermArtists.postValue(response)
+                    "medium_term" -> mediumTermArtists.postValue(response)
+                    "long_term" -> longTermArtists.postValue(response)
+                }
                 topArtists.postValue(response)
             } else if (error != null) {
                 this.error.postValue(error)

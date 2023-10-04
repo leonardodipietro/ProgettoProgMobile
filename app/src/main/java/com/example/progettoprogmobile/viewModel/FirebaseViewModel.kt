@@ -20,6 +20,7 @@ import kotlinx.coroutines.withContext
 class FirebaseViewModel (application: Application): AndroidViewModel(application) {
 
     private val database: DatabaseReference = FirebaseDatabase.getInstance().reference
+    var filter: String = "shortterm" // Default o valore iniziale
 
     private val user = FirebaseAuth.getInstance().currentUser
     private val userId = user?.uid
@@ -152,8 +153,9 @@ class FirebaseViewModel (application: Application): AndroidViewModel(application
         }
     }
 
-    fun saveUserTopArtists(userId: String, topArtists: List<Artist>) {
-        val userTopArtistsRef = FirebaseDatabase.getInstance().reference.child("users").child(userId).child("topArtists")
+    fun saveUserTopArtists(userId: String, topArtists: List<Artist>, timeRange: String = "short_term") {
+        val userTopArtistsRef = FirebaseDatabase.getInstance().reference
+            .child("users").child(userId).child("topArtists").child(timeRange)
 
         // Creiamo una lista solo degli ID degli artisti nell'ordine in cui sono stati passati
         val artistIds = topArtists.map { it.id }
@@ -169,8 +171,9 @@ class FirebaseViewModel (application: Application): AndroidViewModel(application
 
 
 
-    fun saveUserTopTracks(userId: String, topTrack: List<Track>) {
-        val userTopTracksRef = FirebaseDatabase.getInstance().reference.child("users").child(userId).child("topTracks")
+    fun saveUserTopTracks(userId: String, topTrack: List<Track>, timeRange: String = "short_term") {
+        val userTopTracksRef = FirebaseDatabase.getInstance().reference
+            .child("users").child(userId).child("topTracks").child(timeRange)
 
         // Creiamo una lista solo degli ID delle tracce nell'ordine in cui sono state passate
         val trackIds = topTrack.map { it.id }
@@ -183,10 +186,10 @@ class FirebaseViewModel (application: Application): AndroidViewModel(application
                 Log.e("Firebase", "Errore nel salvataggio degli IDs delle tracce per l'utente $userId: ${it.message}")
             }
     }
-    fun fetchTopTracksFromFirebase() {
+    fun fetchTopTracksFromFirebase(filter:String) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         if (userId != null) {
-            val userTopTracksRef = database.child("users").child(userId).child("topTracks")
+            val userTopTracksRef = database.child("users").child(userId).child("topTracks").child(filter)
             userTopTracksRef.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val trackIds = snapshot.children.mapNotNull { it.getValue(String::class.java) }
@@ -240,10 +243,10 @@ class FirebaseViewModel (application: Application): AndroidViewModel(application
             })
         }
     }
-    fun fetchTopArtistsFromFirebase() {
+    fun fetchTopArtistsFromFirebase(filter:String) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         if (userId != null) {
-            val userTopArtistsRef = database.child("users").child(userId).child("topArtists")
+            val userTopArtistsRef = database.child("users").child(userId).child("topArtists").child(filter)
             userTopArtistsRef.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     val artistIds = snapshot.children.mapNotNull { it.getValue(String::class.java) }
