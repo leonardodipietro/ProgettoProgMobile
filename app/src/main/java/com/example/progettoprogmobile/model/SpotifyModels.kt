@@ -14,19 +14,20 @@ data class TopArtistsResponse(
 
 
 data class Track(
+
     @SerializedName("name") val name: String,
     @SerializedName("album") val album: Album,
     @SerializedName("artists") val artisttrack: List<SimpleArtist>,
     @SerializedName("id") val id: String,
-    @SerializedName("genres") val genres: String?,
-    @SerializedName("release_date") val releaseDate: String?,
-    @SerializedName("duration_ms") val durationMs: String
+  //  @SerializedName("genres") val genres: List<String>,
+  //  @SerializedName("duration_ms") val durationMs: String,
+
 )
 
 data class Album(
     val name: String,
-    val images: List<Image>
-
+    val images: List<Image>,
+    val releaseDate: String
 )
 
 data class Image(

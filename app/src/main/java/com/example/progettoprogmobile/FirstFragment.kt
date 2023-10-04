@@ -66,7 +66,8 @@ class FirstFragment : Fragment() {
 
             artistRecyclerView.visibility = View.GONE // Nasconde la RecyclerView degli artisti
             recyclerView.visibility = View.VISIBLE // Mostra la RecyclerView delle tracce
-        //    firebaseViewModel.fetchTopTracksFromFirebase()
+            val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@setOnClickListener
+            firebaseViewModel.fetchTopTracksFromFirebase()
 
         }
 
@@ -74,7 +75,8 @@ class FirstFragment : Fragment() {
 
             recyclerView.visibility = View.GONE // Nasconde la RecyclerView delle tracce
             artistRecyclerView.visibility = View.VISIBLE // Mostra la RecyclerView degli artisti
-           // firebaseViewModel.fetchTopArtistsFromFirebase()
+            val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@setOnClickListener
+            firebaseViewModel.fetchTopArtistsFromFirebase()
         }
 
 
@@ -90,8 +92,8 @@ class FirstFragment : Fragment() {
             trackAdapter.submitList(tracks)
             Log.d("LISTA RECYCLER VIEW","LISTA INSERITA CON SUCCESSO")
         }
+*/
 
-        firebaseViewModel.fetchTopTracksFromFirebase()*/
         // Inizializza il RecyclerView e l'adapter
         recyclerView = rootView.findViewById(R.id.recyclerViewtopbrani)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())

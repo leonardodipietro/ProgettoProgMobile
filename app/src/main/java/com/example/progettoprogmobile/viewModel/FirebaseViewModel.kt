@@ -112,9 +112,9 @@ class FirebaseViewModel (application: Application): AndroidViewModel(application
                 "album" to track.album.name,
                 "artists" to track.artisttrack,
                 "id" to track.id,  // Questo è l'ID fornito da Spotify
-                "genres" to track.genres,
-                "release_date" to track.releaseDate,
-                "duration_ms" to track.durationMs,
+                //"genres" to track.genres,
+                "release_date" to track.album.releaseDate,
+               // "duration_ms" to track.durationMs,
                 "image_url" to imageUrl
             )
 
@@ -167,6 +167,8 @@ class FirebaseViewModel (application: Application): AndroidViewModel(application
             }
     }
 
+
+
     fun saveUserTopTracks(userId: String, topTrack: List<Track>) {
         val userTopTracksRef = FirebaseDatabase.getInstance().reference.child("users").child(userId).child("topTracks")
 
@@ -181,8 +183,182 @@ class FirebaseViewModel (application: Application): AndroidViewModel(application
                 Log.e("Firebase", "Errore nel salvataggio degli IDs delle tracce per l'utente $userId: ${it.message}")
             }
     }
+    fun fetchTopTracksFromFirebase() {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        if (userId != null) {
+            val userTopTracksRef = database.child("users").child(userId).child("topTracks")
+            userTopTracksRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val trackIds = snapshot.children.mapNotNull { it.getValue(String::class.java) }
+                    retrieveTracksDetails(trackIds)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("FirebaseError", "Errore durante la lettura degli IDs delle tracce dal database Firebase: ${error.message}")
+                }
+            })
+        }
+    }
+
+    private fun retrieveTracksDetails(trackIds: List<String>) {
+        val tracksRef = database.child("tracks")
+        val tracks = mutableListOf<Track>()
+        var count = 0
+
+        trackIds.forEach { id ->
+            Log.d("FIREBASE VIEWMODEL","FIREBASE TRACK ID $trackIds")
+            tracksRef.child(id).addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val trackName = snapshot.child("trackName").getValue(String::class.java) ?: ""
+
+                    val albumName = snapshot.child("album").getValue(String::class.java) ?: ""
+
+                    val imageUrl = snapshot.child("image_url").getValue(String::class.java) ?: ""
+
+                    val artistNames = snapshot.child("artists").children.mapNotNull {
+                        it.child("name").getValue(String::class.java)
+                    }
+                    val artistsList = artistNames.map { SimpleArtist(it) }
+                    val id = snapshot.child("id").getValue(String::class.java) ?: ""
+                    val releaseDate = snapshot.child("release_date").getValue(String::class.java) ?: ""
+
+
+                    val album = Album(albumName, listOf(Image(imageUrl)),releaseDate)
+                    val track = Track(trackName, album, artistsList, id)
+
+                    tracks.add(track)
+
+                    count++
+                    if (count == trackIds.size) {
+                        topTracksfromdb.postValue(tracks)
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("FirebaseError", "Errore durante il recupero dei dettagli della traccia dal database Firebase: ${error.message}")
+                }
+            })
+        }
+    }
+    fun fetchTopArtistsFromFirebase() {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        if (userId != null) {
+            val userTopArtistsRef = database.child("users").child(userId).child("topArtists")
+            userTopArtistsRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val artistIds = snapshot.children.mapNotNull { it.getValue(String::class.java) }
+                    retrieveArtistsDetails(artistIds)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("FirebaseError", "Errore durante la lettura degli IDs degli artisti dal database Firebase: ${error.message}")
+                }
+            })
+        }
+    }
+
+    private fun retrieveArtistsDetails(artistIds: List<String>) {
+        val artistsRef = database.child("artists")
+        val artists = mutableListOf<Artist>()
+
+        artistIds.forEach { id ->
+            artistsRef.child(id).addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val artistName = snapshot.child("name").getValue(String::class.java) ?: ""
+                    val genresTypeIndicator = object : GenericTypeIndicator<List<String>>() {}
+                    val genres = snapshot.child("genres").getValue(genresTypeIndicator) ?: listOf()
+
+                    val artistId = snapshot.child("id").getValue(String::class.java) ?: ""
+                    val followersTotal = snapshot.child("followers_total").getValue(Int::class.java) ?: 0
+                    val imageUrl = snapshot.child("image_url").getValue(String::class.java) ?: ""
+
+                    val artist = Artist(artistName, genres, artistId, Followers(followersTotal), listOf(Image(imageUrl)))
+                    artists.add(artist)
+
+                    if (artists.size == artistIds.size) {
+                        topArtistsfromdb.postValue(artists)
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("FirebaseError", "Errore durante il recupero dei dettagli dell'artista dal database Firebase: ${error.message}")
+                }
+            })
+        }
+    }
 
 }
+
+
+   /* fun fetchTopTracksFromFirebase() {
+        Log.d("FirebaseData", "Inizio recupero dati da Firebase")
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        if (userId != null) {
+            val query = database.child("users").child(userId).child("topTracks").orderByKey()
+            query.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    Log.d("FirebaseData", "Metodo onDataChange chiamato")
+                    val tracks = mutableListOf<Track>()
+                    for (trackSnapshot in snapshot.children) {
+                        val trackName = trackSnapshot.child("trackName").getValue(String::class.java) ?: ""
+                        val albumName = trackSnapshot.child("album").getValue(String::class.java) ?: ""
+                        val imageUrl = trackSnapshot.child("image_url").getValue(String::class.java) ?: ""
+                        val artistList = mutableListOf<SimpleArtist>()
+                        val artistsSnapshot = trackSnapshot.child("artists")
+                        for (artistSnapshot in artistsSnapshot.children) {
+                            val artistName = artistSnapshot.child("name").getValue(String::class.java) ?: ""
+                            artistList.add(SimpleArtist(artistName))
+                        }
+                        val id = trackSnapshot.child("id").getValue(String::class.java) ?: ""
+                       // val genres = trackSnapshot.child("genres").getValue(String::class.java) ?: ""
+                        val releaseDate = trackSnapshot.child("release_date").getValue(String::class.java) ?: ""
+                       // val durationMs = trackSnapshot.child("duration_ms").getValue(String::class.java) ?: ""
+                        val album = Album(albumName, listOf(Image(imageUrl)))
+                        val track = Track(trackName, album, artistList, id,  releaseDate, )
+                        tracks.add(track)
+                        Log.d("FIREBASE VIEWMODEL","FIREBASE $tracks")
+                    }
+                    topTracksfromdb.postValue(tracks)
+                }
+                val error: MutableLiveData<Throwable> = MutableLiveData()
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("FirebaseError", "Errore durante la lettura dal database Firebase: ${error.message}")
+                    this.error.postValue(error.toException())
+                }
+            })
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
  /*   fun saveTracksToMainNode(topTrack: List<Track>) {
         val tracksRef = FirebaseDatabase.getInstance().reference.child("tracks")
         topTrack.forEachIndexed { _, track ->
@@ -399,4 +575,5 @@ class FirebaseViewModel (application: Application): AndroidViewModel(application
            .addOnFailureListener {
                Log.e("Firebase", "Errore nell'eliminazione dei dati dell'utente da Firebase: ${it.message}")
            }
-   } */
+   }*/
+   */
