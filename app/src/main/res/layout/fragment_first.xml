@@ -60,6 +60,20 @@
             android:layout_toRightOf="@id/gettoptrack"
             android:layout_below="@id/startAuthButton"
             />
+            <View
+                android:layout_width="10dp"
+                android:layout_height="match_parent"
+                android:background="#000000"/>
+            <Button
+                android:id="@+id/sceglicomevedere"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/sceglicosavedere"
+
+                android:textColor="@color/black"
+                android:layout_below="@id/startAuthButton"
+                />
+
         </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView

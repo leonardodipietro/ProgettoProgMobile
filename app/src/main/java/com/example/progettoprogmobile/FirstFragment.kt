@@ -18,7 +18,10 @@ import com.example.progettoprogmobile.viewModel.FirebaseViewModel
 import com.example.progettoprogmobile.viewModel.SpotifyViewModel
 import com.google.firebase.auth.FirebaseAuth
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.GridLayoutManager
 import com.example.progettoprogmobile.adapter.ArtistAdapter
+import com.example.progettoprogmobile.adapter.ArtistGridAdapter
+import com.example.progettoprogmobile.adapter.TrackGridAdapter
 import com.example.progettoprogmobile.model.TopArtistsResponse
 import com.example.progettoprogmobile.model.TopTracksResponse
 import com.example.progettoprogmobile.model.Track
@@ -31,9 +34,10 @@ class FirstFragment : Fragment() {
     private lateinit var spotifyViewModel: SpotifyViewModel
     private lateinit var recyclerView: RecyclerView
     private lateinit var trackAdapter: TrackAdapter
+    private lateinit var trackGridAdapter: TrackGridAdapter
     private lateinit var artistRecyclerView: RecyclerView
     private lateinit var artistAdapter: ArtistAdapter
-
+    private lateinit var artistGridAdapter: ArtistGridAdapter
     private var token: String? = null
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -90,6 +94,10 @@ class FirstFragment : Fragment() {
             firebaseViewModel.fetchTopArtistsFromFirebase(firebaseViewModel.filter)
         }
 
+        val changeViewStyleButton: Button = rootView.findViewById(R.id.sceglicomevedere)
+        changeViewStyleButton.setOnClickListener {
+            openViewStyleDialog()
+        }
 
         //gestionedati()
         // Inizializza il RecyclerView e l'adapter
@@ -108,27 +116,60 @@ class FirstFragment : Fragment() {
         // Inizializza il RecyclerView e l'adapter
         recyclerView = rootView.findViewById(R.id.recyclerViewtopbrani)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
+
         trackAdapter = TrackAdapter(emptyList()) // Inizialmente senza tracce
         recyclerView.adapter = trackAdapter
-
+        trackGridAdapter = TrackGridAdapter(emptyList())
         // Aggiorna l'adapter con i nuovi dati
         firebaseViewModel.topTracksfromdb.observe(viewLifecycleOwner) { tracks ->
             trackAdapter.submitList(tracks)
             Log.d("LISTA RECYCLER VIEW","LISTA INSERITA CON SUCCESSO")
         }
+        firebaseViewModel.topTracksfromdb.observe(viewLifecycleOwner) { tracks ->
+            trackAdapter.submitList(tracks)
+            trackGridAdapter.submitList(tracks) // Aggiungi questa riga
+            Log.d("LISTA RECYCLER VIEW","LISTA INSERITA CON SUCCESSO")
+        }
 
         // Inizializza il RecyclerView e l'adapter degli artisti
         artistRecyclerView = rootView.findViewById(R.id.recyclerViewTopArtists)
+
+
         artistRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         artistAdapter = ArtistAdapter(emptyList()) // Inizialmente senza artisti
         artistRecyclerView.adapter = artistAdapter
+        artistGridAdapter = ArtistGridAdapter(emptyList())
         firebaseViewModel.topArtistsfromdb.observe(viewLifecycleOwner){ artists ->
             artistAdapter.submitList(artists)
+            artistGridAdapter.submitList(artists)
             Log.d("LISTA RECYCLER VIEW","LISTA INSERITA CON SUCCESSO")
         }
         return rootView
     }
 
+    fun openViewStyleDialog() {
+        val choices = arrayOf("Vista Lineare", "Vista a Griglia")
+        AlertDialog.Builder(requireContext())
+            .setTitle("Scegli Stile di Visualizzazione")
+            .setItems(choices) { _, which ->
+                when(which) {
+                    0 -> { // Vista Lineare
+                        recyclerView.adapter = trackAdapter
+                        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+                        artistRecyclerView.adapter = artistAdapter
+                        artistRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+                    }
+                    1 -> { // Vista a Griglia
+                        recyclerView.adapter = trackGridAdapter
+                        recyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
+                        artistRecyclerView.adapter = artistGridAdapter
+                        artistRecyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
+                    }
+                }
+            }
+            .show()
+    }
 
     private fun openfiltermenu() {
         val dialogView = layoutInflater.inflate(R.layout.filter_time_alertdialog, null)
