@@ -71,6 +71,16 @@ class SecondActivity : AppCompatActivity() {
                     transaction.replace(R.id.nav_host_fragment, newFragment, "thirdFragment")
                     currentFragment = newFragment
                 }
+                R.id.notification -> {
+                    val newFragment = FourthFragment()
+                    transaction.replace(R.id.nav_host_fragment, newFragment, "fourthFragment")
+                    currentFragment = newFragment
+                }
+                R.id.paginaAmico -> {
+                    val newFragment = FifthFragment()
+                    transaction.replace(R.id.nav_host_fragment, newFragment, "fifthFragment")
+                    currentFragment = newFragment
+                }
             }
             transaction.commit()
             true // Indica che la selezione è stata gestita con successo
@@ -122,6 +132,18 @@ class SecondActivity : AppCompatActivity() {
                 transaction.replace(R.id.nav_host_fragment, newFragment, "thirdFragment")
                 currentFragment = newFragment
                 bottomNavigationView.selectedItemId = R.id.settings
+            }
+            R.id.menu_fourth_fragment -> {
+                val newFragment = ThirdFragment()
+                transaction.replace(R.id.nav_host_fragment, newFragment, "fourthFragment")
+                currentFragment = newFragment
+                bottomNavigationView.selectedItemId = R.id.notification
+            }
+            R.id.menu_fifth_fragment -> {
+                val newFragment = ThirdFragment()
+                transaction.replace(R.id.nav_host_fragment, newFragment, "fifthFragment")
+                currentFragment = newFragment
+                bottomNavigationView.selectedItemId = R.id.paginaAmico
             }
             else -> return super.onOptionsItemSelected(item)
         }

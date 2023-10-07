@@ -1,10 +1,9 @@
 <resources>
     <string name="app_name" translatable="false">See Your Music</string>
 
-<!-- Stringhe activity main-->
+    <!-- Stringhe activity main-->
     <string name="welcomeToSeeYourMusic">Benvenuto su See Your Music</string>
-    <string name="login" >Accedi</string>
-
+    <string name="login">Accedi</string>
 
 
     <string name="accedi_con_google">Accedi con Google</string>
@@ -32,7 +31,6 @@
     <string name="second_activity" translatable="false">SECOND ACTIVITY</string>
 
 
-
     <!--First frament xml-->
     <string name="startSpotifyAuthentication">Inizia Autenticazione Spotify</string>
 
@@ -45,8 +43,7 @@
     <string name="ever">Sempre</string>
 
 
-
-<!-- Stringhe fragment third-->
+    <!-- Stringhe fragment third-->
 
     <!--Immagine profilo-->
     <string name="userImage" translatable="false" />
@@ -91,5 +88,10 @@
     <!--Logout/delete-->
     <string name="signOut" translatable="false">LogOut</string>
     <string name="delete">Elimina Account</string>
+    <string name="nome_utente">Nome Utente</string>
+    <string name="aggiungi_amico">Aggiungi amico</string>
+    <string name="recensioni">Recensioni</string>
+    <string name="top_track">top track</string>
+    <string name="top_artist">top artist</string>
 
 </resources>
