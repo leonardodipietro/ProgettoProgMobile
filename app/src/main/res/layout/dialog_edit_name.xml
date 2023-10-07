@@ -15,7 +15,7 @@
             android:layout_marginTop="16dp"
             android:autofillHints=""
             android:backgroundTint="@color/gray"
-            android:hint="@string/enter_your_name"
+            android:hint="@string/enterYourName"
             android:inputType="textPersonName"
             android:textAllCaps="false"
             android:textColor="@color/black"

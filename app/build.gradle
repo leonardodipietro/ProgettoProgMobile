@@ -90,4 +90,6 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2" // queste 3 servono per mettere le coroutine
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.6.2"
+
+    implementation 'androidx.cardview:cardview:1.0.0'
 }

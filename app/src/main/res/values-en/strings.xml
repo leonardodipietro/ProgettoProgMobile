@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="login">Log In</string>
+    <string name="accedi_con_google">Google SignIn</string>
+    <string name="cerca">Search</string>
+    <string name="settings">Settings</string>
+    <string name="cerca_utenti">Search users</string>
+    <string name="cerca2">Search</string>
+    <string name="brani">Tracks</string>
+    <string name="Artisti">Artists</string>
+    <string name="editImageButton">Edit user immage</string>
+    <string name="username">"Username: "</string>
+    <string name="editNameButton">Edit username</string>
+    <string name="save">Save</string>
+    <string name="cancel">Delete</string>
+    <string name="language">"Language: "</string>
+    <string name="italian">Italian</string>
+    <string name="notification">Notification</string>
+    <string name="newfollowers">"New followers: "</string>
+    <string name="newreviews">"New following reviews: "</string>
+    <string name="review">"Reviews: "</string>
+    <string name="delete">Delete Account</string>
+    <string name="english">English</string>
+    <string name="everyone">Everyone</string>
+    <string name="followers">Followers</string>
+    <string name="nobody">Nobody</string>
+    <string name="selectedLanguage">"Selected language: "</string>
+    <string name="takePicture">Take a picture</string>
+    <string name="choseFromGallery">Choose from gallery</string>
+    <string name="choseAnOption">"Choose an option: "</string>
+    <string name="startSpotifyAuthentication">Start Spotify Authentication</string>
+    <string name="topTracks">Top Tracks</string>
+    <string name="topArtists">Top Artists</string>
+    <string name="welcomeToSeeYourMusic">Welcome to See Your Music</string>
+    <string name="enterYourName">Enter your name</string>
+    <string name="lastMonth">Last month</string>
+    <string name="lastSixMonth">Last 6 month</string>
+    <string name="ever">Ever</string>
+    <string name="reviewText">Review</string>
+    <string name="following">Following</string>
+    <string name="account">"Profilo: "</string>
+</resources>
