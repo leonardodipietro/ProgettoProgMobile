@@ -9,6 +9,12 @@
             android:title="Ricerca" />
         <item
             android:id="@+id/menu_third_fragment"
-            android:title="LogOut" />
+            android:title="Logout" />
+        <item
+            android:id="@+id/menu_fourth_fragment"
+            android:title="Notifiche" />
+        <item
+            android:id="@+id/menu_fifth_fragment"
+            android:title="Pagina Amico" />
     </group>
 </menu>
