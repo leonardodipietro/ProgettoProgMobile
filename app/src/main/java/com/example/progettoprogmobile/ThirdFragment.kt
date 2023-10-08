@@ -1,27 +1,18 @@
 package com.example.progettoprogmobile
 
+import android.Manifest
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Rect
-import android.Manifest
-import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.*
 import android.widget.*
-import androidx.activity.result.ActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.bumptech.glide.Glide
 import com.example.progettoprogmobile.utils.SettingUtils
 import com.example.progettoprogmobile.viewModel.FirebaseAuthViewModel
 import com.google.android.material.switchmaterial.SwitchMaterial
@@ -30,9 +21,18 @@ import com.google.firebase.database.*
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.squareup.picasso.Picasso
-import java.io.File
 import java.io.IOException
 import java.util.Locale
+
+import android.app.Activity
+import android.graphics.Bitmap
+import android.widget.Button
+import android.widget.ImageView
+
+import android.content.SharedPreferences
+import android.content.pm.PackageManager
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 
 
 open class ThirdFragment : Fragment() {
@@ -49,7 +49,6 @@ open class ThirdFragment : Fragment() {
 
     private lateinit var userImage: ImageView
     private lateinit var editImageButton: ImageButton
-    private var imageUri: Uri? = null
     private val cameraPermissionRequestCode = 1002 // Puoi scegliere qualsiasi valore univoco
 
     private lateinit var language: TextView
@@ -70,6 +69,12 @@ open class ThirdFragment : Fragment() {
     private lateinit var selectedReviewPrivacy: String
     private lateinit var reviewPrivacyListView: ListView
 
+    val photoRequestCode = 1
+    val photoRequestCodeFromGallery = 2
+
+    private lateinit var imageUrl: String // Aggiungi questa variabile
+    private lateinit var sharedPreferences: SharedPreferences // Aggiungi questa variabile
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -81,14 +86,13 @@ open class ThirdFragment : Fragment() {
 
         //Inizializza Firebase
         databaseReference = FirebaseDatabase.getInstance().getReference("users")
-        storageReference = FirebaseStorage.getInstance().getReference("profile image")
+        storageReference = FirebaseStorage.getInstance().getReference("profile image/$userId")
 
         // Inizializza il ViewModel per la gestione dell'autenticazione Firebase
         firebaseauthviewModel = ViewModelProvider(this)[FirebaseAuthViewModel::class.java]
 
         //Inizializza le view
         language= rootView.findViewById(R.id.language)
-        userImage = rootView.findViewById(R.id.userImage)
         editImageButton = rootView.findViewById(R.id.editImageButton)
 
 
@@ -98,24 +102,21 @@ open class ThirdFragment : Fragment() {
 
         val database: FirebaseDatabase = FirebaseDatabase.getInstance()
 
-        val sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+        sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
 
 
-        // Carica l'URL dell'immagine di profilo dalle SharedPreferences
-        val imageUrl = sharedPreferences.getString("profile image_$userId", null)
-
-        // Mostra l'immagine di profilo se l'URL è presente
-        if (!imageUrl.isNullOrEmpty()) {
-            Picasso.get().load(imageUrl).into(userImage)
-        }
+        userImage = rootView.findViewById(R.id.userImage)
+        editImageButton = rootView.findViewById(R.id.editImageButton)
         // Gestione del cambio immagine
         editImageButton.setOnClickListener {
             openFileChooser()
         }
 
+        // Carica l'URL dell'immagine di profilo dalle SharedPreferences
+        val imageUrl = sharedPreferences.getString("profile image_$userId", null)
         // Mostra l'immagine di profilo se l'URL è presente
         if (!imageUrl.isNullOrEmpty()) {
-            Picasso.get().load(imageUrl).into(userImage) // Utilizza Picasso per caricare l'immagine
+            Picasso.get().load(imageUrl).into(userImage)
         }
 
 
@@ -253,24 +254,6 @@ open class ThirdFragment : Fragment() {
         return rootView
     }
 
-    private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
-        if (result.resultCode == AppCompatActivity.RESULT_OK) {
-            val data: Intent? = result.data
-            if (data != null && data.data != null) {
-                imageUri = data.data
-                try {
-                    if (imageUri != null) {
-                        Glide.with(this)
-                            .load(imageUri)
-                            .into(userImage)
-                        uploadImage(userId)
-                    }
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                }
-            }
-        }
-    }
     private fun openFileChooser() {
         val options = arrayOf(getString(R.string.takePicture), getString(R.string.choseFromGallery), getString(R.string.cancel))
 
@@ -279,59 +262,25 @@ open class ThirdFragment : Fragment() {
         builder.setItems(options) { dialog, which ->
             when (which) {
                 0 -> {
-                    // Scatta una foto
-                    if (ContextCompat.checkSelfPermission(
-                            requireContext(),
-                            Manifest.permission.CAMERA
-                        ) == PackageManager.PERMISSION_GRANTED
-                    ) {
-                        // Hai l'autorizzazione, puoi avviare l'attività di scatto foto
-                        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                        if (takePictureIntent.resolveActivity(requireActivity().packageManager) != null) {
-                            // Crea un file temporaneo in cui verrà salvata l'immagine catturata
-                            val photoFile: File? = try {
-                                settingUtils.createImageFile(requireContext())
-                            } catch (ex: IOException) {
-                                // Gestire l'errore qui se necessario
-                                ex.printStackTrace() // Aggiungi questa linea per registrare l'errore
-                                null
-                            }
-                            // Se il file temporaneo è stato creato con successo, avvia l'attività di scatto foto
-                            photoFile?.also {
-                                val photoURI: Uri = FileProvider.getUriForFile(
-                                    requireContext(),
-                                    "com.example.progettoprogmobile.fileprovider",
-                                    it
-                                )
-                                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
-
-                                pickImageLauncher.launch(takePictureIntent)
-
-                                // Qui puoi chiamare la funzione per salvare l'immagine direttamente nello storage Firebase
-                                // Assicurati di passare il percorso del file temporaneo come parametro
-                                uploadImageToFirebaseStorage( userId, photoFile)
-                            }
-                        }
+                    // Avvia la fotocamera
+                    if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                        val photoIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+                        startActivityForResult(photoIntent, photoRequestCode)
                     } else {
                         // Non hai l'autorizzazione, richiedila all'utente
-                        ActivityCompat.requestPermissions(
-                            requireActivity(),
-                            arrayOf(
-                                Manifest.permission.CAMERA,
-                                Manifest.permission.WRITE_EXTERNAL_STORAGE
-                            ),
-                            cameraPermissionRequestCode
-                        )
+                        ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE), cameraPermissionRequestCode)
                     }
+
                 }
 
                 1 -> {
                     // Scegli dalla galleria
-                    val intent =
+                    val galleryIntent =
                         Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-                    intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*")
-                    pickImageLauncher.launch(intent)
-                }
+                    galleryIntent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*")
+                    startActivityForResult(galleryIntent, photoRequestCodeFromGallery)
+
+                    }
 
                 2 -> {
                     // Annulla
@@ -341,54 +290,42 @@ open class ThirdFragment : Fragment() {
         }
         builder.show()
     }
-    private fun uploadImage(userId: String) {
-        imageUri?.let { uri ->
-            val storage = FirebaseStorage.getInstance()
-            val fileReference = storageReference.child("$userId.jpg")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode==photoRequestCode) {
+            if (resultCode == Activity.RESULT_OK) {
+                val bp = data?.extras?.get("data") as Bitmap
+                // Salva l'immagine nello storage di Firebase
+                settingUtils.uploadImageToFirebaseStorage(requireContext(), userId, bp)
+                userImage.setImageBitmap(bp)
 
-            fileReference.putFile(uri)
-                .addOnSuccessListener {
-                    fileReference.downloadUrl.addOnSuccessListener { uri ->
-                        val imageUrl = uri.toString()
-                        // Salva l'URL dell'immagine nel database Firebase sotto il nodo dell'utente corrente
-                        val userRef: DatabaseReference =
-                            FirebaseDatabase.getInstance().reference.child("users").child(userId)
-                        userRef.child("profile image").setValue(imageUrl)
-                            .addOnSuccessListener {
-                                // URL dell'immagine di profilo salvato con successo nel database
-                                settingUtils.saveProfileImageURL(requireContext(),userId, imageUrl) // Salva l'URL nell SharedPreferences
-                            }
-                    }
-                }
+            }
+        } else if(requestCode==photoRequestCodeFromGallery){
+            onActivityResultForGallery(requestCode, resultCode, data)
         }
     }
-    private fun uploadImageToFirebaseStorage(userId: String, photoFile: File) {
-        val storage = FirebaseStorage.getInstance()
-        val storageReference =
-            storage.getReference("profile image") // Riferimento al tuo nodo "immagine profilo"
 
-        val fileReference = storageReference.child("$userId.jpg")
-
-        val uri = Uri.fromFile(photoFile)
-
-        fileReference.putFile(uri)
-            .addOnSuccessListener {
-                fileReference.downloadUrl.addOnSuccessListener { uri ->
-                    val imageUrl = uri.toString()
-                    // Salva l'URL dell'immagine nel database Firebase sotto il nodo "immagine profilo"
-                    val userRef: DatabaseReference =
-                        FirebaseDatabase.getInstance().reference.child("users").child(userId)
-                    userRef.child("profile image").setValue(imageUrl)
-                        .addOnSuccessListener {
-                            // URL dell'immagine di profilo salvato con successo nel database
-                            settingUtils.saveProfileImageURL(requireContext(), userId, imageUrl) // Salva l'URL nell SharedPreferences
+    private fun onActivityResultForGallery(requestCode: Int, resultCode: Int, data: Intent?) {
+        when (requestCode) {
+            photoRequestCodeFromGallery -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    // Gestione per l'immagine dalla galleria
+                    val selectedImageUri = data?.data
+                    if (selectedImageUri != null) {
+                        try {
+                            val bitmap = MediaStore.Images.Media.getBitmap(requireActivity().contentResolver, selectedImageUri)
+                            // Aggiorna l'ImageView con la nuova immagine
+                            userImage.setImageBitmap(bitmap)
+                            // Carica l'immagine su Firebase Storage
+                            settingUtils.uploadImageToFirebaseStorage(requireContext(), userId, bitmap)
+                            userImage.setImageBitmap(bitmap)
+                        } catch (e: IOException) {
+                            e.printStackTrace()
                         }
+                    }
                 }
             }
-            .addOnFailureListener { e ->
-                // Gestisci eventuali errori nell'upload dell'immagine
-                Log.e("Firebase", "Errore nell'upload dell'immagine: ${e.message}")
-            }
+        }
     }
 
 

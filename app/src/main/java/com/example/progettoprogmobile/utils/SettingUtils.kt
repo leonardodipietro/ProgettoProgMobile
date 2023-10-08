@@ -2,7 +2,7 @@ package com.example.progettoprogmobile.utils
 
 import android.app.AlertDialog
 import android.content.Context
-import android.os.Environment
+import android.graphics.Bitmap
 import com.google.firebase.ktx.Firebase
 import android.util.Log
 import android.view.View
@@ -17,15 +17,13 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
-import java.io.File
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import com.google.firebase.storage.FirebaseStorage
+import java.io.ByteArrayOutputStream
+
 
 
 class SettingUtils{
     companion object {
-
         fun showEditNameDialog(context: Context, userId: String, rootView: View) {
 
             val dialogView =
@@ -80,24 +78,46 @@ class SettingUtils{
         }
 
 
-        fun createImageFile(context: Context): File {
-            // Crea un nome di file univoco basato sulla data e l'ora correnti
-            val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
-            val imageFileName = "JPEG_${timeStamp}_"
-            val storageDir: File? = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-            return File.createTempFile(
-                imageFileName, /* prefix */
-                ".jpg", /* suffix */
-                storageDir /* directory */
-            )
-        }
-        fun saveProfileImageURL(context: Context, userId:String, imageUrl: String) {
+        private fun saveProfileImageURL(context: Context, userId:String, imageUrl: String) {
             val sharedPreferences =
                 context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
             val editor = sharedPreferences.edit()
             editor.putString("profile image_$userId", imageUrl)
             editor.apply()
         }
+
+        fun uploadImageToFirebaseStorage(context: Context, userId: String, bitmap: Bitmap) {
+            val storage = FirebaseStorage.getInstance()
+            val storageReference = storage.getReference("profile image")
+            val imageRef = storageReference.child("$userId.jpg")
+
+            // Converte la Bitmap in un array di byte
+            val baos = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+            val data = baos.toByteArray()
+
+            // Carica l'immagine nello storage di Firebase
+            val uploadTask = imageRef.putBytes(data)
+
+            // Aggiungi un listener per gestire l'avanzamento dell'upload
+            uploadTask.addOnSuccessListener { taskSnapshot ->
+                // L'upload è stato completato con successo
+                // Puoi ottenere l'URL dell'immagine caricata
+                imageRef.downloadUrl.addOnSuccessListener { uri ->
+                    val imageUrl = uri.toString()
+                    saveProfileImageURL(context, userId, imageUrl)
+                    val userRef: DatabaseReference = FirebaseDatabase.getInstance().reference.child("users").child(userId)
+                    userRef.child("profile image").setValue(imageUrl)
+
+                    Log.e ("LOG UPLOAD", "Immagine caricata con successo: $imageUrl")
+                }
+            }.addOnFailureListener { exception ->
+                // Si è verificato un errore durante l'upload
+                // Gestisci l'errore come preferisci
+                Log.e ("LOG UPLOAD",  "Errore durante il caricamento dell'immagine.")
+            }
+        }
+
 
         fun saveSelectedLanguage(context: Context, languageCode: String) {
             val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
@@ -213,6 +233,5 @@ class SettingUtils{
                     }
             }
         }
-
     }
 }
