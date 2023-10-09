@@ -3,72 +3,60 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".BranoSelezionato"
     >
 
-
     <include layout="@layout/genitore"></include>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="80dp"
-        android:text="titolo canzone"
-        android:textColor="@color/white"
-        android:textSize="40sp"
-        android:layout_centerHorizontal="true"
-
-        />
-
-
     <RelativeLayout
         android:layout_width="match_parent"
+        android:layout_below="@id/titolocanzone"
         android:layout_height="170dp"
-        android:layout_marginTop="150dp"
         android:background="@color/dark_gray"
-        android:id="@+id/dettaglibranoselezionato">
+        android:layout_marginTop="40sp"
+        android:id="@+id/dettaglibranoselezionato"
+        android:layout_centerHorizontal="true">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/titolocanzone"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:layout_marginLeft="28sp"
+
+
+            />
+
         <ImageView
-              android:id="@+id/imageView3"
-              android:layout_width="170dp"
-              android:layout_height="match_parent"
-              app:srcCompat="@android:drawable/btn_star_big_on"
-        />
-        <LinearLayout
-            android:layout_width="210dp"
+            android:id="@+id/imagebranoselezionato"
+            android:layout_width="170dp"
             android:layout_height="match_parent"
-            android:layout_toRightOf="@+id/imageView3"
-            android:orientation="vertical">
-            <LinearLayout
-                android:layout_width="210dp"
-                android:layout_height="85dp"
-                android:orientation="horizontal">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:text="Album:"
-                    android:textSize="24dp"
-                    android:textColor="@color/white"/>
-                <TextView
-                    android:layout_width="105dp"
-                    android:layout_height="match_parent"/>
+            android:padding="10dp"
+            android:layout_below="@id/titolocanzone"
 
-            </LinearLayout>
-            <LinearLayout
-                android:layout_width="210dp"
-                android:layout_height="85dp"
-                android:orientation="horizontal">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:text="Artista:"
+            />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_marginTop="15sp"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@id/imagebranoselezionato"
+            android:textColor="@color/white"
+            android:id="@+id/albumbranoselezionato"
+            android:layout_height="40dp"
+            android:layout_below="@id/titolocanzone"
+            />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_marginTop="20sp"
+            android:layout_marginLeft="10dp"
+            android:layout_below="@id/albumbranoselezionato"
+            android:textColor="@color/white"
+            android:id="@+id/artistabranoselezionato"
+            android:layout_height="30dp"
+            android:layout_toRightOf="@id/imagebranoselezionato"/>
 
-                    android:textColor="@color/white"
-                    android:textSize="24dp"/>
-                <TextView
-                    android:layout_width="105dp"
-                    android:layout_height="match_parent"/>
 
-            </LinearLayout>
-        </LinearLayout>
+
     </RelativeLayout>
     <TextView
         android:layout_width="wrap_content"
@@ -88,21 +76,23 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:layout_marginTop="10dp"
+        android:textColor="@color/white"
         android:layout_below="@+id/iniziorecensionepersonale"
         android:inputType="textMultiLine"
         android:layout_marginLeft="50dp"/>
 
-    <ImageButton
+    <Button
         android:id="@+id/inviarrecensione"
-        android:layout_width="50dp"
+        android:text="invia recensione"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_weight="1"
         android:layout_marginLeft="30sp"
-        android:layout_height="50sp"
         android:layout_marginTop="10dp"
         android:layout_toRightOf="@id/recensionepersonale"
-        android:layout_below="@+id/iniziorecensionepersonale"
-        android:src="@drawable/commenta"
-        app:tint="@color/white"/>
+        android:layout_below="@+id/iniziorecensionepersonale"/>
+    <!-- android:src="@drawable/commenta"
+     app:tint="@color/white" -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -117,6 +107,7 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
+        android:id="@+id/recyclerBranoSelezionato"
         android:layout_height="match_parent"
         android:layout_above="@+id/toolbarBottom"
         android:layout_below="@+id/iniziorecensioni"
@@ -125,6 +116,4 @@
 
 
 </RelativeLayout>
-
-
 

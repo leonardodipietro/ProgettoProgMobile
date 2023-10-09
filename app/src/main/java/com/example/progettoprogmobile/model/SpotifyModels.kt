@@ -22,7 +22,7 @@ data class Track(
   //  @SerializedName("genres") val genres: List<String>,
   //  @SerializedName("duration_ms") val durationMs: String,
 
-)
+):Serializable
 
 data class Album(
     val name: String,

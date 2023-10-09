@@ -18,13 +18,13 @@
           android:orientation="horizontal">
 
            <ImageView
-              android:id="@+id/immagineprofiloutente1"
+              android:id="@+id/improfBranoSelezionato"
               android:layout_width="48dp"
               android:layout_height="48dp"
               app:srcCompat="@android:drawable/btn_star_big_on" />
 
            <TextView
-              android:id="@+id/nomeutente1"
+              android:id="@+id/nomeutenteBranoselezionato"
               android:layout_width="0dp"
               android:layout_height="wrap_content"
               android:layout_gravity="center"
@@ -32,7 +32,7 @@
               android:text="UTENTE 1"
               android:textSize="26sp"
               android:textStyle="bold"
-              android:textColor="@color/dark_green"
+              android:textColor="@color/white"
               android:layout_marginLeft="10dp"/>
         </LinearLayout>
         <TextView
@@ -41,6 +41,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_marginLeft="70dp"
+            android:layout_marginRight="30dp"
             android:lines="3"
             android:layout_marginBottom="15dp"/>
         <LinearLayout
@@ -77,82 +78,8 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/dark_gray"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            >
-
-            <ImageView
-                android:id="@+id/immagineprofiloutente2"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                app:srcCompat="@android:drawable/btn_star_big_on" />
-
-            <TextView
-                android:id="@+id/nomeutente2"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="1"
-                android:text="UTENTE 2"
-                android:textSize="26sp"
-                android:textStyle="bold"
-                android:textColor="@color/dark_green"
-                android:layout_marginLeft="10dp"/>
-        </LinearLayout>
-        <TextView
-            android:id="@+id/recensione2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginLeft="70dp"
-            android:lines="3"
-            android:layout_marginBottom="15dp"/>
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right">
-            <ImageButton
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/mipiace"
-                app:tint="@color/white"
-                android:background="@color/black"
-                />
-            <ImageButton
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/nonmipiace"
-                app:tint="@color/white"
-                android:background="@color/black"/>
-            <ImageButton
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/commenta"
-                app:tint="@color/white"
-                android:background="@color/black"/>
-        </LinearLayout>
-    </LinearLayout>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/dark_gray"/>
-
-
-
-
-
-
-
-
 </LinearLayout>
+
 
 
 

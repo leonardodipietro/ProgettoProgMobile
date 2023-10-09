@@ -18,6 +18,8 @@ import com.example.progettoprogmobile.viewModel.FirebaseViewModel
 import com.example.progettoprogmobile.viewModel.SpotifyViewModel
 import com.google.firebase.auth.FirebaseAuth
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.progettoprogmobile.adapter.ArtistAdapter
 import com.example.progettoprogmobile.adapter.ArtistGridAdapter
@@ -29,7 +31,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class FirstFragment : Fragment() {
+class FirstFragment : Fragment(),TrackAdapter.OnTrackClickListener {
     private lateinit var firebaseViewModel: FirebaseViewModel
     private lateinit var spotifyViewModel: SpotifyViewModel
     private lateinit var recyclerView: RecyclerView
@@ -47,8 +49,6 @@ class FirstFragment : Fragment() {
         spotifyViewModel = ViewModelProvider(this).get(SpotifyViewModel::class.java)
         firebaseViewModel = ViewModelProvider(this).get(FirebaseViewModel::class.java)
 
-//        spotifyViewModel = ViewModelProvider(this)[SpotifyViewModel::class.java]
-//        firebaseViewModel = ViewModelProvider(this)[FirebaseViewModel::class.java]
 
         val rootView = inflater.inflate(R.layout.fragment_first, container, false)
         firebaseViewModel.filter="short_term"
@@ -99,25 +99,12 @@ class FirstFragment : Fragment() {
             openViewStyleDialog()
         }
 
-        //gestionedati()
-        // Inizializza il RecyclerView e l'adapter
-      /*  recyclerView = rootView.findViewById(R.id.recyclerViewtopbrani)
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        trackAdapter = TrackAdapter(emptyList()) // Inizialmente senza tracce
-        recyclerView.adapter = trackAdapter
-
-        // Aggiorna l'adapter con i nuovi dati
-        firebaseViewModel.topTracksfromdb.observe(viewLifecycleOwner) { tracks ->
-            trackAdapter.submitList(tracks)
-            Log.d("LISTA RECYCLER VIEW","LISTA INSERITA CON SUCCESSO")
-        }
-*/
 
         // Inizializza il RecyclerView e l'adapter
         recyclerView = rootView.findViewById(R.id.recyclerViewtopbrani)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        trackAdapter = TrackAdapter(emptyList()) // Inizialmente senza tracce
+        trackAdapter = TrackAdapter(emptyList(),this) // Inizialmente senza tracce
         recyclerView.adapter = trackAdapter
         trackGridAdapter = TrackGridAdapter(emptyList())
         // Aggiorna l'adapter con i nuovi dati
@@ -170,6 +157,21 @@ class FirstFragment : Fragment() {
             }
             .show()
     }
+    override fun onTrackClicked(data: Any) {
+        Log.d("FragmentClick", "Item clicked with data: $data")
+        if (data is Track) {
+            // Qui naviga verso il nuovo fragment, puoi passare "data" come argomento se necessario
+            val newFragment = BranoSelezionato()
+            val bundle = Bundle()
+            bundle.putSerializable("trackDetail", data)
+            newFragment.arguments = bundle
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.nav_host_fragment, newFragment)
+                .addToBackStack(null)
+                .commit()
+        }
+    }
+    // Puoi aggiungere condizioni simili per gli artisti se anche loro hanno un comportamento simile
 
     private fun openfiltermenu() {
         val dialogView = layoutInflater.inflate(R.layout.filter_time_alertdialog, null)
@@ -210,16 +212,16 @@ class FirstFragment : Fragment() {
         activity?.startActivity(intent)
     }
 
-   private fun observeToken() {
-       spotifyViewModel.spotifyTokenResponse.observe(viewLifecycleOwner) { tokenResponse ->
-           tokenResponse?.access_token?.let { accessToken ->
-               token = accessToken
-               Log.d("SpotifyToken", "Token ottenuto: $accessToken")
-           } ?: run {
-               Log.d("SpotifyToken", "Token non ottenuto")
-           }
-       }
-   }
+    private fun observeToken() {
+        spotifyViewModel.spotifyTokenResponse.observe(viewLifecycleOwner) { tokenResponse ->
+            tokenResponse?.access_token?.let { accessToken ->
+                token = accessToken
+                Log.d("SpotifyToken", "Token ottenuto: $accessToken")
+            } ?: run {
+                Log.d("SpotifyToken", "Token non ottenuto")
+            }
+        }
+    }
     private fun getTopTracks(token: String, userId: String) {
         val timeRanges = listOf("short_term", "medium_term", "long_term")
 
@@ -310,8 +312,7 @@ class FirstFragment : Fragment() {
         else
             Log.d("secondo LOG FRAGMENT", "INTENT VUOTO")
     }
-}
-/* spotifyViewModel.trackInfoExtracted.observe(viewLifecycleOwner) { extracted ->
+}/* spotifyViewModel.trackInfoExtracted.observe(viewLifecycleOwner) { extracted ->
 
         if (extracted == true) {
             val trackInfo = spotifyViewModel.getSpecificTrackInfo(20)

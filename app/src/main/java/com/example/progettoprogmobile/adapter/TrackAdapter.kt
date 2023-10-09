@@ -12,7 +12,7 @@ import com.example.progettoprogmobile.model.Track
 import com.example.progettoprogmobile.R
 
 
-class TrackAdapter(private var tracks: List<Track>) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
+class TrackAdapter(private var tracks: List<Track>, private val listener: OnTrackClickListener) : RecyclerView.Adapter<TrackAdapter.TrackViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.recycle_view_top_brani, parent, false)
@@ -45,6 +45,10 @@ class TrackAdapter(private var tracks: List<Track>) : RecyclerView.Adapter<Track
                     .load(track.album.images[0].url)
                     .into(albumImageView)
             }
+
+            itemView.setOnClickListener {
+                listener.onTrackClicked(track)
+            }
         }
     }
 
@@ -52,4 +56,9 @@ class TrackAdapter(private var tracks: List<Track>) : RecyclerView.Adapter<Track
         tracks = newTracks
         notifyDataSetChanged()
     }
+
+    interface OnTrackClickListener {
+        fun onTrackClicked(data: Any)
+    }
+
 }
