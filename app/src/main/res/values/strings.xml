@@ -92,4 +92,10 @@
     <string name="signOut" translatable="false">LogOut</string>
     <string name="delete">Elimina Account</string>
 
+
+    <string name="nome_utente" translatable="true"> Nome Utente</string>
+    <string name="aggiungi_amico" translatable="true"> Aggiungi Amico</string>
+    <string name="recensioni" translatable="true">Recensioni</string>
+    <string name="top_track" translatable="true">Top Tracks</string>
+    <string name="top_artist" translatable="true">Top Artists</string>
 </resources>

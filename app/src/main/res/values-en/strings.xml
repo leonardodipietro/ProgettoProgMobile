@@ -39,4 +39,11 @@
     <string name="reviewText">Review</string>
     <string name="following">Following</string>
     <string name="account">"Profilo: "</string>
+
+
+    <string name="nome_utente">Nome Utente</string>
+    <string name="aggiungi_amico">Aggiungi Amico</string>
+    <string name="recensioni">Recensioni</string>
+    <string name="top_track">Top Track</string>
+    <string name="top_artist">Top Artist</string>
 </resources>
