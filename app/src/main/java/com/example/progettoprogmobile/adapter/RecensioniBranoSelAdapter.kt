@@ -6,13 +6,14 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.progettoprogmobile.R
 import com.example.progettoprogmobile.model.Recensione
 import com.example.progettoprogmobile.model.Utente
-import com.firebase.ui.auth.data.model.User
 
-class RecensioniBranoSelAdapter(    private var recensioni: List<Recensione>,
-                                    private var usersMap: Map<String, User> = mapOf() ) : RecyclerView.Adapter<RecensioniBranoSelAdapter.ViewHolder>() {
+
+class RecensioniBranoSelAdapter(     var recensioni: List<Recensione>,
+                                     var usersMap: Map<String, Utente> = mapOf() ) : RecyclerView.Adapter<RecensioniBranoSelAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val imgProfile: ImageView = view.findViewById(R.id.improfBranoSelezionato)
@@ -28,7 +29,14 @@ class RecensioniBranoSelAdapter(    private var recensioni: List<Recensione>,
         val recensione = recensioni[position]
         val user = usersMap[recensione.userId]
 
+        holder.txtRecensione.text = recensione.content // supponendo che Recensione abbia un campo 'content' per il contenuto della recensione
 
+        user?.let {
+            holder.txtUserName.text = it.name
+            Glide.with(holder.itemView.context)
+                .load(it.images) // assumendo che l'oggetto utente abbia un campo 'profileImage' per l'URL dell'immagine
+                .into(holder.imgProfile)
+        }
     }
 
 

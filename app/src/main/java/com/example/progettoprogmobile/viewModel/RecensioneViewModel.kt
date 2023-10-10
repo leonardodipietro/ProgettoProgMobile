@@ -16,21 +16,13 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
 
 class RecensioneViewModel: ViewModel() {
-
-
-   /* private val _recensioniLiveData = MutableLiveData<List<Recensione>>()
-    val recensioniLiveData: LiveData<List<Recensione>> = _recensioniLiveData
-
-    private val _usersLiveData = MutableLiveData<Map<String, Utente>>()
-    val usersLiveData: LiveData<Map<String, Utente>> = _usersLiveData
-*/
-
-
-
     private val database: DatabaseReference = FirebaseDatabase.getInstance().reference
+    val recensioniData: MutableLiveData<List<Recensione>> = MutableLiveData()
+    val usersData: MutableLiveData<Map<String, Utente>> = MutableLiveData()
     fun getCurrentUserId(): String? {
         return FirebaseAuth.getInstance().currentUser?.uid
     }
+
     fun saveOrUpdateRecensione(userId: String, trackId: String, commentContent: String) {
         hasUserReviewed(trackId, userId) { existingReview ->
             if (existingReview == null) {
@@ -47,6 +39,7 @@ class RecensioneViewModel: ViewModel() {
                 database.child("recensioni").child(commentId).setValue(recensione)
                     .addOnSuccessListener {
                         addCommentIdToTrack(commentId, trackId)
+                        addCommentIdToUser(commentId, userId)
                     }
                     .addOnFailureListener {
                         // Gestisci l'errore
@@ -65,7 +58,11 @@ class RecensioneViewModel: ViewModel() {
         }
     }
 
+    private fun addCommentIdToUser(commentId: String, userId: String) {
+      database.child("users").child(userId).child("recensioni").push().setValue(commentId)
 
+
+    }
     fun hasUserReviewed(trackId: String, userId: String, onComplete: (Recensione?) -> Unit) {
         database.child("recensioni").orderByChild("trackId").equalTo(trackId).addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -92,79 +89,51 @@ class RecensioneViewModel: ViewModel() {
         database.child("tracks").child(trackId).child("comments").push().setValue(commentId)
     }
 
- /*   fun fetchRecensioniForTrack(trackId: String, onSuccess: (List<String>) -> Unit) {
-        val trackCommentsRef = database.child("tracks").child(trackId).child("comments")
+    private fun fetchUsers(userIds: List<String>) {
+        database.child("users")
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    val usersMap = mutableMapOf<String, Utente>()
+                    for (id in userIds) {
+                        val user = dataSnapshot.child(id).getValue(Utente::class.java)
+                        user?.let { usersMap[id] = it }
+                    }
+                    usersData.value = usersMap
+                }
 
-        trackCommentsRef.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val commentIds = dataSnapshot.children.mapNotNull { it.getValue(String::class.java) }
-                onSuccess(commentIds)
-            }
+                override fun onCancelled(databaseError: DatabaseError) {
+                    // Handle error here
+                }
+            })
+    }
+    fun fetchRecensioniAndUsersForTrack(trackId: String) {
+        fetchRecensioniForTrack(trackId)
+    }
 
-            override fun onCancelled(databaseError: DatabaseError) {
-                // Gestione errori
-            }
-        })
-    }*/
-
-
-
-
-
-    //NUOVO
-   /*fun fetchRecensioniForTrack(trackId: String) {
-        val recensioniReference = database.child("recensioni")
-        recensioniReference.orderByChild("trackId").equalTo(trackId)
-            .addListenerForSingleValueEvent(object: ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
+    private fun fetchRecensioniForTrack(trackId: String) {
+        database.child("recensioni")
+            .orderByChild("trackId")
+            .equalTo(trackId)
+            .addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
                     val recensioniList = mutableListOf<Recensione>()
-                    val userIds = mutableSetOf<String>()
-
-                    for (postSnapshot in snapshot.children) {
-                        val recensione = postSnapshot.getValue(Recensione::class.java)
+                    val userIds = mutableListOf<String>()
+                    for (snapshot in dataSnapshot.children) {
+                        val recensione = snapshot.getValue(Recensione::class.java)
                         recensione?.let {
                             recensioniList.add(it)
                             userIds.add(it.userId)
                         }
                     }
-                    _recensioniLiveData.value = recensioniList
-
-                    // Dopo aver ottenuto le recensioni, carica gli utenti
+                    recensioniData.value = recensioniList
                     fetchUsers(userIds)
                 }
 
-                override fun onCancelled(error: DatabaseError) {
-                    // Gestisci l'errore
+                override fun onCancelled(databaseError: DatabaseError) {
+                    // Handle error here
                 }
             })
     }
-
-    private fun fetchUsers(userIds: Set<String>) {
-        val usersReference = database.child("users")
-        val usersMap = mutableMapOf<String, Utente>()
-
-        // Potresti dover richiamare questo metodo per ogni ID utente.
-        for (userId in userIds) {
-            usersReference.child(userId).addListenerForSingleValueEvent(object: ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val user = snapshot.getValue(Utente::class.java)
-                    if (user != null) {
-                        usersMap[userId] = user
-                        if (usersMap.size == userIds.size) { // Se hai recuperato tutti gli utenti
-                            _usersLiveData.value = usersMap
-                        }
-                    }
-                }
-
-                override fun onCancelled(error: DatabaseError) {
-                    // Gestisci l'errore
-                }
-            })
-        }
-
-
-
-    }*/
 
 
 }

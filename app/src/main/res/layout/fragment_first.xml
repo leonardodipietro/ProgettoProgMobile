@@ -15,13 +15,14 @@
             android:layout_height="wrap_content"
             android:backgroundTint="@color/verde_spotify"
             android:text="@string/startSpotifyAuthentication"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             android:layout_marginTop="20dp"
             android:layout_centerHorizontal="true"/>
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/startAuthButton"
+            android:background="@color/gray"
             android:layout_centerHorizontal="true"
             android:id="@+id/sceglicosavedere">
             <Button
@@ -35,35 +36,35 @@
             <View
                 android:layout_width="10dp"
                 android:layout_height="match_parent"
-                android:background="#000000"/>
+
+                />
             <Button
             android:id="@+id/gettoptrack"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/verde_spotify"
             android:text="@string/topTracks"
-
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             android:layout_below="@id/sceglicosavedere"
             />
             <View
                 android:layout_width="10dp"
                 android:layout_height="match_parent"
-                android:background="#000000"/>
+                />
         <Button
             android:id="@+id/gettopartist"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:backgroundTint="@color/verde_spotify"
             android:text="@string/topArtists"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             android:layout_toRightOf="@id/gettoptrack"
             android:layout_below="@id/startAuthButton"
             />
             <View
                 android:layout_width="10dp"
                 android:layout_height="match_parent"
-                android:background="#000000"/>
+                />
             <Button
                 android:id="@+id/sceglicomevedere"
                 android:layout_width="50dp"

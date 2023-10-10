@@ -6,7 +6,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".BranoSelezionato"
     >
-
     <include layout="@layout/genitore"></include>
     <RelativeLayout
         android:layout_width="match_parent"
@@ -33,7 +32,6 @@
             android:layout_height="match_parent"
             android:padding="10dp"
             android:layout_below="@id/titolocanzone"
-
             />
         <TextView
             android:layout_width="match_parent"
@@ -58,61 +56,62 @@
 
 
     </RelativeLayout>
+
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="lascia un commento:"
-        android:textColor="@color/white"
-        android:textSize="30sp"
+        android:text="Recensioni:"
+        android:background="@color/gray"
+        android:textColor="@color/verde_spotify"
+        android:textSize="20sp"
         android:layout_below="@+id/dettaglibranoselezionato"
         android:layout_centerHorizontal="true"
-        android:id="@+id/iniziorecensionepersonale"
-        />
+        android:id="@+id/iniziorecensioni" />
 
-    <EditText
-        android:id="@+id/recensionepersonale"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:layout_marginTop="10dp"
-        android:textColor="@color/white"
-        android:layout_below="@+id/iniziorecensionepersonale"
-        android:inputType="textMultiLine"
-        android:layout_marginLeft="50dp"/>
-
-    <Button
-        android:id="@+id/inviarrecensione"
-        android:text="invia recensione"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:layout_marginLeft="30sp"
-        android:layout_marginTop="10dp"
-        android:layout_toRightOf="@id/recensionepersonale"
-        android:layout_below="@+id/iniziorecensionepersonale"/>
-    <!-- android:src="@drawable/commenta"
-     app:tint="@color/white" -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="recensioni:"
-        android:textColor="@color/white"
-        android:textSize="30sp"
-        android:layout_below="@id/recensionepersonale"
-        android:layout_centerHorizontal="true"
-        android:id="@+id/iniziorecensioni"
-        />
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         android:id="@+id/recyclerBranoSelezionato"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/toolbarBottom"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/iniziorecensioni"
+        android:layout_marginTop="10dp" />
+
+
+
+    <TextView
+        android:background="@color/gray"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:layout_marginBottom="2dp" />
+        android:text="Lascia un commento:"
+        android:textColor="@color/verde_spotify"
+        android:textSize="20sp"
+        android:layout_below="@+id/recyclerBranoSelezionato"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/iniziocommentopersonale" />
+
+    <EditText
+        android:id="@+id/recensionepersonale"
+        android:layout_width="290dp"
+       android:backgroundTint="@color/white"
+       android:layout_height="wrap_content"
+       android:layout_marginTop="10dp"
+       android:textColor="@color/white"
+       android:layout_below="@+id/iniziocommentopersonale"
+       android:inputType="textMultiLine" />
+
+    <Button
+        android:id="@+id/inviarrecensione"
+        android:text="invia"
+        android:backgroundTint="@color/verde_spotify"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="30sp"
+        android:layout_marginTop="10dp"
+        android:layout_toRightOf="@id/recensionepersonale"
+        android:layout_below="@+id/iniziocommentopersonale" />
+
 
 
 </RelativeLayout>

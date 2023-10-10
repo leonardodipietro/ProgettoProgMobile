@@ -21,7 +21,7 @@
               android:id="@+id/improfBranoSelezionato"
               android:layout_width="48dp"
               android:layout_height="48dp"
-              app:srcCompat="@android:drawable/btn_star_big_on" />
+               />
 
            <TextView
               android:id="@+id/nomeutenteBranoselezionato"
@@ -30,7 +30,7 @@
               android:layout_gravity="center"
               android:layout_weight="1"
               android:text="UTENTE 1"
-              android:textSize="26sp"
+              android:textSize="20sp"
               android:textStyle="bold"
               android:textColor="@color/white"
               android:layout_marginLeft="10dp"/>
@@ -39,31 +39,31 @@
             android:id="@+id/recensione1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
             android:layout_marginLeft="70dp"
             android:layout_marginRight="30dp"
-            android:lines="3"
+
+            android:textColor="@color/white"
             android:layout_marginBottom="15dp"/>
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="right">
             <ImageButton
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:src="@drawable/mipiace"
                 app:tint="@color/white"
                 android:background="@color/black"
                 />
             <ImageButton
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:src="@drawable/nonmipiace"
                 app:tint="@color/white"
                 android:background="@color/black"/>
             <ImageButton
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:src="@drawable/commenta"
                 app:tint="@color/white"
                 android:background="@color/black"/>

@@ -10,8 +10,12 @@ import com.bumptech.glide.Glide
 import com.example.progettoprogmobile.R
 import com.example.progettoprogmobile.model.Track
 
-class TrackGridAdapter(private var tracks: List<Track>) : RecyclerView.Adapter<TrackGridAdapter.TrackGridViewHolder>() {
+class TrackGridAdapter(private var tracks: List<Track>, private val listener: TrackAdapter.OnTrackClickListener) : RecyclerView.Adapter<TrackGridAdapter.TrackGridViewHolder>() {
 
+
+    interface OnTrackClickListener {
+        fun onTrackClicked(data: Track)
+    }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackGridViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.recyclerviewbranigridlayout, parent, false)
         return TrackGridViewHolder(view)
@@ -41,6 +45,10 @@ class TrackGridAdapter(private var tracks: List<Track>) : RecyclerView.Adapter<T
                     .load(track.album.images[0].url)
                     .into(albumImageViewGrid)
             }
+            itemView.setOnClickListener {
+                listener.onTrackClicked(track)
+            }
+
         }
     }
 

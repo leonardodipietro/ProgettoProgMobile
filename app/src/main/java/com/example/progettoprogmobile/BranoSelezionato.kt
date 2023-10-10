@@ -10,6 +10,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -67,6 +68,7 @@ class BranoSelezionato : Fragment() {
             albumBranoSelezionato.text = currentTrack.album.name
             artistaBranoSelezionato.text = currentTrack.artisttrack.firstOrNull()?.name ?: "Sconosciuto" // prendo il primo artista, se esiste
            // recensioneViewModel.fetchRecensioniForTrack(track.id)
+            recensioneViewModel.fetchRecensioniAndUsersForTrack(currentTrack.id)
             // Impostazione dell'immagine con Glide
             val imageUrl = currentTrack.album.images.firstOrNull()?.url // prendo la prima immagine, se esiste
             if (imageUrl != null) {
@@ -76,7 +78,28 @@ class BranoSelezionato : Fragment() {
             }
         }
 
+        setupRecyclerView(rootView)
 
         return rootView
     }
+
+
+    private fun setupRecyclerView(rootView: View) {
+        recyclerView = rootView.findViewById(R.id.recyclerBranoSelezionato)
+        recyclerView.layoutManager = LinearLayoutManager(context)
+        recyclerView.adapter = RecensioniBranoSelAdapter(emptyList())
+
+        recensioneViewModel.recensioniData.observe(viewLifecycleOwner, Observer { recensioni ->
+            val adapter = recyclerView.adapter as? RecensioniBranoSelAdapter
+            adapter?.recensioni = recensioni
+            adapter?.notifyDataSetChanged()
+        })
+
+        recensioneViewModel.usersData.observe(viewLifecycleOwner, Observer { users ->
+            val adapter = recyclerView.adapter as? RecensioniBranoSelAdapter
+            adapter?.usersMap = users
+            adapter?.notifyDataSetChanged()
+        })
+    }
+
 }
