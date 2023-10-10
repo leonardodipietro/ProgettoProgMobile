@@ -20,8 +20,6 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.storage.FirebaseStorage
 import java.io.ByteArrayOutputStream
 
-
-
 class SettingUtils{
     companion object {
         fun showEditNameDialog(context: Context, userId: String, rootView: View) {
@@ -77,7 +75,6 @@ class SettingUtils{
             })
         }
 
-
         private fun saveProfileImageURL(context: Context, userId:String, imageUrl: String) {
             val sharedPreferences =
                 context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
@@ -85,7 +82,6 @@ class SettingUtils{
             editor.putString("profile image_$userId", imageUrl)
             editor.apply()
         }
-
         fun uploadImageToFirebaseStorage(context: Context, userId: String, bitmap: Bitmap) {
             val storage = FirebaseStorage.getInstance()
             val storageReference = storage.getReference("profile image")
@@ -117,7 +113,6 @@ class SettingUtils{
                 Log.e ("LOG UPLOAD",  "Errore durante il caricamento dell'immagine.")
             }
         }
-
 
         fun saveSelectedLanguage(context: Context, languageCode: String) {
             val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
@@ -167,70 +162,76 @@ class SettingUtils{
                 }
         }
 
+        private fun privacyATranslationMap(context: Context): Map<String, String> {
+            return mapOf(
+                context.getString(R.string.everyone) to "Everyone",
+                context.getString(R.string.followers) to "Followers"
+            )
+        }
         fun saveSelectedAP(context: Context, accountPrivacy: String) {
             val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
             val editor = sharedPreferences.edit()
             editor.putString("selectedAccountPrivacy", accountPrivacy)
             editor.apply()
         }
-        fun updateAPOption(context: Context, userId: String, selectedOption: String) {
-            val userRef: DatabaseReference = FirebaseDatabase.getInstance()
-                .reference
+        fun updateAPOption(context: Context, userId: String, selectedROption: String) {
+            val userRef: DatabaseReference = Firebase.database.reference
                 .child("users")
                 .child(userId)
                 .child("privacy")
                 .child("account")
 
-            // Recupera l'elenco delle opzioni di privacy
-            val privacyOptions =
-                listOf(context.getString(R.string.everyone), context.getString(R.string.followers))
+            // Invoca la funzione per creare la mappa di traduzione delle opzioni di privacy
+            val privacyATranslationMap = privacyATranslationMap(context)
 
-            // Imposta tutte le opzioni su false, tranne quella selezionata su true
-            for (option in privacyOptions) {
-                val isOptionSelected = option.equals(selectedOption, ignoreCase = true)
-                userRef.child(option).setValue(isOptionSelected)
-                    .addOnSuccessListener {
-                        // Il valore è stato aggiornato con successo nel database
-                        // Puoi fare qualcosa qui se necessario
-                    }
-                    .addOnFailureListener { e ->
-                        // Gestisci eventuali errori nell'aggiornamento del valore
-                        Log.e("Firebase", "Errore nell'aggiornamento del valore: ${e.message}")
-                    }
+            // Usa la mappa di traduzione per ottenere la chiave univoca
+            val databaseKey = privacyATranslationMap[selectedROption]
+
+            if (databaseKey != null) {
+                // Imposta solo la chiave univoca nel database Firebase
+                val privacyOptions = privacyATranslationMap.values
+                for (option in privacyOptions) {
+                    userRef.child(option).setValue(option == databaseKey)
+                }
+            } else {
+                Log.e("Firebase", "Opzione selezionata non valida: $selectedROption")
             }
         }
 
+        private fun privacyRTranslationMap(context: Context): Map<String, String> {
+            return mapOf(
+                context.getString(R.string.everyone) to "Everyone",
+                context.getString(R.string.followers) to "Followers",
+                context.getString(R.string.nobody) to "Nobody"
+            )
+        }
         fun saveSelectedRP(context: Context, reviewPrivacy: String) {
             val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
             val editor = sharedPreferences.edit()
             editor.putString("selectedReviewPrivacy", reviewPrivacy)
             editor.apply()
         }
-        fun updateRPOption(context: Context, userId: String, selectedOption: String) {
+        fun updateRPOption(context: Context, userId: String, selectedROption: String) {
             val userRef: DatabaseReference = Firebase.database.reference
                 .child("users")
                 .child(userId)
                 .child("privacy")
                 .child("review")
 
-            // Recupera l'elenco delle opzioni di privacy
-            val privacyOptions = listOf(
-                context.getString(R.string.everyone),
-                context.getString(R.string.followers),
-                context.getString(R.string.nobody)
-            )
-            // Imposta tutte le opzioni su false, tranne quella selezionata su true
-            for (option in privacyOptions) {
-                val isOptionSelected = option.equals(selectedOption, ignoreCase = true)
-                userRef.child(option).setValue(isOptionSelected)
-                    .addOnSuccessListener {
-                        // Il valore è stato aggiornato con successo nel database
-                        // Puoi fare qualcosa qui se necessario
-                    }
-                    .addOnFailureListener { e ->
-                        // Gestisci eventuali errori nell'aggiornamento del valore
-                        Log.e("Firebase", "Errore nell'aggiornamento del valore: ${e.message}")
-                    }
+            // Invoca la funzione per creare la mappa di traduzione delle opzioni di privacy
+            val privacyRTranslationMap = privacyRTranslationMap(context)
+
+            // Usa la mappa di traduzione per ottenere la chiave univoca
+            val databaseKey = privacyRTranslationMap[selectedROption]
+
+            if (databaseKey != null) {
+                // Imposta solo la chiave univoca nel database Firebase
+                val privacyOptions = privacyRTranslationMap.values
+                for (option in privacyOptions) {
+                    userRef.child(option).setValue(option == databaseKey)
+                }
+            } else {
+                Log.e("Firebase", "Opzione selezionata non valida: $selectedROption")
             }
         }
     }

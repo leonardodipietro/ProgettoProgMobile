@@ -85,6 +85,8 @@ android {
         //noinspection GradleDependency
         implementation 'com.squareup.picasso:picasso:2.8' //Picasso per salvataggio immagine profilo
 
+        implementation 'androidx.activity:activity-ktx:1.7.2'
+
     }
 
     compileOptions {

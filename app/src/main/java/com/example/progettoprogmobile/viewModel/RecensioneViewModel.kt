@@ -36,7 +36,7 @@ class RecensioneViewModel: ViewModel() {
                     content = commentContent
                 )
 
-                database.child("recensioni").child(commentId).setValue(recensione)
+                database.child("reviews").child(commentId).setValue(recensione)
                     .addOnSuccessListener {
                         addCommentIdToTrack(commentId, trackId)
                         addCommentIdToUser(commentId, userId)
@@ -47,7 +47,7 @@ class RecensioneViewModel: ViewModel() {
             } else {
                 val updatedReview = existingReview.copy(content = commentContent, timestamp = System.currentTimeMillis())
 
-                database.child("recensioni").child(updatedReview.commentId).setValue(updatedReview)
+                database.child("reviews").child(updatedReview.commentId).setValue(updatedReview)
                     .addOnSuccessListener {
                         // Recensione aggiornata con successo
                     }
@@ -59,12 +59,12 @@ class RecensioneViewModel: ViewModel() {
     }
 
     private fun addCommentIdToUser(commentId: String, userId: String) {
-      database.child("users").child(userId).child("recensioni").push().setValue(commentId)
+      database.child("users").child(userId).child("reviews").push().setValue(commentId)
 
 
     }
     fun hasUserReviewed(trackId: String, userId: String, onComplete: (Recensione?) -> Unit) {
-        database.child("recensioni").orderByChild("trackId").equalTo(trackId).addListenerForSingleValueEvent(object : ValueEventListener {
+        database.child("reviews").orderByChild("trackId").equalTo(trackId).addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 var foundRecensione: Recensione? = null
                 for (snapshot in dataSnapshot.children) {
@@ -111,7 +111,7 @@ class RecensioneViewModel: ViewModel() {
     }
 
     private fun fetchRecensioniForTrack(trackId: String) {
-        database.child("recensioni")
+        database.child("reviews")
             .orderByChild("trackId")
             .equalTo(trackId)
             .addValueEventListener(object : ValueEventListener {

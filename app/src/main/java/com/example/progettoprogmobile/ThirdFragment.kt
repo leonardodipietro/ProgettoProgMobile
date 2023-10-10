@@ -1,16 +1,25 @@
 package com.example.progettoprogmobile
 
-import android.Manifest
+import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.content.SharedPreferences
+import android.graphics.Bitmap
+import android.graphics.Matrix
 import android.graphics.Rect
+import android.Manifest
+import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
 import android.view.*
 import android.widget.*
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.progettoprogmobile.utils.SettingUtils
@@ -23,17 +32,6 @@ import com.google.firebase.storage.StorageReference
 import com.squareup.picasso.Picasso
 import java.io.IOException
 import java.util.Locale
-
-import android.app.Activity
-import android.graphics.Bitmap
-import android.widget.Button
-import android.widget.ImageView
-
-import android.content.SharedPreferences
-import android.content.pm.PackageManager
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-
 
 open class ThirdFragment : Fragment() {
 
@@ -69,11 +67,10 @@ open class ThirdFragment : Fragment() {
     private lateinit var selectedReviewPrivacy: String
     private lateinit var reviewPrivacyListView: ListView
 
-    val photoRequestCode = 1
-    val photoRequestCodeFromGallery = 2
+    private val photoRequestCode = 1
+    private val photoRequestCodeFromGallery = 2
 
-    private lateinit var imageUrl: String // Aggiungi questa variabile
-    private lateinit var sharedPreferences: SharedPreferences // Aggiungi questa variabile
+    private lateinit var sharedPreferences: SharedPreferences
 
 
     override fun onCreateView(
@@ -227,6 +224,31 @@ open class ThirdFragment : Fragment() {
         // Imposta un click listener per il pulsante "Delete"
         delete.setOnClickListener {
             firebaseauthviewModel.delete(requireContext())
+
+            // Ottieni un riferimento al nodo utente nel Realtime Database
+            val databaseReference = FirebaseDatabase.getInstance().getReference("users").child(userId)
+            // Rimuovi il nodo utente dal database in tempo reale
+            databaseReference.removeValue()
+
+            // Ora, elimina anche tutte le recensioni associate a questo utente
+            val reviewsReference = FirebaseDatabase.getInstance().getReference("reviews")
+
+            // Query per ottenere le recensioni dell'utente che stai eliminando
+            val query = reviewsReference.orderByChild("userId").equalTo(userId)
+
+            query.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    for (reviewSnapshot in dataSnapshot.children) {
+                        // Rimuovi questa recensione
+                        reviewSnapshot.ref.removeValue()
+                    }
+                }
+
+                override fun onCancelled(databaseError: DatabaseError) {
+                    // Gestisci eventuali errori qui
+                }
+            })
+
         }
 
         // Osserva il risultato del logout dall'account Firebase
@@ -304,7 +326,6 @@ open class ThirdFragment : Fragment() {
             onActivityResultForGallery(requestCode, resultCode, data)
         }
     }
-
     private fun onActivityResultForGallery(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
             photoRequestCodeFromGallery -> {
@@ -423,8 +444,8 @@ open class ThirdFragment : Fragment() {
 
         accountPrivacyListView.setOnItemClickListener { _, _, position, _ ->
             selectedAccountPrivacy = accountPrivacy[position]
-            settingUtils.saveSelectedAP(requireContext(), selectedReviewPrivacy)
-            settingUtils.updateAPOption(requireContext(), userId, selectedReviewPrivacy)
+            settingUtils.saveSelectedAP(requireContext(), selectedAccountPrivacy)
+            settingUtils.updateAPOption(requireContext(), userId, selectedAccountPrivacy)
             popupWindow.dismiss()
             account.text = selectedAccountPrivacy
         }
