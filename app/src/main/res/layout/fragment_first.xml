@@ -83,6 +83,7 @@
             android:layout_below="@+id/sceglicosavedere"
             android:layout_marginTop="20dp"
             android:id="@+id/recyclerViewtopbrani"
+            android:visibility="visible"
             android:layout_marginBottom="18dp">
 
         </androidx.recyclerview.widget.RecyclerView>
