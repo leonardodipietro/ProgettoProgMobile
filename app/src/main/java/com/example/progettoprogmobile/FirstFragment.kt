@@ -57,7 +57,7 @@ class FirstFragment : Fragment(),TrackAdapter.OnTrackClickListener {
             // Mostra l'AlertDialog quando il pulsante viene premuto
             openfiltermenu()
         }
-
+        // Inizializza il RecyclerView e l'adapter
 
         val startAuthBotton:Button=rootView.findViewById(R.id.startAuthButton)
         startAuthBotton.setOnClickListener {
@@ -106,7 +106,7 @@ class FirstFragment : Fragment(),TrackAdapter.OnTrackClickListener {
 
         trackAdapter = TrackAdapter(emptyList(),this) // Inizialmente senza tracce
         recyclerView.adapter = trackAdapter
-        trackGridAdapter = TrackGridAdapter(emptyList())
+        trackGridAdapter = TrackGridAdapter(emptyList(),this)
         // Aggiorna l'adapter con i nuovi dati
         firebaseViewModel.topTracksfromdb.observe(viewLifecycleOwner) { tracks ->
             trackAdapter.submitList(tracks)
