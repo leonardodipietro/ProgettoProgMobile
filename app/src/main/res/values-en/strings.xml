@@ -46,4 +46,20 @@
     <string name="recensioni">Recensioni</string>
     <string name="top_track">Top Track</string>
     <string name="top_artist">Top Artist</string>
+
+    <string name="followersNotification">Follow requests</string>
+    <string name="reviewNotification">Review</string>
+    <string name="newFRequest">requested to follow you</string>
+    <string name="delete1">Delete</string>
+    <string name="confirm">Confirm</string>
+    <string name="newFollower">started following you</string>
+    <string name="follow">Follow</string>
+    <string name="following1">Following</string>
+
+    <string name="newReviewNotification">just wrote a new review</string>
+    <string name="newResponseNotification">just responded to your review</string>
+    <string name="newLikedReview">liked your review</string>
+    <string name="newDislikedReview">didn\'t like your review</string>
+
+
 </resources>

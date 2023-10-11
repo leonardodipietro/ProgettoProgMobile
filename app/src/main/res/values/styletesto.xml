@@ -1,4 +1,3 @@
-
 <resources>
 
     <style name="CustomTextStyle">
@@ -19,6 +18,18 @@
 
         <!-- inactive track color (30% transparency) -->
         <item name="android:colorForeground">@color/white</item>
+    </style>
+
+    <style name="CustomButtonStyle" parent="Widget.MaterialComponents.Button">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="cornerRadius">10dp</item> <!-- Imposta il raggio degli angoli arrotondati -->
+        <item name="backgroundTint">@color/verde_spotify</item> <!-- Imposta il colore di sfondo -->
+    </style>
+
+    <style name="CustomToggleButtonStyle">
+        <item name="android:background">@drawable/button</item>
+        <item name="android:textColor">@color/white</item>
     </style>
 
 </resources>

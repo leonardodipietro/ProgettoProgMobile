@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <corners android:radius="8dp" /> <!-- Imposta il raggio per gli angoli arrotondati -->
-    <solid android:color="@color/verde_spotify" /> <!-- Imposta il colore di sfondo -->
-</shape>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_checked="false">
+        <shape android:shape="rectangle">
+            <corners android:radius="12dp" /> <!-- Imposta il raggio degli angoli -->
+            <solid android:color="@color/verde_spotify" /> <!-- Colore di sfondo quando non è selezionato -->
+        </shape>
+    </item>
+    <item android:state_checked="true">
+        <shape android:shape="rectangle">
+            <corners android:radius="12dp" /> <!-- Imposta il raggio degli angoli -->
+            <solid android:color="@color/light_gray" /> <!-- Colore di sfondo quando è selezionato -->
+        </shape>
+    </item>
+</selector>
