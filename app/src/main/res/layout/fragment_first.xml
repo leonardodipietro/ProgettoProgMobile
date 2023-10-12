@@ -27,8 +27,9 @@
             android:id="@+id/sceglicosavedere">
             <Button
                 android:id="@+id/apriilmenudifiltraggio"
-                android:layout_width="40dp"
+                android:layout_width="50dp"
                 android:layout_height="50dp"
+                android:contentDescription="@string/clessidra1"
                 android:background="@drawable/time"
                 android:layout_centerInParent="true"
                 android:backgroundTint="@color/verde_spotify"
@@ -70,7 +71,7 @@
                 android:layout_width="50dp"
                 android:layout_height="wrap_content"
                 android:background="@drawable/sceglicosavedere"
-
+                android:contentDescription="@string/griglia1"
                 android:textColor="@color/black"
                 android:layout_below="@id/startAuthButton"
                 />

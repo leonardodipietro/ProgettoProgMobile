@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/black"
@@ -9,7 +10,7 @@
     <RelativeLayout
         android:id="@+id/topSection"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content" >
 
         <Button
             android:id="@+id/backArrow"
@@ -58,27 +59,115 @@
 
         <TextView
             android:id="@+id/contatoreRecensioni"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/recensioni"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:contentDescription="@string/contatorerecensioni"
             android:textColor="@color/white"
             android:layout_toEndOf="@+id/userProfileImage" />
 
         <TextView
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_above="@+id/recensioniContatore"
+            android:layout_alignStart="@+id/contatoreRecensioni"
+            android:layout_alignTop="@+id/contatoreRecensioni"
+            android:layout_alignEnd="@+id/contatoreRecensioni"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="19dp"
+            android:layout_marginBottom="0dp"
+            app:layout_constraintBottom_toTopOf="@+id/recensioniContatore"
+            app:layout_constraintEnd_toEndOf="@+id/contatoreRecensioni"
+            app:layout_constraintStart_toStartOf="@+id/contatoreRecensioni" />
+
+        <TextView
+            android:layout_width="80dp"
+            android:layout_height="35dp"
+            android:id="@+id/recensioniContatore"
+            android:layout_alignEnd="@+id/contatoreRecensioni"
+            android:layout_alignBottom="@+id/contatoreRecensioni"
+            android:layout_marginEnd="0dp"
+            android:layout_marginBottom="0dp"
+            android:gravity="center"
+            android:text="@string/reviewText"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@+id/contatoreRecensioni"
+            app:layout_constraintEnd_toEndOf="@+id/contatoreRecensioni" />
+
+        <TextView
             android:id="@+id/contatoreFollowers"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/followers"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
             android:textColor="@color/white"
             android:layout_toEndOf="@+id/contatoreRecensioni" />
 
         <TextView
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_above="@+id/followersContatore"
+            android:layout_alignStart="@+id/contatoreFollowers"
+            android:layout_alignTop="@+id/contatoreFollowers"
+            android:layout_alignEnd="@+id/contatoreFollowers"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="19dp"
+            android:layout_marginBottom="0dp"
+            app:layout_constraintBottom_toTopOf="@+id/followersContatore"
+            app:layout_constraintEnd_toEndOf="@+id/contatoreFollowers"
+            app:layout_constraintStart_toStartOf="@+id/contatoreFollowers" />
+
+        <TextView
+            android:layout_width="80dp"
+            android:layout_height="35dp"
+            android:id="@+id/followersContatore"
+            android:layout_alignEnd="@+id/contatoreFollowers"
+            android:layout_alignBottom="@+id/contatoreFollowers"
+            android:layout_marginEnd="0dp"
+            android:layout_marginBottom="0dp"
+            android:gravity="center"
+            android:text="@string/followers"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@+id/contatoreFollowers"
+            app:layout_constraintEnd_toEndOf="@+id/contatoreFollowers" />
+
+        <TextView
             android:id="@+id/contatoreFollowing"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/following"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
             android:textColor="@color/white"
             android:layout_toEndOf="@+id/contatoreFollowers" />
+
+        <TextView
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_above="@+id/followingsContatore"
+            android:layout_alignStart="@+id/contatoreFollowing"
+            android:layout_alignTop="@+id/contatoreFollowing"
+            android:layout_alignEnd="@+id/contatoreFollowing"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginEnd="19dp"
+            android:layout_marginBottom="0dp"
+            app:layout_constraintBottom_toTopOf="@+id/followingsContatore"
+            app:layout_constraintEnd_toEndOf="@+id/contatoreFollowing"
+            app:layout_constraintStart_toStartOf="@+id/contatoreFollowing" />
+
+        <TextView
+            android:layout_width="80dp"
+            android:layout_height="35dp"
+            android:id="@+id/followingsContatore"
+            android:layout_alignEnd="@+id/contatoreFollowing"
+            android:layout_alignBottom="@+id/contatoreFollowing"
+            android:layout_marginEnd="0dp"
+            android:layout_marginBottom="0dp"
+            android:gravity="center"
+            android:text="@string/following"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@+id/contatoreFollowing"
+            app:layout_constraintEnd_toEndOf="@+id/contatoreFollowing" />
 
     </RelativeLayout>
 
@@ -99,7 +188,7 @@
             android:contentDescription="@string/clessidra"
             android:paddingEnd="16dp"
             android:paddingStart="8dp"
-            android:layout_marginEnd="8dp"/>
+            android:layout_marginEnd="0dp"/>
 
         <Button
             android:id="@+id/btn_topBrani"
