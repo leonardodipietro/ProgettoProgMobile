@@ -1,40 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/fragment_container_second"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/gray"
     android:orientation="horizontal"
     android:padding="16dp">
 
-
-
-
-      <!--  <EditText
-            android:id="@+id/editTextSearch"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:hint="@string/cerca_utenti"
-            android:textColor="@color/black"
-            android:imeOptions="actionSearch"
-            android:inputType="text"
-            android:minHeight="48dp"
-            tools:ignore="Autofill,VisualLintTextFieldSize" />
-
-        <Button
-            android:id="@+id/buttonSearch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/buttonstyle"
-            android:text="@string/cerca2"
-            tools:ignore="TouchTargetSizeCheck" />
-    -->
     <androidx.appcompat.widget.SearchView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/searchviewuser"/>
-
+        android:id="@+id/searchviewuser" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
@@ -45,3 +23,23 @@
     </androidx.recyclerview.widget.RecyclerView>
 </RelativeLayout>
 
+    <!--  <EditText
+          android:id="@+id/editTextSearch"
+          android:layout_width="0dp"
+          android:layout_height="wrap_content"
+          android:layout_weight="1"
+          android:hint="@string/cerca_utenti"
+          android:textColor="@color/black"
+          android:imeOptions="actionSearch"
+          android:inputType="text"
+          android:minHeight="48dp"
+          tools:ignore="Autofill,VisualLintTextFieldSize" />
+
+      <Button
+          android:id="@+id/buttonSearch"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:background="@drawable/buttonstyle"
+          android:text="@string/cerca2"
+          tools:ignore="TouchTargetSizeCheck" />
+  -->

@@ -76,11 +76,6 @@ class SecondActivity : AppCompatActivity() {
                     transaction.replace(R.id.nav_host_fragment, newFragment, "fourthFragment")
                     currentFragment = newFragment
                 }
-                R.id.paginaAmico -> {
-                    val newFragment = FifthFragment()
-                    transaction.replace(R.id.nav_host_fragment, newFragment, "fifthFragment")
-                    currentFragment = newFragment
-                }
             }
             transaction.commit()
             true // Indica che la selezione è stata gestita con successo
@@ -139,12 +134,6 @@ class SecondActivity : AppCompatActivity() {
                 currentFragment = newFragment
                 bottomNavigationView.selectedItemId = R.id.notification
             }
-            R.id.menu_fifth_fragment -> {
-                val newFragment = ThirdFragment()
-                transaction.replace(R.id.nav_host_fragment, newFragment, "fifthFragment")
-                currentFragment = newFragment
-                bottomNavigationView.selectedItemId = R.id.paginaAmico
-            }
             else -> return super.onOptionsItemSelected(item)
         }
         transaction.commit()
@@ -170,40 +159,12 @@ class SecondActivity : AppCompatActivity() {
             Log.d("SECONDO LOG ACTIVITY", "Intent does not contain data")
         }
     }
-}
 
-
-
-
-/*
- // Trova il componente BottomNavigationView nel layout XML e lo assegna ad una variabile
-        val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
-        // Imposta un listener per la selezione degli elementi nel BottomNavigationView
-        bottomNavigationView.setOnItemSelectedListener { item ->
-            // Gestisci la selezione in base all'ID dell'elemento selezionato
-            when (item.itemId) {
-                R.id.home -> {
-                    // Trova il NavController e naviga al primo fragment
-                    val navController = Navigation.findNavController(this, R.id.nav_host_fragment)
-                    navController.navigate(R.id.firstFragment)
-                    //NOTA BENE
-                    bottomNavigationView.selectedItemId = R.id.firstFragment // Aggiorna la sezione dell'icona nella barra di navigazione
-
-                    true // Indica che la selezione è stata gestita con successo
-                }
-                R.id.profile -> {
-                    // Trova il NavController e naviga al secondo fragment
-                    val navController = Navigation.findNavController(this, R.id.nav_host_fragment)
-                    navController.navigate(R.id.secondFragment)
-                    true // Indica che la selezione è stata gestita con successo
-                }
-                R.id.settings -> {
-                    // Trova il NavController e naviga al terzo fragment
-                    val navController = Navigation.findNavController(this, R.id.nav_host_fragment)
-                    navController.navigate(R.id.thirdFragment)
-                    true // Indica che la selezione è stata gestita con successo
-                }
-                else -> false // Gestione predefinita nel caso in cui l'ID dell'elemento non corrisponda a nessuno dei casi precedenti
-            }
+    override fun onBackPressed() {
+        if (supportFragmentManager.backStackEntryCount > 0) {
+            supportFragmentManager.popBackStack()
+        } else {
+            super.onBackPressed()
         }
- */
+    }
+}

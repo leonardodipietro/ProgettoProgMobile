@@ -31,12 +31,12 @@ class RecensioniBranoSelAdapter(     var recensioni: List<Recensione>,
 
         holder.txtRecensione.text = recensione.content // supponendo che Recensione abbia un campo 'content' per il contenuto della recensione
 
-        user?.let {
-            holder.txtUserName.text = it.name
-            Glide.with(holder.itemView.context)
-                .load(it.images) // assumendo che l'oggetto utente abbia un campo 'profileImage' per l'URL dell'immagine
-                .into(holder.imgProfile)
-        }
+//        user?.let {
+//            holder.txtUserName.text = it.name
+//            Glide.with(holder.itemView.context)
+//                .load(it.images) // assumendo che l'oggetto utente abbia un campo 'profileImage' per l'URL dell'immagine
+//                .into(holder.imgProfile)
+//        }
     }
 
 

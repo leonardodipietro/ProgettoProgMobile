@@ -10,6 +10,9 @@ import androidx.lifecycle.AndroidViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import android.content.Context
+import android.os.Bundle
+import com.example.progettoprogmobile.FifthFragment
+import com.example.progettoprogmobile.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -30,6 +33,7 @@ class FirebaseViewModel (application: Application): AndroidViewModel(application
     // Dichiarazione della variabile per il controllo dello stato di registrazione dell'utente
     private var isUserRegistered = false
     val _users= MutableLiveData<List<Utente>>()
+
     fun cercaUtenti(query: String) {
         Log.d("FirebaseViewModel", "cercaUtenti called with query: $query")
         val ref = FirebaseDatabase.getInstance().getReference("users")
@@ -43,6 +47,7 @@ class FirebaseViewModel (application: Application): AndroidViewModel(application
                         val utente = it.getValue(Utente::class.java)
                         if (utente != null) {
                             Log.d("FirebaseViewModel", "Read user name from Firebase: ${utente.name}")
+                            Log.d("FirebaseViewModel", "Read ID from Firebase: ${utente.userId}")
                             risultati.add(utente)
                         } else {
                             Log.e("FirebaseViewModel", "Error reading user: $it")
@@ -66,6 +71,7 @@ class FirebaseViewModel (application: Application): AndroidViewModel(application
 
         user?.displayName?.let { userData["name"] = it }
         user?.email?.let { userData["email"] = it }
+        user?.uid?.let {userData["userId"] = it }
 
         // Verifica se l'utente è già registrato prima di salvare le credenziali
         if (!isUserRegistered) {
@@ -290,6 +296,34 @@ class FirebaseViewModel (application: Application): AndroidViewModel(application
         }
     }
 
+
+    interface OnUserFetchedListener {
+        fun onUserFetched(utente: Utente)
+    }
+
+    var onUserFetchedListener: OnUserFetchedListener? = null
+
+    // Funzione per recuperare i dati di un utente dal database Firebase
+    fun fetchUserDataFromFirebase(userId: String, listener: OnUserFetchedListener) {
+        val userRef = FirebaseDatabase.getInstance().reference.child("users").child(userId)
+
+        userRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val name = snapshot.child("name").getValue(String::class.java) ?: ""
+                val userId = snapshot.child("userId").getValue(String::class.java) ?: ""
+
+                // Crea un oggetto Utente con dati non nulli
+                val utente = Utente(userId, name)
+
+                // Passa l'oggetto Utente al listener fornito come parametro
+                listener.onUserFetched(utente)
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                // Gestisci l'errore durante la lettura dei dati utente
+            }
+        })
+    }
 }
 
 

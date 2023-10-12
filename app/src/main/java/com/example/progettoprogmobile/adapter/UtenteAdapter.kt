@@ -1,51 +1,57 @@
-import android.util.Log
+package com.example.progettoprogmobile.adapter
+
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.progettoprogmobile.R
 import com.example.progettoprogmobile.model.Utente
+import android.util.Log
 
-class UtenteAdapter : RecyclerView.Adapter<UtenteAdapter.UtenteViewHolder>() {
-
-    private var users = listOf<Utente>()
-
-    fun submitList(users: List<Utente>) {
-        this.users = users
-        Log.d("UtenteAdapter", "submitList - users.size: ${users.size}")
-        notifyDataSetChanged() // Notifica all'adapter che i dati sono cambiati
-    }
+class UtenteAdapter(private val onUserSelected: (String) -> Unit) :
+    ListAdapter<Utente, UtenteAdapter.UtenteViewHolder>(UtenteDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UtenteViewHolder {
-        Log.d("UtenteAdapter", "onCreateViewHolder called")
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.item_utente_view, parent, false)
         return UtenteViewHolder(itemView)
     }
 
     override fun onBindViewHolder(holder: UtenteViewHolder, position: Int) {
-        Log.d("UtenteAdapter", "onBindViewHolder - position: $position")
-        val user= users[position]
-        Log.d("UtenteAdapter", "User at position $position: ${user.toString()}")
-        holder.bind(user)
-    }
-
-    override fun getItemCount(): Int {
-        Log.d("UtenteAdapter", "getItemCount: ${users.size}")
-        return users.size
-    }
-
-
-    class UtenteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        fun bind(utente: Utente) {
-            val textViewNome: TextView = itemView.findViewById(R.id.textViewNome)
-            if(utente.name.isNullOrEmpty()) {
-                Log.e("UtenteViewHolder", "User name is null or empty")
+        val utente = getItem(position)
+        holder.bind(utente)
+        holder.itemView.setOnClickListener {
+            val userId = utente.userId
+            Log.d("UtenteAdapter", "Item clicked with userId: $userId")
+            if (!userId.isNullOrEmpty()) {
+                onUserSelected(userId)
             } else {
-                Log.d("UtenteViewHolder", "Binding user name: ${utente.name}")
-                textViewNome.text = utente.name
+                Log.e("UtenteAdapter", "Invalid userId for item at position $position")
             }
         }
     }
 
+    inner class UtenteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val textViewNome: TextView = itemView.findViewById(R.id.textViewNome)
+
+        fun bind(utente: Utente) {
+            textViewNome.text = utente.name
+        }
+    }
+
+    private class UtenteDiffCallback : DiffUtil.ItemCallback<Utente>() {
+        override fun areItemsTheSame(oldItem: Utente, newItem: Utente): Boolean {
+            return oldItem.userId == newItem.userId
+        }
+
+        override fun areContentsTheSame(oldItem: Utente, newItem: Utente): Boolean {
+            return oldItem == newItem
+        }
+    }
+
+    fun setUtenti(utenti: List<Utente>) {
+        submitList(utenti)
+    }
 }

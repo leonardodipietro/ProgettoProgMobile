@@ -1,11 +1,21 @@
 package com.example.progettoprogmobile.model
 
-import com.google.gson.annotations.SerializedName
-
 data class Utente(
-    val name:String?=null,
-    val images: List<ImageProfile>?=null ,
+    val userId: String,
+    val name: String
+) {
+    // Costruttore senza argomenti necessario per Firebase
+    constructor() : this("", "")
+}
+
+/*
+data class Utente(
+    val userId: String = "",
+    val name: String = ""
 )
-data class ImageProfile(
-    @SerializedName("url") val url: String
-)
+
+{
+    // Costruttore senza argomenti necessario per Firebase
+    constructor() : this("")
+}
+ */

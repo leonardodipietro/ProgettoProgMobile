@@ -113,5 +113,8 @@
     <string name="newResponseNotification">ha appena risposto alla tua recensione</string>
     <string name="newLikedReview">piace la tua recensione</string>
     <string name="newDislikedReview">non piace la tua recensione</string>
+    <string name="clessidra">Clessidra</string>
+    <string name="frecciaindietro">FrecciaIndietro</string>
+    <string name="calendario">Calendario</string>
 
 </resources>

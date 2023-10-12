@@ -16,8 +16,4 @@
         android:id="@+id/notification"
         android:title="Notifiche"
         android:icon="@drawable/baseline_notifications_24"/>
-    <item
-        android:id="@+id/paginaAmico"
-        android:title="Pagina Amico"
-        android:icon="@drawable/amici"/>
 </menu>
