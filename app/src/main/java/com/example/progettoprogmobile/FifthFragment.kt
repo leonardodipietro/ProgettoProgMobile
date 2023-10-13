@@ -7,8 +7,10 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import android.widget.Button
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.squareup.picasso.Picasso
 import com.bumptech.glide.Glide
 import com.example.progettoprogmobile.adapter.TrackAdapter
 import com.example.progettoprogmobile.adapter.ArtistAdapter
@@ -20,12 +22,13 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.progettoprogmobile.viewModel.FirebaseViewModel
 import java.util.ArrayList
 import com.example.progettoprogmobile.model.Utente
+import android.os.Handler
+import android.os.Looper
 import com.example.progettoprogmobile.model.Track
 import com.example.progettoprogmobile.model.Artist
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.firebase.database.DataSnapshot
-
 
 class FifthFragment : Fragment() {
 
@@ -43,17 +46,19 @@ class FifthFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
+
         val rootView = inflater.inflate(R.layout.fragment_fifth, container, false)
         val topTracksRecyclerView: RecyclerView = rootView.findViewById(R.id.recyclerViewUtenteTrack)
         val topArtistsRecyclerView: RecyclerView = rootView.findViewById(R.id.recyclerViewUtenteArtist)
+        val backButton: Button = rootView.findViewById(R.id.backArrow)
+
+        backButton.setOnClickListener {
+            // Azione da eseguire quando il pulsante freccia viene cliccato
+            requireActivity().onBackPressed() // Torna al fragment precedente
+        }
 
         val userId: String? = arguments?.getString("userId")
         Log.d("FifthFragment", "User ID ricevuto: $userId")
-
-        // Crea un elenco vuoto di oggetti Track e Artist
-        val topTracksList: ArrayList<String> = ArrayList()
-        val topArtistsList: ArrayList<String> = ArrayList()
 
         // Inizializza Firebase
         auth = FirebaseAuth.getInstance()
@@ -66,7 +71,45 @@ class FifthFragment : Fragment() {
         usernameTextView = rootView.findViewById(R.id.usernameHeader)
         profileImageView = rootView.findViewById(R.id.userProfileImage)
 
-        // Crea gli adapter e passa un'istanza del listener
+        // Ottieni il riferimento al nodo utente nel database Firebase
+        val userReference = database.reference.child("users").child(userId ?: "")
+
+        // Ottieni il nome utente dell'utente attuale da Firebase
+        userReference.child("name").get().addOnSuccessListener { dataSnapshot ->
+            val username = dataSnapshot.value as? String
+            username?.let {
+                usernameTextView.text = it
+                Log.d("FifthFragment", "Name: $it")
+            }
+        }.addOnFailureListener { exception ->
+            // Gestisci l'errore
+            Log.e("FifthFragment", "Errore nel recupero del nome utente: ${exception.message}")
+        }
+
+        // Ottieni l'URL dell'immagine del profilo dell'utente attuale da Firebase Storage
+        userReference.child("profile image").get().addOnSuccessListener { dataSnapshot ->
+            val profileImageUrl = dataSnapshot.value as? String
+            profileImageUrl?.let {
+                // Carica l'immagine del profilo utilizzando Glide o un'altra libreria di immagini
+                Handler(Looper.getMainLooper()).post {
+                    Picasso.get().load(it).into(profileImageView) //Glide.with(this).load(it).into(profileImageView)
+                    Log.d("FifthFragment", "Profile Image URL: $it")
+                }
+            }
+        }.addOnFailureListener { exception ->
+            // Gestisci l'errore
+            Log.e("FifthFragment", "Errore nel recupero dell'URL dell'immagine del profilo: ${exception.message}")
+        }
+        return rootView
+    }
+}
+
+/*
+// Crea un elenco vuoto di oggetti Track e Artist
+        val topTracksList: ArrayList<String> = ArrayList()
+        val topArtistsList: ArrayList<String> = ArrayList()
+
+// Crea gli adapter e passa un'istanza del listener
         topTracksAdapter = TrackAdapter(emptyList(), object : TrackAdapter.OnTrackClickListener {
             override fun onTrackClicked(data: Any) {
                 // Gestisci l'evento di clic sulla traccia
@@ -107,29 +150,7 @@ class FifthFragment : Fragment() {
             }
         })
 
-        // Ottieni il riferimento al nodo utente nel database Firebase
-        val userReference = database.reference.child("users").child(userId ?: "")
-
-        // Ottieni il nome utente dell'utente attuale da Firebase
-        userReference.child("username").get().addOnSuccessListener { dataSnapshot ->
-            val username = dataSnapshot.value as? String
-            username?.let {
-                usernameTextView.text = it
-                Log.d("FifthFragment", "Username: $it")
-            }
-        }
-
-        // Ottieni l'URL dell'immagine del profilo dell'utente attuale da Firebase Storage
-        userReference.child("profileImageURL").get().addOnSuccessListener { dataSnapshot ->
-            val profileImageUrl = dataSnapshot.value as? String
-            profileImageUrl?.let {
-                // Carica l'immagine del profilo utilizzando Glide o un'altra libreria di immagini
-                Glide.with(this).load(it).into(profileImageView)
-                Log.d("FifthFragment", "Profile Image URL: $it")
-            }
-        }
-
-        // Riferimento al nodo delle top track nel database Firebase
+// Riferimento al nodo delle top track nel database Firebase
         val topTracksReference = database.reference.child("top_tracks")
 
         // Ottieni la lista delle top track da Firebase
@@ -174,7 +195,4 @@ class FifthFragment : Fragment() {
             topArtistsRecyclerView.adapter = topArtistsAdapter
             topArtistsRecyclerView.layoutManager = LinearLayoutManager(context)
         }
-
-        return rootView
-    }
-}
+ */

@@ -92,11 +92,12 @@ class SecondFragment : Fragment() {
                     }
                     val fifthFragment = FifthFragment()
                     fifthFragment.arguments = bundle
-                    val transaction = requireActivity().supportFragmentManager.beginTransaction()
+                    //val transaction = requireActivity().supportFragmentManager.beginTransaction()
 
-                    transaction.replace(R.id.fragment_container_second, fifthFragment)
-                    transaction.addToBackStack(null) // Rimuovi il fragment precedente dallo stack
-                    transaction.commit()
+                    parentFragmentManager.beginTransaction()
+                        .replace(R.id.nav_host_fragment, fifthFragment) //fragment_container_second
+                        .addToBackStack(null) // Rimuovi il fragment precedente dallo stack
+                        .commit()
                 }
             })
             val backStackEntryCountAfter = requireActivity().supportFragmentManager.backStackEntryCount
@@ -106,20 +107,3 @@ class SecondFragment : Fragment() {
         }
     }
 }
-
-/*
-fun onTrackClicked(data: Any) {
-        Log.d("FragmentClick", "Item clicked with data: $data")
-        if (data is Utente) {
-            // Qui naviga verso il nuovo fragment, puoi passare "Utente" come argomento se necessario
-            val newFragment = com.example.progettoprogmobile.FifthFragment()
-            val bundle = Bundle()
-            bundle.putSerializable("trackDetail", data)
-            newFragment.arguments = bundle
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container_second, newFragment)
-                .addToBackStack(null)
-                .commit()
-        }
-    }
- */
