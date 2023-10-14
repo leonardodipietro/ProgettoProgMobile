@@ -15,9 +15,14 @@ import android.os.Bundle
 import com.example.progettoprogmobile.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import java.util.concurrent.CountDownLatch
+import kotlin.coroutines.resumeWithException
 
 
 class FirebaseViewModel (application: Application): AndroidViewModel(application) {
@@ -244,57 +249,67 @@ class FirebaseViewModel (application: Application): AndroidViewModel(application
     }
 
     private fun retrieveTracksDetails(trackIds: List<String>) {
-        val tracksRef = database.child("tracks")
-        val artistsRef = database.child("artists")
-        val tracks = mutableListOf<Track>()
-        var count = 0
+        CoroutineScope(Dispatchers.IO).launch {
+            val tracksRef = database.child("tracks")
+            val artistsRef = database.child("artists")
+            val tracks = mutableListOf<Track>()
 
-        trackIds.forEach { trackId ->
-            tracksRef.child(trackId).addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val trackName = snapshot.child("trackName").getValue(String::class.java) ?: ""
-                    val albumName = snapshot.child("album").getValue(String::class.java) ?: ""
-                    val imageUrl = snapshot.child("image_url").getValue(String::class.java) ?: ""
+            val trackDetails = trackIds.map { trackId ->
+                async {
+                    val trackSnapshot = getSnapshotFromFirebase(tracksRef.child(trackId))
+                    val trackName = trackSnapshot.child("trackName").getValue(String::class.java) ?: ""
+                    val albumName = trackSnapshot.child("album").getValue(String::class.java) ?: ""
+                    val imageUrl = trackSnapshot.child("image_url").getValue(String::class.java) ?: ""
+                    val artistIds = trackSnapshot.child("artists").children.mapNotNull { it.getValue(String::class.java) }
 
-                    val artistIds = snapshot.child("artists").children.mapNotNull { it.getValue(String::class.java) }
-                    val artistDetailsList = mutableListOf<Artist>()
+                    val artistDetails = artistIds.map { artistId ->
+                        async {
+                            getSnapshotFromFirebase(artistsRef.child(artistId))
+                        }
+                    }.awaitAll()
 
-                    artistIds.forEach { artistId ->
-                        artistsRef.child(artistId).addListenerForSingleValueEvent(object : ValueEventListener {
-                            override fun onDataChange(artistSnapshot: DataSnapshot) {
-                                val artistName = artistSnapshot.child("name").getValue(String::class.java) ?: ""
-                                val genresTypeIndicator = object : GenericTypeIndicator<List<String>>() {}
-                                val genres = artistSnapshot.child("genres").getValue(genresTypeIndicator) ?: listOf()
-                                val artistImageUrl = artistSnapshot.child("image_url").getValue(String::class.java) ?: ""
-
-                                artistDetailsList.add(Artist(artistName, genres, artistId, listOf(Image(artistImageUrl))))
-
-                                if (artistDetailsList.size == artistIds.size) {
-                                    val album = Album(albumName, listOf(Image(imageUrl)), snapshot.child("release_date").getValue(String::class.java) ?: "")
-                                    val track = Track(trackName, album, artistDetailsList, trackId)
-
-                                    tracks.add(track)
-
-                                    count++
-                                    if (count == trackIds.size) {
-                                        topTracksfromdb.postValue(tracks)
-                                    }
-                                }
-                            }
-
-                            override fun onCancelled(artistError: DatabaseError) {
-                                Log.e("FirebaseError", "Errore durante il recupero dei dettagli dell'artista dal database Firebase: ${artistError.message}")
-                            }
-                        })
+                    val artistDetailsList = artistDetails.map { artistSnapshot ->
+                        val artistName = artistSnapshot.child("name").getValue(String::class.java) ?: ""
+                        val genresTypeIndicator = object : GenericTypeIndicator<List<String>>() {}
+                        val genres = artistSnapshot.child("genres").getValue(genresTypeIndicator) ?: listOf()
+                        val artistImageUrl = artistSnapshot.child("image_url").getValue(String::class.java) ?: ""
+                        Artist(artistName, genres, artistSnapshot.key!!, listOf(Image(artistImageUrl)))
                     }
-                }
 
-                override fun onCancelled(trackError: DatabaseError) {
-                    Log.e("FirebaseError", "Errore durante il recupero dei dettagli della traccia dal database Firebase: ${trackError.message}")
+                    val album = Album(albumName, listOf(Image(imageUrl)), trackSnapshot.child("release_date").getValue(String::class.java) ?: "")
+                    Track(trackName, album, artistDetailsList, trackId)
                 }
-            })
+            }.awaitAll()
+
+            tracks.addAll(trackDetails)
+
+            withContext(Dispatchers.Main) {
+                topTracksfromdb.postValue(tracks)
+            }
         }
     }
+
+
+    private suspend fun getSnapshotFromFirebase(ref: DatabaseReference): DataSnapshot {
+        return suspendCancellableCoroutine { continuation ->
+            val listener = ref.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    continuation.resume(snapshot) {}
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    continuation.resumeWithException(Exception(error.message))
+                }
+            })
+
+            continuation.invokeOnCancellation {
+                ref.removeEventListener(listener as ValueEventListener)
+            }
+        }
+    }
+
+
+
 
     fun fetchTopArtistsFromFirebase(filter:String) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid
