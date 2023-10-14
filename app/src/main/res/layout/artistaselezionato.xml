@@ -1,0 +1,56 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ArtistaSelezionato"
+    >
+    <include layout="@layout/genitore"></include>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="170dp"
+        android:background="@color/dark_gray"
+        android:layout_marginTop="40sp"
+        android:id="@+id/dettagliartistaselezionato"
+        android:layout_centerHorizontal="true">
+        <ImageView
+            android:id="@+id/imageartistaselezionato"
+            android:layout_width="170dp"
+            android:layout_height="match_parent"
+            android:padding="10dp"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_marginTop="15sp"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@id/imageartistaselezionato"
+            android:textColor="@color/white"
+            android:id="@+id/nomeartistaselezionato"
+            android:layout_height="40dp"
+            />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_marginTop="20sp"
+            android:layout_marginLeft="10dp"
+            android:layout_below="@id/nomeartistaselezionato"
+            android:textColor="@color/white"
+            android:id="@+id/genereartistaselezionato"
+            android:layout_height="30dp"
+            android:layout_toRightOf="@id/imageartistaselezionato"/>
+    </RelativeLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="Brani recensiti:"
+        android:background="@color/gray"
+        android:textColor="@color/verde_spotify"
+        android:textSize="20sp"
+        android:layout_below="@+id/dettagliartistaselezionato"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/iniziobranirecensiti" />
+
+
+</RelativeLayout>
