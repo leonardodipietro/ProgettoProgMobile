@@ -45,44 +45,27 @@ class SpotifyViewModel : ViewModel(){
             }
         }
     }
-
-
-    // Metodo per estrarre gli ID delle tracce dalla risposta e salvarli nella lista
-// Metodo per estrarre gli ID delle tracce dalla risposta e salvarli nella lista
-    /* private fun extractTracks(response: TopTracksResponse) {
-         trackInfo.clear() // Cancella la lista esistente prima dell'estrazione
-
-         val tracks = response.items
-         for (track in tracks) {
-             val trackId = track.id
-             val trackName = track.name
-             val album = track.album
-             val artists = track.artists
-             val genres = track.genres
-             val releaseDate = track.release_date
-             val durationMs = track.duration_ms
-
-             val trackItem = Track(trackName, album, artists, trackId, genres, releaseDate, durationMs)
-             trackInfo.add(trackItem)
-             Log.d("SpotifyRepo", "Traccia aggiunta: $trackItem")
-
-
-         }
-         Log.d("SpotifyRepo", "Lista di tracce: $trackInfo")
-         trackInfoExtracted.postValue(true)
-     }
-
-     fun getSpecificTrackInfo(index: Int): Track? {
-         Log.d("SpotifyRepo", "metodo chiamato top")
-         // Verifica che l'indice sia valido
-         if (index >= 0 && index < trackInfo.size) {
-             val specificTrackInfo = trackInfo[index]
-             Log.d("SpotifyRepo", "ID della traccia richiesta all'indice $index: $specificTrackInfo")
-             return specificTrackInfo
-         }
-         Log.d("SpotifyRepo", "Nessun ID di traccia trovato all'indice $index.")
-         return null // Restituisci null se l'indice è fuori dai limiti
-     }*/
+     fun createSpotifyPlaylist(token: String,trackIds: List<String>) {
+         Log.d("Playlistchiamata","playlistchiamata")
+        val playlistBody = CreatePlaylistBody(name = "Mia Playlist", description = "Descrizione della mia playlist")
+        val trackUris = trackIds.map { "spotify:track:$it" }
+         Log.d("Playlistchiamata","playlistchiamata con $trackUris")
+        repository.createPlaylist(token, playlistBody) { response, error ->
+            if (response != null) {
+                val playlistId = response.id
+                val addTracksBody = AddTracksBody(uris = trackUris)
+                repository.addTracksToPlaylist(token, playlistId, addTracksBody) { success, error ->
+                    if (success) {
+                        Log.d("Spotify", "Tracce aggiunte con successo alla playlist.")
+                    } else {
+                        Log.e("Spotify", "Errore nell'aggiungere tracce alla playlist: $error")
+                    }
+                }
+            } else {
+                Log.e("Spotify", "Errore nella creazione della playlist: $error")
+            }
+        }
+    }
     fun fetchTopTracks(token: String, timeRange: String = "short_term") {
         repository.getTopTracks(token, timeRange, 50) { response, error ->
             if (response != null) {
@@ -118,3 +101,40 @@ class SpotifyViewModel : ViewModel(){
     }
 
 }
+
+// Metodo per estrarre gli ID delle tracce dalla risposta e salvarli nella lista
+// Metodo per estrarre gli ID delle tracce dalla risposta e salvarli nella lista
+/* private fun extractTracks(response: TopTracksResponse) {
+     trackInfo.clear() // Cancella la lista esistente prima dell'estrazione
+
+     val tracks = response.items
+     for (track in tracks) {
+         val trackId = track.id
+         val trackName = track.name
+         val album = track.album
+         val artists = track.artists
+         val genres = track.genres
+         val releaseDate = track.release_date
+         val durationMs = track.duration_ms
+
+         val trackItem = Track(trackName, album, artists, trackId, genres, releaseDate, durationMs)
+         trackInfo.add(trackItem)
+         Log.d("SpotifyRepo", "Traccia aggiunta: $trackItem")
+
+
+     }
+     Log.d("SpotifyRepo", "Lista di tracce: $trackInfo")
+     trackInfoExtracted.postValue(true)
+ }
+
+ fun getSpecificTrackInfo(index: Int): Track? {
+     Log.d("SpotifyRepo", "metodo chiamato top")
+     // Verifica che l'indice sia valido
+     if (index >= 0 && index < trackInfo.size) {
+         val specificTrackInfo = trackInfo[index]
+         Log.d("SpotifyRepo", "ID della traccia richiesta all'indice $index: $specificTrackInfo")
+         return specificTrackInfo
+     }
+     Log.d("SpotifyRepo", "Nessun ID di traccia trovato all'indice $index.")
+     return null // Restituisci null se l'indice è fuori dai limiti
+ }*/

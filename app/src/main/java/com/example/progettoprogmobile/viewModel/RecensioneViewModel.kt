@@ -111,6 +111,7 @@ class RecensioneViewModel: ViewModel() {
     }
 
     private fun fetchRecensioniForTrack(trackId: String) {
+
         database.child("reviews")
             .orderByChild("trackId")
             .equalTo(trackId)
@@ -127,6 +128,8 @@ class RecensioneViewModel: ViewModel() {
                     }
                     recensioniData.value = recensioniList
                     fetchUsers(userIds)
+
+
                 }
 
                 override fun onCancelled(databaseError: DatabaseError) {
@@ -134,6 +137,76 @@ class RecensioneViewModel: ViewModel() {
                 }
             })
     }
+
+    fun fetchRecensioniForArtist(artistname: String?) {
+        // Lista per contenere tutte le recensioni associate all'artista
+        val recensioniList = mutableListOf<Recensione>()
+
+        Log.d("FETCH_ARTIST", "Inizio recupero recensioni per artista con ID: $artistname")
+
+        // Step 1: Cerca tutte le tracce associate all'artista
+        database.child("tracks")
+            .orderByChild("artists/0/name")
+            .equalTo(artistname)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    val trackIdsForArtist = mutableListOf<String>()
+                    for (trackSnapshot in dataSnapshot.children) {
+                        trackSnapshot.key?.let {
+                            trackIdsForArtist.add(it)
+                            Log.d("FETCH_ARTIST", "Trovata traccia con ID: $it per artista: $artistname")
+                        } ?: run {
+                            Log.w("FETCH_ARTIST", "Trovata traccia senza ID per artista: $artistname")
+                        }
+                    }
+
+                    // Se non ci sono tracce per l'artista, restituisci una lista vuota
+                    if (trackIdsForArtist.isEmpty()) {
+                        Log.d("FETCH_ARTIST", "Nessuna traccia trovata per l'artista con ID: $artistname")
+                        recensioniData.value = recensioniList
+                    } else {
+                        // Step 2: Con la lista delle tracce, cerca tutte le recensioni associate a queste tracce
+                        var tracksProcessed = 0
+                        trackIdsForArtist.forEach { trackId ->
+                            database.child("reviews")
+                                .orderByChild("trackId")
+                                .equalTo(trackId)
+                                .addListenerForSingleValueEvent(object : ValueEventListener {
+                                    override fun onDataChange(snapshot: DataSnapshot) {
+                                        for (reviewSnapshot in snapshot.children) {
+                                            reviewSnapshot.getValue(Recensione::class.java)?.let {
+                                                recensioniList.add(it)
+                                                Log.d("FETCH_ARTIST", "Trovata recensione con ID: ${it.commentId} per la traccia: $trackId")
+                                            }
+                                        }
+
+                                        tracksProcessed++
+                                        // Se abbiamo elaborato tutte le tracce, aggiorniamo il LiveData
+                                        if (tracksProcessed == trackIdsForArtist.size) {
+                                            Log.d("FETCH_ARTIST", "Tutte le tracce sono state elaborate per l'artista: $artistname")
+                                            recensioniData.value = recensioniList
+                                            Log.d("FETCH_ARTIST", "recensioni$recensioniList ")
+                                        }
+                                    }
+
+                                    override fun onCancelled(error: DatabaseError) {
+                                        Log.e("FETCH_ARTIST", "Errore durante il recupero delle recensioni per la traccia: $trackId", error.toException())
+                                    }
+                                })
+                        }
+                    }
+                }
+
+                override fun onCancelled(databaseError: DatabaseError) {
+                    Log.e("FETCH_ARTIST", "Errore durante il recupero delle tracce per l'artista: $artistname", databaseError.toException())
+                }
+            })
+    }
+
+
+
+
+
 
 
 }

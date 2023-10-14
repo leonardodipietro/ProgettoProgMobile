@@ -39,7 +39,7 @@ class TrackGridAdapter(private var tracks: List<Track>, private val listener: Tr
         fun bind(track: Track) {
             BranoTopBraniGrid.text = track.name
             AlbumInfoGrid.text = track.album.name
-            ArtistInfoGrid.text = track.artisttrack.joinToString { it.name }
+            ArtistInfoGrid.text = track.artists.joinToString { it.name }
             if (track.album.images.isNotEmpty()) {
                 Glide.with(itemView)
                     .load(track.album.images[0].url)

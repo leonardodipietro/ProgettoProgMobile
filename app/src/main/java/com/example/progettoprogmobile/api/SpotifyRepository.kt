@@ -13,6 +13,11 @@ import com.example.progettoprogmobile.model.SpotifyTokenResponse
 import com.example.progettoprogmobile.model.TopTracksResponse
 import com.example.progettoprogmobile.model.TopArtistsResponse
 import android.util.Log
+import com.example.progettoprogmobile.model.AddTracksBody
+import com.example.progettoprogmobile.model.CreatePlaylistBody
+import com.example.progettoprogmobile.model.CreatedPlaylistResponse
+import retrofit2.http.Body
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 
@@ -32,6 +37,8 @@ class SpotifyRepository {
     private val spotifyService: SpotifyAuthService = retrofit.create(SpotifyAuthService::class.java)
     private val spotifyApiTrackService: SpotifyApiTrackService = apiRetrofit.create(SpotifyApiTrackService::class.java)
     private val spotifyApiArtistService: SpotifyApiArtistService = apiRetrofit.create(SpotifyApiArtistService::class.java)
+    private val spotifyApiPlaylistService: SpotifyApiPlaylistService = apiRetrofit.create(SpotifyApiPlaylistService::class.java)
+
     fun getAccessToken(
         code: String,
         redirectUri: String,
@@ -89,6 +96,39 @@ class SpotifyRepository {
             }
         })
     }
+    fun createPlaylist(token: String, body: CreatePlaylistBody, callback: (response: CreatedPlaylistResponse?, error: Throwable?) -> Unit) {
+        Log.d("Spotify", "Tentativo di creazione playlist con token: $token e body: $body")
+
+        spotifyApiPlaylistService.createPlaylist("Bearer $token", body).enqueue(object : Callback<CreatedPlaylistResponse> {
+            override fun onResponse(call: Call<CreatedPlaylistResponse>, response: Response<CreatedPlaylistResponse>) {
+                if (response.isSuccessful) {
+                    Log.d("Spotify", "Playlist creata con successo! Response: ${response.body()}")
+                } else {
+                    Log.e("Spotify", "Errore nella risposta di creazione playlist. Codice: ${response.code()} - Messaggio: ${response.message()}")
+                }
+                callback(response.body(), null)
+            }
+
+            override fun onFailure(call: Call<CreatedPlaylistResponse>, t: Throwable) {
+                Log.e("Spotify", "Errore nella chiamata di creazione playlist", t)
+                callback(null, t)
+            }
+        })
+    }
+
+
+    fun addTracksToPlaylist(token: String, playlistId: String, body: AddTracksBody, callback: (success: Boolean, error: Throwable?) -> Unit) {
+        spotifyApiPlaylistService.addTracksToPlaylist("Bearer $token", playlistId, body).enqueue(object : Callback<Void> {
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                callback(response.isSuccessful, null)
+            }
+
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                callback(false, t)
+            }
+        })
+    }
+
 
 
 
@@ -124,6 +164,22 @@ class SpotifyRepository {
             @Query("limit")limit:Int
         ): Call<TopArtistsResponse>
     }
+
+    interface SpotifyApiPlaylistService {
+        @POST("me/playlists")
+        fun createPlaylist(
+            @Header("Authorization") authToken: String,
+            @Body body: CreatePlaylistBody
+        ): Call<CreatedPlaylistResponse>
+
+        @POST("playlists/{playlist_id}/tracks")
+        fun addTracksToPlaylist(
+            @Header("Authorization") authToken: String,
+            @Path("playlist_id") playlistId: String,
+            @Body body: AddTracksBody
+        ): Call<Void>
+    }
+
 
 
 }

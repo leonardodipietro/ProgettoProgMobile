@@ -36,7 +36,7 @@ class TrackAdapter(private var tracks: List<Track>, private val listener: OnTrac
         private val albumImageView: ImageView = itemView.findViewById(R.id.imageviewtopbrani)
         fun bind(track: Track) {
             BranoTopBrani.text = track.name
-            ArtistaTopbrani.text = track.artisttrack.joinToString{it.name}
+            ArtistaTopbrani.text = track.artists.joinToString{it.name}
             ALbumTopbrani.text= track.album.name
             Log.d("TrackAdapter", "Album: ${track.album.name}, Images: ${track.album.images}")
             if (track.album.images.isNotEmpty()) {
@@ -62,3 +62,4 @@ class TrackAdapter(private var tracks: List<Track>, private val listener: OnTrac
     }
 
 }
+

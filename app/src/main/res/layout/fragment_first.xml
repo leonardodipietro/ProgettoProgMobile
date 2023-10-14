@@ -85,7 +85,8 @@
             android:layout_marginTop="20dp"
             android:id="@+id/recyclerViewtopbrani"
             android:visibility="visible"
-            android:layout_marginBottom="18dp">
+            android:layout_marginBottom="70dp"
+            android:layout_centerHorizontal="true">
 
         </androidx.recyclerview.widget.RecyclerView>
 

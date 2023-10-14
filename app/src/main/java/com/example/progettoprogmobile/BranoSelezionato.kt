@@ -66,8 +66,8 @@ class BranoSelezionato : Fragment() {
         track?.let { currentTrack ->
             titoloCanzone.text = currentTrack.name
             albumBranoSelezionato.text = currentTrack.album.name
-            artistaBranoSelezionato.text = currentTrack.artisttrack.firstOrNull()?.name ?: "Sconosciuto" // prendo il primo artista, se esiste
-           // recensioneViewModel.fetchRecensioniForTrack(track.id)
+            artistaBranoSelezionato.text = currentTrack.artists.firstOrNull()?.name ?: "Sconosciuto" // prendo il primo artista, se esiste
+            // recensioneViewModel.fetchRecensioniForTrack(track.id)
             recensioneViewModel.fetchRecensioniAndUsersForTrack(currentTrack.id)
             // Impostazione dell'immagine con Glide
             val imageUrl = currentTrack.album.images.firstOrNull()?.url // prendo la prima immagine, se esiste

@@ -17,7 +17,7 @@ data class Track(
 
     @SerializedName("name") val name: String,
     @SerializedName("album") val album: Album,
-    @SerializedName("artists") val artisttrack: List<SimpleArtist>,
+    @SerializedName("artists") val artists: List<Artist>,
     @SerializedName("id") val id: String,
   //  @SerializedName("genres") val genres: List<String>,
   //  @SerializedName("duration_ms") val durationMs: String,
@@ -30,22 +30,24 @@ data class Album(
     val releaseDate: String
 )
 
+/*data class SimpleArtist(
+    @SerializedName("name") val name: String,// Solo il nome dell'artista
+    @SerializedName("id") val id: String?
+)*/
+
+
+
 data class Image(
     @SerializedName("url") val url: String
-)
-
-data class Artist(
-    @SerializedName("name") val name: String,
-    @SerializedName("genres") val genres: List<String>,
-    @SerializedName("id") val id: String,
-    @SerializedName("followers") val followers: Followers,
-    @SerializedName("images") val images: List<Image>
 )
 
 data class Followers(
     @SerializedName("total") val total: Int
 )
-data class SimpleArtist(
-    @SerializedName("name") val name: String // Solo il nome dell'artista
-)
-
+data class Artist(
+    @SerializedName("name") val name: String,
+    @SerializedName("genres") val genres: List<String>,
+    @SerializedName("id") val id: String,
+    //@SerializedName("followers") val followers: Followers,
+    @SerializedName("images") val images: List<Image>
+):Serializable
