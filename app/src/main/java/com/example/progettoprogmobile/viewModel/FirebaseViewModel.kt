@@ -15,6 +15,7 @@ import android.os.Bundle
 import com.example.progettoprogmobile.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
@@ -23,6 +24,7 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.util.concurrent.CountDownLatch
 import kotlin.coroutines.resumeWithException
+
 
 
 class FirebaseViewModel (application: Application): AndroidViewModel(application) {
@@ -290,6 +292,7 @@ class FirebaseViewModel (application: Application): AndroidViewModel(application
     }
 
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private suspend fun getSnapshotFromFirebase(ref: DatabaseReference): DataSnapshot {
         return suspendCancellableCoroutine { continuation ->
             val listener = ref.addListenerForSingleValueEvent(object : ValueEventListener {

@@ -22,6 +22,7 @@ import androidx.core.content.ContextCompat
 import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.example.progettoprogmobile.utils.SettingUtils
 import com.example.progettoprogmobile.viewModel.FirebaseAuthViewModel
 import com.google.android.material.switchmaterial.SwitchMaterial
@@ -116,6 +117,32 @@ open class ThirdFragment : Fragment() {
             Picasso.get().load(imageUrl).into(userImage)
         }
 
+        val reviewTextView = rootView.findViewById<TextView>(R.id.reviewTextButton)
+        reviewTextView.setOnClickListener{
+            val reviewFragment = ReviewFragment()
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.nav_host_fragment, reviewFragment)
+                .addToBackStack(null)
+                .commit()
+        }
+
+        val followersTextView = rootView.findViewById<TextView>(R.id.followersTextButton)
+        followersTextView.setOnClickListener{
+            val followersFragment = FollowersFragment()
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.nav_host_fragment, followersFragment)
+                .addToBackStack(null)
+                .commit()
+        }
+
+        val followingTextView = rootView.findViewById<TextView>(R.id.followingTextButton)
+        followingTextView.setOnClickListener{
+            val followingFragment = FollowingFragment()
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.nav_host_fragment, followingFragment)
+                .addToBackStack(null)
+                .commit()
+        }
 
         // Mostra il nome utente
         settingUtils.displayUsername(userId, rootView)

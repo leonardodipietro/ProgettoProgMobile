@@ -32,4 +32,8 @@
         <item name="android:textColor">@color/white</item>
     </style>
 
+    <style name="CustomArrowStyle" parent="Widget.MaterialComponents.Button">
+        <item name="backgroundTint">@color/white</item> <!-- Imposta il colore di sfondo -->
+    </style>
+
 </resources>
