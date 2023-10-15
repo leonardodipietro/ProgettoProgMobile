@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/ReviewFragment"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="676dp"
     android:background="@color/black"
     tools:context=".ReviewFragment">
 
@@ -59,8 +59,7 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/reviewRecyclerView"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:background="@color/white"/>
+            android:layout_height="wrap_content"/>
 
     </RelativeLayout>
 

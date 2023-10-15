@@ -5,20 +5,25 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.progettoprogmobile.R
+import com.example.progettoprogmobile.ReviewFragment
 import com.example.progettoprogmobile.model.ReviewData
 import com.squareup.picasso.Picasso
 
 
-class ReviewAdapter(private val reviewDataList: List<ReviewData>) : RecyclerView.Adapter<ReviewAdapter.ViewHolder>() {
+class ReviewAdapter (private val parent: ViewGroup) : ListAdapter<ReviewData, ReviewAdapter.ViewHolder>(ReviewDataDiffCallback()) {
+
+    val view = LayoutInflater.from(parent.context).inflate(R.layout.recycler_view_recensioni_profilo, parent, false)
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val copertina: ImageView = view.findViewById(R.id.copertina)
         val brano: TextView = view.findViewById(R.id.brano)
         val artista: TextView = view.findViewById(R.id.artista)
         val album: TextView = view.findViewById(R.id.album)
-        val recensione: TextView = view.findViewById(R.id.recensione1)
+        val recensione: TextView = view.findViewById(R.id.content)
         val timestamp: TextView = view.findViewById(R.id.timestamp)
     }
 
@@ -28,7 +33,7 @@ class ReviewAdapter(private val reviewDataList: List<ReviewData>) : RecyclerView
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val reviewData = reviewDataList[position]
+        val reviewData = getItem(position)
 
         Picasso.get().load(reviewData.image).into(holder.copertina)
         holder.brano.text = reviewData.track
@@ -37,7 +42,14 @@ class ReviewAdapter(private val reviewDataList: List<ReviewData>) : RecyclerView
         holder.recensione.text = reviewData.recensione
         holder.timestamp.text = reviewData.timestamp.toString()
     }
+}
 
-    override fun getItemCount(): Int = reviewDataList.size
+class ReviewDataDiffCallback : DiffUtil.ItemCallback<ReviewData>() {
+    override fun areItemsTheSame(oldItem: ReviewData, newItem: ReviewData): Boolean {
+        return oldItem == newItem
+    }
 
+    override fun areContentsTheSame(oldItem: ReviewData, newItem: ReviewData): Boolean {
+        return oldItem == newItem
+    }
 }

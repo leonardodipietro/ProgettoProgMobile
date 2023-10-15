@@ -119,5 +119,6 @@
     <string name="clessidra1">Clessidra1</string>
     <string name="griglia1">Griglia1</string>
     <string name="contatorerecensioni">contatoreRecensioni</string>
+    <string name="trackImage">Immagine canzone</string>
 
 </resources>

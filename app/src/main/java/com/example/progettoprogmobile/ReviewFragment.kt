@@ -1,7 +1,6 @@
 package com.example.progettoprogmobile
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,9 +10,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.progettoprogmobile.adapter.ReviewAdapter
 import com.example.progettoprogmobile.model.ReviewData
-import com.example.progettoprogmobile.viewModel.FirebaseViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+
 
 
 class ReviewFragment: Fragment() {
@@ -29,7 +28,6 @@ class ReviewFragment: Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
         val rootView = inflater.inflate(R.layout.fragment_review, container, false)
         val backButton: Button = rootView.findViewById(R.id.backArrow)
 
@@ -40,90 +38,74 @@ class ReviewFragment: Fragment() {
 
         recyclerView = rootView.findViewById(R.id.reviewRecyclerView)
         recyclerView.layoutManager = LinearLayoutManager(context)
-        reviewAdapter = ReviewAdapter(emptyList())
+        reviewAdapter = ReviewAdapter(recyclerView)
         recyclerView.adapter = reviewAdapter
 
-        retrieveReviewData()
+        setupReviewDataObserver()
 
         return rootView
     }
 
+    private fun setupReviewDataObserver() {
+        val reviewsReference = database.getReference("reviews")
+        val query = reviewsReference.orderByChild("userId").equalTo(userId)
 
-    private fun retrieveReviewData(): List<ReviewData> {
-        // Assicurati che l'utente sia loggato prima di procedere
-        val currentUser = FirebaseAuth.getInstance().currentUser
-        if (currentUser != null) {
-            val reviewsReference = database.getReference("reviews")
-            reviewsReference.addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    for (reviewSnapshot in dataSnapshot.children) {
-                        val reviewUserId = reviewSnapshot.child("userId").value.toString()
-                        Log.d("ReviewFragment", "Review User ID: $reviewUserId")
+        query.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val reviewDataList = mutableListOf<ReviewData>()
 
-                        if (reviewUserId == userId) {
-                            val trackId = reviewSnapshot.child("trackId").value.toString()
-                            val content = reviewSnapshot.child("content").value.toString()
-                            val timestamp = reviewSnapshot.child("timestamp").getValue(Long::class.java)?.toLong() ?: 0L
+                for (reviewSnapshot in dataSnapshot.children) {
+                    val trackId = reviewSnapshot.child("trackId").value.toString()
+                    val content = reviewSnapshot.child("content").value.toString()
+                    val timestamp = reviewSnapshot.child("timestamp").getValue(Long::class.java) ?: 0L
 
-                            Log.d("ReviewFragment", "Track ID: $trackId")
-                            Log.d("ReviewFragment", "Content: $content")
-                            Log.d("ReviewFragment", "Timestamp: $timestamp")
+                    val tracksRef = database.getReference("tracks").child(trackId)
+                    tracksRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(trackDataSnapshot: DataSnapshot) {
+                            val trackName = trackDataSnapshot.child("trackName").value.toString()
+                            val albumName = trackDataSnapshot.child("album").value.toString()
+                            val imageUrl = trackDataSnapshot.child("image_url").value.toString()
+                            val artistId = trackDataSnapshot.child("artists").child("0").value.toString()
 
-                            // Ora che hai l'ID della traccia, puoi eseguire un'altra query per ottenere ulteriori informazioni sulla traccia.
-                            val tracksRef = database.getReference("tracks")
-                            tracksRef.child(trackId).addListenerForSingleValueEvent(object : ValueEventListener {
-                                override fun onDataChange(trackDataSnapshot: DataSnapshot) {
-                                    val trackName = trackDataSnapshot.child("trackName").value.toString()
-                                    val albumName = trackDataSnapshot.child("album").value.toString()
-                                    val imageUrl = trackDataSnapshot.child("image_url").value.toString()
-                                    val artistId = trackDataSnapshot.child("artists").child("0").value.toString()
+                            val artistRef = database.getReference("artists").child(artistId)
+                            artistRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                                override fun onDataChange(artistDataSnapshot: DataSnapshot) {
+                                    val artistName = artistDataSnapshot.child("name").value.toString()
 
-                                    Log.d("ReviewFragment", "Track name: $trackName")
-                                    Log.d("ReviewFragment", "Album name: $albumName")
-                                    Log.d("ReviewFragment", "Image URL: $imageUrl")
-                                    Log.d("ReviewFragment", "Artist ID: $artistId")
+                                    val reviewData = ReviewData(
+                                        content,
+                                        timestamp,
+                                        trackName,
+                                        albumName,
+                                        imageUrl,
+                                        artistName
+                                    )
 
-                                    val artistRef = database.getReference("artists")
-                                    artistRef.child(artistId).addListenerForSingleValueEvent(object : ValueEventListener {
-                                        override fun onDataChange(artistDataSnapshot: DataSnapshot) {
-                                            val artistName = artistDataSnapshot.child("name").value.toString()
+                                    reviewDataList.add(reviewData)
 
-                                            val reviewData = ReviewData(
-                                                content,
-                                                timestamp,
-                                                trackName,
-                                                albumName,
-                                                imageUrl,
-                                                artistName
-                                            )
-
-                                            // Log per verificare i dati
-                                            Log.d("ReviewFragment", "Review User ID: $reviewUserId")
-                                            Log.d("ReviewFragment", "Track ID: $trackId")
-                                            Log.d("ReviewFragment", "Content: $content")
-                                            Log.d("ReviewFragment", "Timestamp: $timestamp")
-
-                                            reviewDataList.add(reviewData)
-
-                                            Log.d("ReviewFragment", "Review Data: $reviewData")
-                                        }
-                                        override fun onCancelled(databaseError: DatabaseError) {
-                                                    // Gestisci eventuali errori
-                                        }
-                                    })
+                                    // Se hai raccolto tutte le recensioni, aggiorna la RecyclerView
+                                    if (reviewDataList.size == dataSnapshot.childrenCount.toInt()) {
+                                        reviewAdapter.submitList(reviewDataList)
+                                    }
                                 }
+
                                 override fun onCancelled(databaseError: DatabaseError) {
-                                        // Gestisci eventuali errori
+                                    // Gestisci eventuali errori
                                 }
                             })
                         }
-                    }
+
+                        override fun onCancelled(databaseError: DatabaseError) {
+                            // Gestisci eventuali errori
+                        }
+                    })
                 }
-                override fun onCancelled(databaseError: DatabaseError) {
-                    // Gestisci eventuali errori
-                }
-            })
-        }
-        return reviewDataList
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Gestisci eventuali errori
+            }
+        })
     }
+
 }
