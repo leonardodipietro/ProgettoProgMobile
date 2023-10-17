@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.progettoprogmobile.model.Recensione
+import com.example.progettoprogmobile.model.Track
 import com.example.progettoprogmobile.model.Utente
 import com.firebase.ui.auth.data.model.User
 import com.google.firebase.auth.FirebaseAuth
@@ -19,11 +20,13 @@ class RecensioneViewModel: ViewModel() {
     private val database: DatabaseReference = FirebaseDatabase.getInstance().reference
     val recensioniData: MutableLiveData<List<Recensione>> = MutableLiveData()
     val usersData: MutableLiveData<Map<String, Utente>> = MutableLiveData()
+   // private lateinit var firebaseViewModel :FirebaseViewModel
+
     fun getCurrentUserId(): String? {
         return FirebaseAuth.getInstance().currentUser?.uid
     }
 
-    fun saveOrUpdateRecensione(userId: String, trackId: String, commentContent: String) {
+    fun saveOrUpdateRecensione(userId: String, trackId: String, artistId:String, commentContent: String) {
         hasUserReviewed(trackId, userId) { existingReview ->
             if (existingReview == null) {
                 val commentId = database.push().key!!
@@ -33,13 +36,15 @@ class RecensioneViewModel: ViewModel() {
                     userId = userId,
                     trackId = trackId,
                     timestamp = System.currentTimeMillis(),
-                    content = commentContent
+                    content = commentContent,
+                    artistId = artistId
                 )
 
                 database.child("reviews").child(commentId).setValue(recensione)
                     .addOnSuccessListener {
                         addCommentIdToTrack(commentId, trackId)
                         addCommentIdToUser(commentId, userId)
+                        addCommentIdToArtist(commentId, artistId)
                     }
                     .addOnFailureListener {
                         // Gestisci l'errore
@@ -88,7 +93,9 @@ class RecensioneViewModel: ViewModel() {
     private fun addCommentIdToTrack(commentId: String, trackId: String) {
         database.child("tracks").child(trackId).child("comments").push().setValue(commentId)
     }
-
+    private fun addCommentIdToArtist(commentId: String, artistId: String) {
+        database.child("artists").child(artistId).child("comments").push().setValue(commentId)
+    }
     private fun fetchUsers(userIds: List<String>) {
         database.child("users")
             .addListenerForSingleValueEvent(object : ValueEventListener {
@@ -137,71 +144,100 @@ class RecensioneViewModel: ViewModel() {
                 }
             })
     }
+    fun retrieveTracksReviewedByArtistAndDetails(artistId: String, firebaseViewModel: FirebaseViewModel, onComplete: (List<Track>) -> Unit) {
+        // Prima, chiamiamo la funzione fetchTracksReviewedByArtist per ottenere gli ID delle tracce recensite dall'artista
+        fetchTracksReviewedByArtist(artistId) { trackIds ->
+            // Ora abbiamo una lista di ID di tracce recensite dall'artista
+            // Possiamo chiamare retrieveTracksDetails per ottenere i dettagli di queste tracce
+            firebaseViewModel.retrieveTracksDetails(trackIds) { tracks ->
+                // Ora abbiamo una lista di tracce con i loro dettagli
+                // Puoi fare ciò che vuoi con queste tracce, ad esempio, stamparle a console
+                for (track in tracks) {
+                    Log.d("TrackDetails", "Nome Traccia: ${track.name}")
+                    Log.d("TrackDetails", "Album: ${track.album.name}")
+                    for (artist in track.artists) {
+                        Log.d("TrackDetails", "Artista: ${artist.name}")
+                    }
+                    Log.d("TrackDetails", "-------------------")
+                    onComplete?.invoke(tracks)
+                }
+            }
+        }
+    }
 
-    fun fetchRecensioniForArtist(artistname: String?) {
-        // Lista per contenere tutte le recensioni associate all'artista
-        val recensioniList = mutableListOf<Recensione>()
 
-        Log.d("FETCH_ARTIST", "Inizio recupero recensioni per artista con ID: $artistname")
+    fun fetchTracksReviewedByArtist(artistId: String, onComplete: (List<String>) -> Unit) {
+        Log.d("TracceRecensite", "Artist ID: $artistId")
 
-        // Step 1: Cerca tutte le tracce associate all'artista
-        database.child("tracks")
-            .orderByChild("artists/0/name")
-            .equalTo(artistname)
+        val tracksReviewedByArtist = mutableListOf<String>()
+
+        // Cerca tutte le recensioni associate all'artista con l'ID specificato
+        database.child("reviews")
+            .orderByChild("artistId")
+            .equalTo(artistId)
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    val trackIdsForArtist = mutableListOf<String>()
-                    for (trackSnapshot in dataSnapshot.children) {
-                        trackSnapshot.key?.let {
-                            trackIdsForArtist.add(it)
-                            Log.d("FETCH_ARTIST", "Trovata traccia con ID: $it per artista: $artistname")
-                        } ?: run {
-                            Log.w("FETCH_ARTIST", "Trovata traccia senza ID per artista: $artistname")
+                    for (snapshot in dataSnapshot.children) {
+                        val recensione = snapshot.getValue(Recensione::class.java)
+                        recensione?.let {
+                            // Aggiungi l'ID della traccia alla lista se non è già presente
+                            if (!tracksReviewedByArtist.contains(it.trackId)) {
+                                tracksReviewedByArtist.add(it.trackId)
+                            }
                         }
+                        // Ora hai una lista di ID di tracce recensite dall'artista
+                        // Chiama retrieveTracksDetails per ottenere i dettagli delle tracce
                     }
+                    Log.d("TracceRecensite", "Prima di onComplete: $tracksReviewedByArtist")
 
-                    // Se non ci sono tracce per l'artista, restituisci una lista vuota
-                    if (trackIdsForArtist.isEmpty()) {
-                        Log.d("FETCH_ARTIST", "Nessuna traccia trovata per l'artista con ID: $artistname")
-                        recensioniData.value = recensioniList
-                    } else {
-                        // Step 2: Con la lista delle tracce, cerca tutte le recensioni associate a queste tracce
-                        var tracksProcessed = 0
-                        trackIdsForArtist.forEach { trackId ->
-                            database.child("reviews")
-                                .orderByChild("trackId")
-                                .equalTo(trackId)
-                                .addListenerForSingleValueEvent(object : ValueEventListener {
-                                    override fun onDataChange(snapshot: DataSnapshot) {
-                                        for (reviewSnapshot in snapshot.children) {
-                                            reviewSnapshot.getValue(Recensione::class.java)?.let {
-                                                recensioniList.add(it)
-                                                Log.d("FETCH_ARTIST", "Trovata recensione con ID: ${it.commentId} per la traccia: $trackId")
-                                            }
-                                        }
-
-                                        tracksProcessed++
-                                        // Se abbiamo elaborato tutte le tracce, aggiorniamo il LiveData
-                                        if (tracksProcessed == trackIdsForArtist.size) {
-                                            Log.d("FETCH_ARTIST", "Tutte le tracce sono state elaborate per l'artista: $artistname")
-                                            recensioniData.value = recensioniList
-                                            Log.d("FETCH_ARTIST", "recensioni$recensioniList ")
-                                        }
-                                    }
-
-                                    override fun onCancelled(error: DatabaseError) {
-                                        Log.e("FETCH_ARTIST", "Errore durante il recupero delle recensioni per la traccia: $trackId", error.toException())
-                                    }
-                                })
-                        }
-                    }
+                    // Ora hai una lista di ID di tracce recensite dall'artista
+                    onComplete(tracksReviewedByArtist)
+                    Log.d("TracceRecensite", "Lista di ID delle tracce recensite dall'artista: $tracksReviewedByArtist")
                 }
 
                 override fun onCancelled(databaseError: DatabaseError) {
-                    Log.e("FETCH_ARTIST", "Errore durante il recupero delle tracce per l'artista: $artistname", databaseError.toException())
+                    Log.e("TracceRecensite", "Errore durante la ricerca delle tracce recensite: ${databaseError.message}")
+                    // Gestisci l'errore qui
                 }
             })
     }
+
+
+
+    fun fetchRecensioniForArtist(artistId: String) {
+        Log.d("Recensioni", "Sto cercando le recensioni per l'artista con ID: $artistId")
+
+        database.child("reviews")
+            .orderByChild("artistId")
+            .equalTo(artistId)
+            .addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    Log.d("Recensioni", "Recensioni trovate nel database per l'artista con ID: $artistId")
+
+                    val recensioniList = mutableListOf<Recensione>()
+                    val userIds = mutableListOf<String>()
+                    for (snapshot in dataSnapshot.children) {
+                        val recensione = snapshot.getValue(Recensione::class.java)
+                        recensione?.let {
+                            recensioniList.add(it)
+                            userIds.add(it.userId)
+                        }
+                    }
+                    recensioniData.value = recensioniList
+                    fetchUsers(userIds)
+
+                    Log.d("Recensioni", "Recensioni caricate con successo per l'artista con ID: $artistId")
+                    Log.d("Recensioni", "Numero totale di recensioni: ${recensioniList.size}")
+                }
+
+                override fun onCancelled(databaseError: DatabaseError) {
+                    Log.e("Recensioni", "Errore durante la ricerca delle recensioni: ${databaseError.message}")
+                    // Gestisci l'errore qui
+                }
+            })
+    }
+
+
 
 
 

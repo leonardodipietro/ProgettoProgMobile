@@ -8,7 +8,7 @@
     <include layout="@layout/genitore"></include>
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="170dp"
+        android:layout_height="wrap_content"
         android:background="@color/dark_gray"
         android:layout_marginTop="40sp"
         android:id="@+id/dettagliartistaselezionato"
@@ -16,28 +16,33 @@
         <ImageView
             android:id="@+id/imageartistaselezionato"
             android:layout_width="170dp"
-            android:layout_height="match_parent"
+            android:layout_height="170dp"
             android:padding="10dp"
+            android:layout_marginTop="40dp"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/imgcantante"
             />
 
         <TextView
-            android:layout_width="match_parent"
-            android:layout_marginTop="15sp"
+            android:layout_width="wrap_content"
             android:layout_marginLeft="10dp"
-            android:layout_toRightOf="@id/imageartistaselezionato"
             android:textColor="@color/white"
             android:id="@+id/nomeartistaselezionato"
-            android:layout_height="40dp"
+            android:layout_height="wrap_content"
+            android:textSize="30dp"
+            android:layout_centerHorizontal="true"
             />
+       <!--
         <TextView
             android:layout_width="match_parent"
             android:layout_marginTop="20sp"
             android:layout_marginLeft="10dp"
             android:layout_below="@id/nomeartistaselezionato"
+
             android:textColor="@color/white"
             android:id="@+id/genereartistaselezionato"
             android:layout_height="30dp"
-            android:layout_toRightOf="@id/imageartistaselezionato"/>
+            android:layout_toRightOf="@id/imageartistaselezionato"/>-->
     </RelativeLayout>
 
     <TextView
@@ -52,5 +57,16 @@
         android:layout_centerHorizontal="true"
         android:id="@+id/iniziobranirecensiti" />
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="20dp"
+        android:id="@+id/recyclerBranidiArtistaRecensiti"
+        android:visibility="visible"
+        android:layout_marginBottom="70dp"
+        android:layout_below="@id/iniziobranirecensiti"
+        android:layout_centerHorizontal="true">
+
+    </androidx.recyclerview.widget.RecyclerView>
 
 </RelativeLayout>

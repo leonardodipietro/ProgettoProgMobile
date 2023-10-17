@@ -250,7 +250,8 @@ class FirebaseViewModel (application: Application): AndroidViewModel(application
         }
     }
 
-    private fun retrieveTracksDetails(trackIds: List<String>) {
+    fun retrieveTracksDetails(trackIds: List<String>,onComplete: ((List<Track>) -> Unit)? = null) {
+        //L ON COMPLETE SERVE NEL FRAGMENT ARTISTASELEZIONATO
         CoroutineScope(Dispatchers.IO).launch {
             val tracksRef = database.child("tracks")
             val artistsRef = database.child("artists")
@@ -284,11 +285,13 @@ class FirebaseViewModel (application: Application): AndroidViewModel(application
             }.awaitAll()
 
             tracks.addAll(trackDetails)
-
+            // Dopo aver ottenuto i dettagli delle tracce, chiami onComplete se è stato fornito
+            onComplete?.invoke(tracks)
             withContext(Dispatchers.Main) {
                 topTracksfromdb.postValue(tracks)
             }
         }
+
     }
 
 
@@ -310,7 +313,23 @@ class FirebaseViewModel (application: Application): AndroidViewModel(application
             }
         }
     }
+  /*  private suspend fun getSnapshotFromFirebase(ref: DatabaseReference): DataSnapshot {
+        return suspendCancellableCoroutine { continuation ->
+            val listener = ref.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    continuation.resume(snapshot) {}
+                }
 
+                override fun onCancelled(error: DatabaseError) {
+                    continuation.resumeWithException(Exception(error.message))
+                }
+            })
+
+            continuation.invokeOnCancellation {
+                ref.removeEventListener(listener as ValueEventListener)
+            }
+        }
+    }*/
 
 
 
@@ -360,7 +379,30 @@ class FirebaseViewModel (application: Application): AndroidViewModel(application
             })
         }
     }
+    fun retrieveArtistById(artistId: String, onComplete: (Artist?) -> Unit) {
+        val database = FirebaseDatabase.getInstance().reference
+        val artistRef = database.child("artists").child(artistId)
 
+        artistRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    val name = dataSnapshot.child("name").getValue(String::class.java) ?: ""
+                    val genres = dataSnapshot.child("genres").getValue(object : GenericTypeIndicator<List<String>>() {}) ?: listOf<String>()
+                    val imageUrl = dataSnapshot.child("image_url").getValue(String::class.java) ?: ""
+
+                    val artist = Artist(name, genres, artistId,  listOf(Image(imageUrl)))
+                    onComplete(artist)
+                } else {
+                    onComplete(null)
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Gestisci l'errore qui
+                onComplete(null)
+            }
+        })
+    }
 
 
     interface OnUserFetchedListener {

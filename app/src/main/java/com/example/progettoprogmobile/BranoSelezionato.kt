@@ -19,24 +19,27 @@ import com.example.progettoprogmobile.viewModel.FirebaseViewModel
 import com.example.progettoprogmobile.viewModel.RecensioneViewModel
 import com.bumptech.glide.Glide
 import com.example.progettoprogmobile.adapter.RecensioniBranoSelAdapter
+import com.example.progettoprogmobile.model.Artist
 import com.google.firebase.auth.FirebaseAuth
 
 class BranoSelezionato : Fragment() {
 
     private lateinit var recensioneViewModel: RecensioneViewModel
     private lateinit var recyclerView:RecyclerView
+    private lateinit var firebaseViewModel: FirebaseViewModel
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
 
         val rootView = inflater.inflate(R.layout.branoselezionato, container, false)
+        firebaseViewModel=ViewModelProvider(this).get(FirebaseViewModel::class.java)
         recyclerView = rootView.findViewById(R.id.recyclerBranoSelezionato)
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = RecensioniBranoSelAdapter(emptyList())
         val track = arguments?.getSerializable("trackDetail") as? Track
         Log.d("FragmentBranoSelezionato", "Received track: $track")
-
+        val artistId = track?.artists?.firstOrNull()?.id ?: ""
         // Binding delle viste
         val titoloCanzone: TextView = rootView.findViewById(R.id.titolocanzone)
         val albumBranoSelezionato: TextView = rootView.findViewById(R.id.albumbranoselezionato)
@@ -54,7 +57,7 @@ class BranoSelezionato : Fragment() {
             if (userId != null && track != null) {
                 val commentContent = recensioneEditText.text.toString()
                 if (commentContent.isNotBlank()) {
-                    recensioneViewModel.saveOrUpdateRecensione(userId, track.id, commentContent)
+                    recensioneViewModel.saveOrUpdateRecensione(userId, track.id,artistId, commentContent)
                 }
             } else {
                 // Gestisci il caso in cui l'utente non sia loggato o non ci sia un brano selezionato
@@ -78,6 +81,13 @@ class BranoSelezionato : Fragment() {
             }
         }
 
+        artistaBranoSelezionato.setOnClickListener {
+            firebaseViewModel.retrieveArtistById(artistId) { artist ->
+                if (artist != null) {
+                    onNameArtistClicked(artist)
+                }
+            }
+        }
         setupRecyclerView(rootView)
 
         return rootView
@@ -100,6 +110,20 @@ class BranoSelezionato : Fragment() {
             adapter?.usersMap = users
             adapter?.notifyDataSetChanged()
         })
+    }
+    fun onNameArtistClicked(data: Artist) {
+        Log.d("FragmentClick", "Item clicked with data: $data")
+        if (data is Artist) {
+            // Qui naviga verso il nuovo fragment, puoi passare "data" come argomento se necessario
+            val newFragment = com.example.progettoprogmobile.ArtistaSelezionato()
+            val bundle = Bundle()
+            bundle.putSerializable("artistdetails", data)
+            newFragment.arguments = bundle
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.nav_host_fragment, newFragment)
+                .addToBackStack(null)
+                .commit()
+        }
     }
 
 }

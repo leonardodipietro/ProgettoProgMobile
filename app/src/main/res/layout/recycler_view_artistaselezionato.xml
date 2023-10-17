@@ -1,0 +1,57 @@
+<!-- res/layout/item_layout.xml -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@color/black"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="20dp">
+
+        <ImageView
+            android:id="@+id/imageviewlistaartistselezionato"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center"
+            />
+
+        <TextView
+            android:id="@+id/Branolistaartistselezionato"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+
+            android:textSize="16sp"
+            android:textColor="@color/white"
+            android:layout_marginLeft="10dp"/>
+
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            android:id="@+id/Albumlistaartistaselezionato"
+            android:textSize="16sp"
+            android:layout_marginLeft="10dp"
+            android:textColor="@color/white"
+            />
+    </LinearLayout>
+
+
+    <!-- Aggiungi un delimitatore tra gli elementi -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/dark_gray"/>
+
+</LinearLayout>
+

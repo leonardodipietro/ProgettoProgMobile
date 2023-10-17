@@ -5,5 +5,5 @@ data class Recensione(
     val trackId: String = "",         // ID della canzone recensita
     val timestamp: Long = 0L,         // Timestamp del momento in cui la recensione è stata lasciata
     val content: String = "",
-
+    val artistId: String= ""
 )

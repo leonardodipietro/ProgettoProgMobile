@@ -10,7 +10,7 @@ import com.bumptech.glide.Glide
 import com.example.progettoprogmobile.R
 import com.example.progettoprogmobile.model.Artist
 
-class ArtistGridAdapter(private var artists: List<Artist>) : RecyclerView.Adapter<ArtistGridAdapter.ArtistGridViewHolder>() {
+class ArtistGridAdapter(private var artists: List<Artist>, private val listener: ArtistAdapter.OnArtistClickListener) : RecyclerView.Adapter<ArtistGridAdapter.ArtistGridViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArtistGridViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.recyclerviewartistgridlayout, parent, false)
@@ -34,6 +34,9 @@ class ArtistGridAdapter(private var artists: List<Artist>) : RecyclerView.Adapte
                 Glide.with(itemView)
                     .load(artist.images[0].url)
                     .into(artistImageView)
+            }
+            itemView.setOnClickListener {
+                listener.onArtistClicked(artist)
             }
         }
     }

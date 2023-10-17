@@ -8,10 +8,11 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.progettoprogmobile.FirstFragment
 import com.example.progettoprogmobile.R
 import com.example.progettoprogmobile.model.Artist
 
-class ArtistAdapter(private var artists: List<Artist>) : RecyclerView.Adapter<ArtistAdapter.ArtistViewHolder>() {
+class ArtistAdapter(private var artists: List<Artist>, private val listener: OnArtistClickListener) : RecyclerView.Adapter<ArtistAdapter.ArtistViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArtistViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.recycler_view_artist, parent, false)
@@ -39,11 +40,19 @@ class ArtistAdapter(private var artists: List<Artist>) : RecyclerView.Adapter<Ar
                     .load(artist.images[0].url)
                     .into(artistImageView)
             }
+
+            itemView.setOnClickListener {
+                listener.onArtistClicked(artist)
+            }
         }
     }
 
     fun submitList(newArtists: List<Artist>) {
         artists = newArtists
         notifyDataSetChanged()
+    }
+
+    interface OnArtistClickListener {
+        fun onArtistClicked(data: Any)
     }
 }

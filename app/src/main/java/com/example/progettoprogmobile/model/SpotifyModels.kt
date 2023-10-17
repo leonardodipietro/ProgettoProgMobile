@@ -47,7 +47,7 @@ data class Followers(
 data class Artist(
     @SerializedName("name") val name: String,
     @SerializedName("genres") val genres: List<String>,
-    @SerializedName("id") val id: String,
+    @SerializedName("id") val id: String="",
     //@SerializedName("followers") val followers: Followers,
     @SerializedName("images") val images: List<Image>
 ):Serializable

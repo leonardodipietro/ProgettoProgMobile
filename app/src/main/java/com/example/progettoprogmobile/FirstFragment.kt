@@ -32,7 +32,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class FirstFragment : Fragment(),TrackAdapter.OnTrackClickListener {
+class FirstFragment : Fragment(),TrackAdapter.OnTrackClickListener,
+    ArtistAdapter.OnArtistClickListener {
     private lateinit var firebaseViewModel: FirebaseViewModel
     private lateinit var spotifyViewModel: SpotifyViewModel
     private lateinit var recyclerView: RecyclerView
@@ -135,8 +136,8 @@ class FirstFragment : Fragment(),TrackAdapter.OnTrackClickListener {
 
         artistRecyclerView = rootView.findViewById(R.id.recyclerViewTopArtists)
         artistRecyclerView.layoutManager = LinearLayoutManager(requireContext())  // Linear view by default
-        artistAdapter = ArtistAdapter(emptyList())
-        artistGridAdapter = ArtistGridAdapter(emptyList())
+        artistAdapter = ArtistAdapter(emptyList(), this)
+        artistGridAdapter = ArtistGridAdapter(emptyList(), this)
         artistRecyclerView.adapter = artistAdapter  // Setting linear adapter by default
     }
     fun saveTimeFilter(context: Context, timeFilter: String) {
@@ -266,7 +267,7 @@ class FirstFragment : Fragment(),TrackAdapter.OnTrackClickListener {
         }
     }
     // Puoi aggiungere condizioni simili per gli artisti se anche loro hanno un comportamento simile
-     fun onArtistClicked(data: Any) {
+     override fun onArtistClicked(data: Any) {
         Log.d("FragmentClick", "Item clicked with data: $data")
         if (data is Artist) {
             // Qui naviga verso il nuovo fragment, puoi passare "data" come argomento se necessario
