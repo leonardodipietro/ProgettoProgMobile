@@ -198,7 +198,7 @@ class SettingUtils{
             }
         }
 
-        private fun privacyRTranslationMap(context: Context): Map<String, String> {
+        fun privacyRTranslationMap(context: Context): Map<String, String> {
             return mapOf(
                 context.getString(R.string.everyone) to "Everyone",
                 context.getString(R.string.followers) to "Followers",

@@ -1,5 +1,6 @@
 package com.example.progettoprogmobile
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,7 +12,6 @@ import android.widget.Button
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
-import com.bumptech.glide.Glide
 import com.example.progettoprogmobile.adapter.TrackAdapter
 import com.example.progettoprogmobile.adapter.ArtistAdapter
 import com.google.firebase.auth.FirebaseAuth
@@ -26,9 +26,15 @@ import android.os.Handler
 import android.os.Looper
 import com.example.progettoprogmobile.model.Track
 import com.example.progettoprogmobile.model.Artist
+import com.example.progettoprogmobile.utils.SettingUtils
 import com.google.android.gms.tasks.OnSuccessListener
 import com.google.android.gms.tasks.OnFailureListener
 import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 
 class FifthFragment : Fragment() {
 
@@ -42,6 +48,12 @@ class FifthFragment : Fragment() {
     private lateinit var auth: FirebaseAuth
     private lateinit var storage: FirebaseStorage
 
+    private lateinit var followButton: Button
+    private var staSeguendoUtente = false
+    private lateinit var userId: String
+    private var databaseReference = FirebaseDatabase.getInstance().reference
+    private val currentUserUid = FirebaseAuth.getInstance().currentUser?.uid
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -51,14 +63,87 @@ class FifthFragment : Fragment() {
         val topTracksRecyclerView: RecyclerView = rootView.findViewById(R.id.recyclerViewUtenteTrack)
         val topArtistsRecyclerView: RecyclerView = rootView.findViewById(R.id.recyclerViewUtenteArtist)
         val backButton: Button = rootView.findViewById(R.id.backArrow)
+        followButton = rootView.findViewById(R.id.addFriendButton)
 
+        userId = arguments?.getString("userId") ?: "" //Dichiarazione al livello di classe
+        //val userId: String? = arguments?.getString("userId")
+        Log.d("FifthFragment", "User ID ricevuto: $userId")
+
+        // Controlla se currentUserUid(io) sono dentro nodo Followers di userId(Amico)
+        val followersRef = databaseReference
+            .child("users")
+            .child(userId)
+            .child("followers")
+
+        // Crea una query per trovare il nodo figlio con valore uguale a currentUserUid
+        val followersCheck = followersRef.orderByValue().equalTo(true)
+
+        // Controlla se userId(Amico) ha il nodo Followers true o false
+        val privacyAmico = databaseReference.child("users")
+            .child(userId)
+            .child("privacy")
+            .child("account")
+            .child("Followers")
+
+        privacyAmico.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val privacyAmicoValue = dataSnapshot.getValue(Boolean::class.java)
+                Log.d("MyTag", "Valore di privacyAmicoValue: $privacyAmicoValue")
+
+                // Utilizza la query per ottenere i dati da followersRef
+                followersCheck.addListenerForSingleValueEvent(object : ValueEventListener {
+                    override fun onDataChange(dataSnapshot: DataSnapshot) {
+                        // Loop attraverso i risultati della query
+                        for (childSnapshot in dataSnapshot.children) {
+                            val followersCheckValue = childSnapshot.getValue(Boolean::class.java)
+                            Log.d("MyTag", "Valore di followersCheckValue: $followersCheckValue")
+
+                            // Esegui le azioni desiderate se il valore è true
+                            if (privacyAmicoValue == true && followersCheckValue == true) {
+                                // Il valore di "Followers" è true
+                                Log.d("MyTag", "Followers è true.")
+                                // Esegui le azioni desiderate qui
+                            } else {
+                                // Il valore di "Followers" non è true
+                                Log.d("MyTag", "Followers non è true.")
+                            }
+                        }
+                    }
+
+                    override fun onCancelled(databaseError: DatabaseError) {
+                        // Gestisci eventuali errori qui
+                        Log.e(
+                            "MyTag",
+                            "Errore nel recupero del valore di Followers: " + databaseError.message
+                        )
+                    }
+                })
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Gestisci eventuali errori qui per privacyAmico
+                Log.e(
+                    "MyTag",
+                    "Errore nel recupero del valore di privacyAmico: " + databaseError.message
+                )
+            }
+        })
+
+        // Azione da eseguire quando il pulsante freccia viene cliccato
         backButton.setOnClickListener {
-            // Azione da eseguire quando il pulsante freccia viene cliccato
             requireActivity().onBackPressed() // Torna al fragment precedente
         }
 
-        val userId: String? = arguments?.getString("userId")
-        Log.d("FifthFragment", "User ID ricevuto: $userId")
+        followButton.setOnClickListener {
+            // Esegui l'azione di follow o smetti di seguire in base allo stato attuale
+            if (staSeguendoUtente) {
+                // Esegui l'azione per smettere di seguire
+                smettiDiSeguire()
+            } else {
+                // Esegui l'azione per iniziare a seguire
+                iniziaASeguire()
+            }
+        }
 
         // Inizializza Firebase
         auth = FirebaseAuth.getInstance()
@@ -101,6 +186,58 @@ class FifthFragment : Fragment() {
             Log.e("FifthFragment", "Errore nel recupero dell'URL dell'immagine del profilo: ${exception.message}")
         }
         return rootView
+    }
+
+    // Funzioni per seguendo e smettere di seguire
+    private fun iniziaASeguire() {
+        //val currentUserUid = FirebaseAuth.getInstance().currentUser?.uid
+        //val databaseReference = FirebaseDatabase.getInstance().reference
+
+        if (currentUserUid != null) {
+            // Aggiungi l'utente corrente all'elenco dei seguaci dell'utente da seguire
+            databaseReference.child("users").child(userId).child("followers").child(currentUserUid).setValue(true)
+                .addOnSuccessListener {
+                    staSeguendoUtente = true
+                    aggiornaAspettoPulsante()
+                    Log.d("Firebase", "Hai iniziato a seguire l'utente con ID: $userId")
+                }
+                .addOnFailureListener {
+                    // Gestisci eventuali errori durante l'aggiunta dell'utente come seguace
+                    Log.e("Firebase", "Errore durante l'aggiunta dell'utente come seguace: $it")
+                }
+            databaseReference.child("users").child(currentUserUid).child("following").child(userId).setValue(true)
+        }
+    }
+
+    private fun smettiDiSeguire() {
+        val currentUserUid = FirebaseAuth.getInstance().currentUser?.uid
+
+        if (currentUserUid != null) {
+            val databaseReference = FirebaseDatabase.getInstance().reference
+
+            // Rimuovi l'utente corrente dall'elenco dei seguaci dell'utente da smettere di seguire
+            databaseReference.child("users").child(userId).child("followers").child(currentUserUid).removeValue()
+                .addOnSuccessListener {
+                    staSeguendoUtente = false
+                    aggiornaAspettoPulsante()
+                    Log.d("Firebase", "Hai smesso di seguire l'utente con ID: $userId")
+                }
+                .addOnFailureListener {
+                    // Gestisci eventuali errori durante la rimozione dell'utente come seguace
+                    Log.e("Firebase", "Errore durante la rimozione dell'utente come seguace: $it")
+                }
+            databaseReference.child("users").child(currentUserUid).child("following").child(userId).removeValue()
+        }
+    }
+
+    private fun aggiornaAspettoPulsante() {
+        if (staSeguendoUtente) {
+            followButton.text = "Following"
+            followButton.setBackgroundResource(R.drawable.unfollow_button_background) // Cambia lo sfondo
+        } else {
+            followButton.text = "Follow"
+            followButton.setBackgroundResource(R.drawable.follow_button_background) // Cambia lo sfondo
+        }
     }
 }
 
