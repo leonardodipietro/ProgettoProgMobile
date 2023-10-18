@@ -2,10 +2,11 @@ package com.example.progettoprogmobile.model
 
 data class Utente(
     val userId: String,
-    val name: String
+    val name: String,
+    val userImage: String
 ) {
     // Costruttore senza argomenti necessario per Firebase
-    constructor() : this("", "")
+    constructor() : this("", "", "")
 }
 
 /*

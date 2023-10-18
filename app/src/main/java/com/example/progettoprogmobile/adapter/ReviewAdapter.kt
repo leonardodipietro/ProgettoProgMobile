@@ -9,14 +9,13 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.progettoprogmobile.R
-import com.example.progettoprogmobile.ReviewFragment
 import com.example.progettoprogmobile.model.ReviewData
 import com.squareup.picasso.Picasso
 
 
-class ReviewAdapter (private val parent: ViewGroup) : ListAdapter<ReviewData, ReviewAdapter.ViewHolder>(ReviewDataDiffCallback()) {
+class ReviewAdapter (parent: ViewGroup) : ListAdapter<ReviewData, ReviewAdapter.ViewHolder>(ReviewDataDiffCallback()) {
 
-    val view = LayoutInflater.from(parent.context).inflate(R.layout.recycler_view_recensioni_profilo, parent, false)
+    val view: View = LayoutInflater.from(parent.context).inflate(R.layout.recycler_view_recensioni_profilo, parent, false)
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val copertina: ImageView = view.findViewById(R.id.copertina)
@@ -37,19 +36,19 @@ class ReviewAdapter (private val parent: ViewGroup) : ListAdapter<ReviewData, Re
 
         Picasso.get().load(reviewData.image).into(holder.copertina)
         holder.brano.text = reviewData.track
-        holder.artista.text = reviewData.artist
+        holder.artista.text = reviewData.artist.joinToString (", ")
         holder.album.text = reviewData.album
         holder.recensione.text = reviewData.recensione
         holder.timestamp.text = reviewData.timestamp.toString()
     }
-}
 
-class ReviewDataDiffCallback : DiffUtil.ItemCallback<ReviewData>() {
-    override fun areItemsTheSame(oldItem: ReviewData, newItem: ReviewData): Boolean {
-        return oldItem == newItem
-    }
+    class ReviewDataDiffCallback : DiffUtil.ItemCallback<ReviewData>() {
+        override fun areItemsTheSame(oldItem: ReviewData, newItem: ReviewData): Boolean {
+            return oldItem == newItem
+        }
 
-    override fun areContentsTheSame(oldItem: ReviewData, newItem: ReviewData): Boolean {
-        return oldItem == newItem
+        override fun areContentsTheSame(oldItem: ReviewData, newItem: ReviewData): Boolean {
+            return oldItem == newItem
+        }
     }
 }

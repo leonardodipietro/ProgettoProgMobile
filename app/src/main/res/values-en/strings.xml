@@ -54,12 +54,20 @@
     <string name="confirm">Confirm</string>
     <string name="newFollower">started following you</string>
     <string name="follow">Follow</string>
-    <string name="following1">Following</string>
+    <string name="following1">Unfollow</string>
 
     <string name="newReviewNotification">just wrote a new review</string>
     <string name="newResponseNotification">just responded to your review</string>
     <string name="newLikedReview">liked your review</string>
     <string name="newDislikedReview">didn\'t like your review</string>
+    <string name="clessidra">Hourglass</string>
+    <string name="frecciaindietro">Back arrow</string>
+    <string name="calendario">Calendar</string>
+    <string name="clessidra1">Hourglass</string>
+    <string name="griglia1">Grid</string>
+    <string name="contatorerecensioni">Reviews counter</string>
+    <string name="trackImage">Track immage</string>
+    <string name="remove">Remove</string>
 
 
 </resources>

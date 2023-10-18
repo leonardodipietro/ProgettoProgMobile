@@ -12,14 +12,14 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
         android:orientation="horizontal">
 
         <ImageView
-            android:id="@+id/followersImage"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:id="@+id/followingImage"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:contentDescription="@string/userImage"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -28,34 +28,29 @@
 
         <!--        il testo sotto verrà tolto e inserito dal kt-->
         <TextView
-            android:id="@+id/followersRequest"
-            android:layout_width="151dp"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:text="@string/newFollower"
-            android:textColor="@color/white"
-            android:textSize="18sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/followersImage"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ToggleButton
-            android:id="@+id/toggleButton"
-            style="@style/CustomToggleButtonStyle"
+            android:id="@+id/followingUsername"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
-            android:checked="true"
-            android:text="@string/follow"
+            android:gravity="center_vertical"
             android:textColor="@color/white"
-            android:textOff="@string/follow"
-            android:textOn="@string/following1"
+            android:layout_marginStart="5dp"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/followingImage"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/followingButton"
+            style="@style/CustomButtonStyle2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:text="@string/following1"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.45"
-            app:layout_constraintStart_toEndOf="@+id/followersRequest"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:textAllCaps="false"
+            />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

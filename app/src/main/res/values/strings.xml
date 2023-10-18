@@ -107,7 +107,7 @@
     <string name="confirm">Conferma</string>
     <string name="newFollower">ha iniziato a seguirti</string>
     <string name="follow">Segui</string>
-    <string name="following1">Segui già</string>
+    <string name="following1">Smetti di\n seguire</string>
 
     <string name="newReviewNotification">ha appena scritto una nuova recensione</string>
     <string name="newResponseNotification">ha appena risposto alla tua recensione</string>
@@ -116,9 +116,11 @@
     <string name="clessidra">Clessidra</string>
     <string name="frecciaindietro">FrecciaIndietro</string>
     <string name="calendario">Calendario</string>
-    <string name="clessidra1">Clessidra1</string>
-    <string name="griglia1">Griglia1</string>
+    <string name="clessidra1">Clessidra</string>
+    <string name="griglia1">Griglia</string>
     <string name="contatorerecensioni">contatoreRecensioni</string>
     <string name="trackImage">Immagine canzone</string>
+
+    <string name="remove">Rimuovi</string>
 
 </resources>

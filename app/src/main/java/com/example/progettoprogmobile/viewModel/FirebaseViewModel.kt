@@ -419,9 +419,10 @@ class FirebaseViewModel (application: Application): AndroidViewModel(application
             override fun onDataChange(snapshot: DataSnapshot) {
                 val name = snapshot.child("name").getValue(String::class.java) ?: ""
                 val userId = snapshot.child("userId").getValue(String::class.java) ?: ""
+                val userImage = snapshot.child("userId").getValue(String::class.java) ?: ""
 
                 // Crea un oggetto Utente con dati non nulli
-                val utente = Utente(userId, name)
+                val utente = Utente(userId, name, userImage)
 
                 // Passa l'oggetto Utente al listener fornito come parametro
                 listener.onUserFetched(utente)
