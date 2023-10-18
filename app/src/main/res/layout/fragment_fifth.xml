@@ -39,8 +39,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
-            android:text="@string/follow"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            android:contentDescription="@string/follow" />
 
     </RelativeLayout>
 

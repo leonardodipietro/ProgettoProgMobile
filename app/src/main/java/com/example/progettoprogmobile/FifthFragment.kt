@@ -20,6 +20,7 @@ import com.google.firebase.storage.FirebaseStorage
 import android.util.Log
 import androidx.lifecycle.ViewModelProvider
 import com.example.progettoprogmobile.viewModel.FirebaseViewModel
+import android.content.SharedPreferences
 import java.util.ArrayList
 import com.example.progettoprogmobile.model.Utente
 import android.os.Handler
@@ -53,6 +54,16 @@ class FifthFragment : Fragment() {
     private lateinit var userId: String
     private var databaseReference = FirebaseDatabase.getInstance().reference
     private val currentUserUid = FirebaseAuth.getInstance().currentUser?.uid
+
+    private enum class ButtonState {
+        ATTENDI_CONFERMA,
+        INIZIA_A_SEGUIRE,
+        SMETTI_DI_SEGUIRE
+    }
+
+    private var currentState = ButtonState.ATTENDI_CONFERMA
+    private var isRequestAccepted = false
+    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -135,15 +146,41 @@ class FifthFragment : Fragment() {
         }
 
         followButton.setOnClickListener {
-            // Esegui l'azione di follow o smetti di seguire in base allo stato attuale
-            if (staSeguendoUtente) {
-                // Esegui l'azione per smettere di seguire
-                smettiDiSeguire()
-            } else {
-                // Esegui l'azione per iniziare a seguire
-                iniziaASeguire()
+            when (currentState) {
+                ButtonState.ATTENDI_CONFERMA -> {
+                    // Esegui l'azione per la richiesta di amicizia
+                    // Cambia lo stato del pulsante se la richiesta è stata accettata
+                    currentState = ButtonState.INIZIA_A_SEGUIRE
+                    // Aggiorna l'aspetto del pulsante
+                    aggiornaAspettoPulsante()
+                    // Esegui l'azione per inviare la richiesta di amicizia
+                    inviaRichiestaAmicizia()
+                }
+                ButtonState.INIZIA_A_SEGUIRE -> {
+                    // Esegui l'azione per smettere di seguire
+                    currentState = ButtonState.SMETTI_DI_SEGUIRE
+                    // Aggiorna l'aspetto del pulsante
+                    aggiornaAspettoPulsante()
+                    // Esegui l'azione per iniziare a seguire
+                    iniziaASeguire()
+                }
+                ButtonState.SMETTI_DI_SEGUIRE -> {
+                    // Esegui l'azione per smettere di seguire
+                    currentState = ButtonState.INIZIA_A_SEGUIRE
+                    // Aggiorna l'aspetto del pulsante
+                    aggiornaAspettoPulsante()
+                    // Esegui l'azione per smettere di seguire
+                    smettiDiSeguire()
+                }
             }
         }
+
+        // Inizializza le SharedPreferences
+        sharedPreferences = requireActivity().getPreferences(Context.MODE_PRIVATE)
+
+        // Carica lo stato del bottone dalle SharedPreferences, utilizza false come valore di default
+        isRequestAccepted = sharedPreferences.getBoolean("isRequestAccepted", false)
+        aggiornaAspettoPulsante()
 
         // Inizializza Firebase
         auth = FirebaseAuth.getInstance()
@@ -188,13 +225,54 @@ class FifthFragment : Fragment() {
         return rootView
     }
 
-    // Funzioni per seguendo e smettere di seguire
-    private fun iniziaASeguire() {
-        //val currentUserUid = FirebaseAuth.getInstance().currentUser?.uid
-        //val databaseReference = FirebaseDatabase.getInstance().reference
-
+    private fun inviaRichiestaAmicizia() {
+        // Implementa l'azione per inviare una richiesta di amicizia
         if (currentUserUid != null) {
-            // Aggiungi l'utente corrente all'elenco dei seguaci dell'utente da seguire
+            val requestsRef = databaseReference
+                .child("users")
+                .child(userId)
+                .child("requests")
+
+            // Aggiungi l'utente corrente all'elenco delle richieste nell'utente da seguire
+            requestsRef.child(currentUserUid).setValue(true)
+                .addOnSuccessListener {
+                    Log.d("Firebase", "Richiesta di amicizia inviata all'utente con ID: $userId")
+                    // Imposta lo stato della richiesta come non accettata
+                    isRequestAccepted = false
+                    // Salva lo stato del bottone nelle SharedPreferences
+                    saveButtonState()
+                }
+                .addOnFailureListener {
+                    // Gestisci eventuali errori durante l'invio della richiesta di amicizia
+                    Log.e("Firebase", "Errore durante l'invio della richiesta di amicizia: $it")
+                }
+        }
+    }
+
+    private fun saveButtonState() {
+        // Salva lo stato del bottone nelle SharedPreferences
+        val editor = sharedPreferences.edit()
+        editor.putBoolean("isRequestAccepted", isRequestAccepted)
+        editor.apply()
+    }
+
+    // Funzioni per seguire e smettere di seguire
+    private fun iniziaASeguire() {
+        if (isRequestAccepted && currentUserUid != null) {
+
+            val usersReference = databaseReference.child("users")
+            val requestsRef = usersReference.child(userId).child("requests").child(currentUserUid)
+            // La richiesta di amicizia è stata accettata, rimuovi l'utente corrente dalle richieste pendenti
+            requestsRef.removeValue()
+                .addOnSuccessListener {
+                    Log.d("Firebase", "Richiesta di amicizia accettata. Richiesta rimossa.")
+                }
+                .addOnFailureListener {
+                    // Gestisci eventuali errori durante la rimozione della richiesta di amicizia
+                    Log.e("Firebase", "Errore durante la rimozione della richiesta di amicizia: $it")
+                }
+
+            // Esegui l'azione per iniziare a seguire
             databaseReference.child("users").child(userId).child("followers").child(currentUserUid).setValue(true)
                 .addOnSuccessListener {
                     staSeguendoUtente = true
@@ -206,14 +284,26 @@ class FifthFragment : Fragment() {
                     Log.e("Firebase", "Errore durante l'aggiunta dell'utente come seguace: $it")
                 }
             databaseReference.child("users").child(currentUserUid).child("following").child(userId).setValue(true)
+        } else {
+            // La richiesta di amicizia non è stata ancora accettata, mostra un messaggio all'utente
+            Log.d("Firebase", "La richiesta di amicizia è ancora in attesa di accettazione.")
+            // Puoi anche mostrare un toast o un avviso per informare l'utente
         }
     }
 
     private fun smettiDiSeguire() {
-        val currentUserUid = FirebaseAuth.getInstance().currentUser?.uid
-
         if (currentUserUid != null) {
-            val databaseReference = FirebaseDatabase.getInstance().reference
+            val usersReference = databaseReference.child("users")
+            val requestsRef = usersReference.child(userId).child("requests").child(currentUserUid)
+            // Rimuovi l'utente corrente dalle richieste pendenti
+            requestsRef.removeValue()
+                .addOnSuccessListener {
+                    Log.d("Firebase", "Richiesta di amicizia accettata. Richiesta rimossa.")
+                }
+                .addOnFailureListener {
+                    // Gestisci eventuali errori durante la rimozione della richiesta di amicizia
+                    Log.e("Firebase", "Errore durante la rimozione della richiesta di amicizia: $it")
+                }
 
             // Rimuovi l'utente corrente dall'elenco dei seguaci dell'utente da smettere di seguire
             databaseReference.child("users").child(userId).child("followers").child(currentUserUid).removeValue()
@@ -231,13 +321,37 @@ class FifthFragment : Fragment() {
     }
 
     private fun aggiornaAspettoPulsante() {
-        if (staSeguendoUtente) {
-            followButton.text = "Following"
-            followButton.setBackgroundResource(R.drawable.unfollow_button_background) // Cambia lo sfondo
-        } else {
-            followButton.text = "Follow"
-            followButton.setBackgroundResource(R.drawable.follow_button_background) // Cambia lo sfondo
+        when {
+            isRequestAccepted -> {
+                followButton.text = "Following"
+                followButton.setBackgroundResource(R.drawable.unfollow_button_background) // Cambia lo sfondo
+            }
+            currentUserHasSentRequest() -> {
+                followButton.text = "Request Sent"
+                followButton.setBackgroundResource(R.drawable.pending_button_background) // Cambia lo sfondo per indicare "In attesa"
+            }
+            else -> {
+                followButton.text = "Follow"
+                followButton.setBackgroundResource(R.drawable.follow_button_background) // Cambia lo sfondo
+            }
         }
+    }
+
+    private fun currentUserHasSentRequest(): Boolean {
+        val currentUserUid = FirebaseAuth.getInstance().currentUser?.uid
+        if (currentUserUid != null) {
+            val requestsRef = databaseReference
+                .child("users")
+                .child(userId)
+                .child("requests")
+
+            // Verifica se l'utente corrente ha già inviato una richiesta di amicizia
+//            val hasSentRequest = requestsRef.child(currentUserUid).get().isComplete
+//            Log.d("MyTag", "Utente corrente ha già inviato una richiesta: $hasSentRequest")
+//            return hasSentRequest
+            return requestsRef.child(currentUserUid).get().isComplete
+        }
+        return false
     }
 }
 
