@@ -86,7 +86,7 @@ class SecondFragment : Fragment() {
                     // Esegui le azioni desiderate con l'oggetto Utente ricevuto
                     Log.d("SecondFragment", "User selected: ${utente.name}, ID: ${utente.userId}")
 
-                    // Ad esempio, passare l'oggetto Utente al tuo FifthFragment
+                    // Passare l'oggetto Utente al tuo FifthFragment
                     val bundle = Bundle().apply {
                         putString("userId", utente.userId)
                     }

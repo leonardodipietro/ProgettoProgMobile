@@ -14,14 +14,18 @@ import android.util.Log
 class UtenteAdapter(private val onUserSelected: (String) -> Unit) :
     ListAdapter<Utente, UtenteAdapter.UtenteViewHolder>(UtenteDiffCallback()) {
 
+    // Crea una nuova istanza di UtenteViewHolder quando necessario
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UtenteViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.item_utente_view, parent, false)
         return UtenteViewHolder(itemView)
     }
 
+    // Associa i dati dell'utente alla vista quando viene richiesto
     override fun onBindViewHolder(holder: UtenteViewHolder, position: Int) {
         val utente = getItem(position)
         holder.bind(utente)
+
+        // Aggiungi un listener per l'evento di clic sulla vista dell'utente
         holder.itemView.setOnClickListener {
             val userId = utente.userId
             Log.d("UtenteAdapter", "Item clicked with userId: $userId")
@@ -33,14 +37,17 @@ class UtenteAdapter(private val onUserSelected: (String) -> Unit) :
         }
     }
 
+    // ViewHolder per visualizzare gli elementi dell'utente nella RecyclerView
     inner class UtenteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val textViewNome: TextView = itemView.findViewById(R.id.textViewNome)
 
+        // Associa i dati dell'utente ai widget nella vista
         fun bind(utente: Utente) {
             textViewNome.text = utente.name
         }
     }
 
+    // Callback per determinare se due elementi nella lista sono gli stessi (stessa identità) o contengono gli stessi dati
     private class UtenteDiffCallback : DiffUtil.ItemCallback<Utente>() {
         override fun areItemsTheSame(oldItem: Utente, newItem: Utente): Boolean {
             return oldItem.userId == newItem.userId
@@ -51,6 +58,7 @@ class UtenteAdapter(private val onUserSelected: (String) -> Unit) :
         }
     }
 
+    // Funzione per impostare la lista di utenti nella RecyclerView
     fun setUtenti(utenti: List<Utente>) {
         submitList(utenti)
     }

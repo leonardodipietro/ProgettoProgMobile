@@ -25,6 +25,7 @@ import java.util.ArrayList
 import com.example.progettoprogmobile.model.Utente
 import android.os.Handler
 import android.os.Looper
+import com.example.progettoprogmobile.adapter.UtenteAdapter
 import com.example.progettoprogmobile.model.Track
 import com.example.progettoprogmobile.model.Artist
 import com.example.progettoprogmobile.utils.SettingUtils
@@ -64,6 +65,7 @@ class FifthFragment : Fragment() {
     private var currentState = ButtonState.ATTENDI_CONFERMA
     private var isRequestAccepted = false
     private lateinit var sharedPreferences: SharedPreferences
+    private var currentUserHasSentRequest = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -101,7 +103,7 @@ class FifthFragment : Fragment() {
                 val privacyAmicoValue = dataSnapshot.getValue(Boolean::class.java)
                 Log.d("MyTag", "Valore di privacyAmicoValue: $privacyAmicoValue")
 
-                // Utilizza la query per ottenere i dati da followersRef
+                // Utilizza la query per ottenere i dati da followersCheck
                 followersCheck.addListenerForSingleValueEvent(object : ValueEventListener {
                     override fun onDataChange(dataSnapshot: DataSnapshot) {
                         // Loop attraverso i risultati della query
@@ -146,33 +148,60 @@ class FifthFragment : Fragment() {
         }
 
         followButton.setOnClickListener {
-            when (currentState) {
-                ButtonState.ATTENDI_CONFERMA -> {
-                    // Esegui l'azione per la richiesta di amicizia
-                    // Cambia lo stato del pulsante se la richiesta è stata accettata
-                    currentState = ButtonState.INIZIA_A_SEGUIRE
+
+            val privacyAmico = databaseReference.child("users")
+                .child(userId)
+                .child("privacy")
+                .child("account")
+                .child("Followers")
+
+            privacyAmico.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    val privacyAmicoValue = dataSnapshot.getValue(Boolean::class.java) ?: false
+
+                    if(privacyAmicoValue) {
+                        when (currentState) {
+                            ButtonState.ATTENDI_CONFERMA -> {
+                                // Esegui l'azione per la richiesta di amicizia
+                                // Cambia lo stato del pulsante se la richiesta è stata accettata
+                                currentState = ButtonState.INIZIA_A_SEGUIRE
+                                // Aggiorna l'aspetto del pulsante
+                                aggiornaAspettoPulsante()
+                                // Esegui l'azione per inviare la richiesta di amicizia
+                                inviaRichiestaAmicizia()
+                            }
+
+                            ButtonState.INIZIA_A_SEGUIRE -> {
+                                // Esegui l'azione per smettere di seguire
+                                currentState = ButtonState.SMETTI_DI_SEGUIRE
+                                // Aggiorna l'aspetto del pulsante
+                                aggiornaAspettoPulsante()
+                                // Esegui l'azione per iniziare a seguire
+                                iniziaASeguire()
+                            }
+
+                            ButtonState.SMETTI_DI_SEGUIRE -> {
+                                // Esegui l'azione per smettere di seguire
+                                currentState = ButtonState.INIZIA_A_SEGUIRE
+                                // Aggiorna l'aspetto del pulsante
+                                aggiornaAspettoPulsante()
+                                // Esegui l'azione per smettere di seguire
+                                smettiDiSeguire()
+                            }
+                        }
+                    } else {
+                        // Se Followers è false, esegui l'azione per inviare la richiesta di amicizia
+                        currentState = ButtonState.INIZIA_A_SEGUIRE
+                        inviaRichiestaAmicizia()
+                    }
                     // Aggiorna l'aspetto del pulsante
                     aggiornaAspettoPulsante()
-                    // Esegui l'azione per inviare la richiesta di amicizia
-                    inviaRichiestaAmicizia()
                 }
-                ButtonState.INIZIA_A_SEGUIRE -> {
-                    // Esegui l'azione per smettere di seguire
-                    currentState = ButtonState.SMETTI_DI_SEGUIRE
-                    // Aggiorna l'aspetto del pulsante
-                    aggiornaAspettoPulsante()
-                    // Esegui l'azione per iniziare a seguire
-                    iniziaASeguire()
+                override fun onCancelled(error: DatabaseError) {
+                    // Gestisci eventuali errori nel recupero del valore di Followers
+                    Log.e("MyTag", "Errore nel recupero del valore di Followers: " + error.message)
                 }
-                ButtonState.SMETTI_DI_SEGUIRE -> {
-                    // Esegui l'azione per smettere di seguire
-                    currentState = ButtonState.INIZIA_A_SEGUIRE
-                    // Aggiorna l'aspetto del pulsante
-                    aggiornaAspettoPulsante()
-                    // Esegui l'azione per smettere di seguire
-                    smettiDiSeguire()
-                }
-            }
+            })
         }
 
         // Inizializza le SharedPreferences
@@ -195,6 +224,47 @@ class FifthFragment : Fragment() {
 
         // Ottieni il riferimento al nodo utente nel database Firebase
         val userReference = database.reference.child("users").child(userId ?: "")
+
+        val reviewTextView = rootView.findViewById<TextView>(R.id.contatoreRecensioni)
+        reviewTextView.setOnClickListener{
+            val reviewFragmentFriend = ReviewFragmentFriend()
+            // Passare l'oggetto Utente al tuo ReviewFragmentFriend
+            val bundle = Bundle().apply {
+                putString("userId", userId)
+            }
+            reviewFragmentFriend.arguments = bundle
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.nav_host_fragment, reviewFragmentFriend)
+                .addToBackStack(null)
+                .commit()
+        }
+
+        val followersTextView = rootView.findViewById<TextView>(R.id.contatoreFollowers)
+        followersTextView.setOnClickListener{
+            val followersFragmentFriend = FollowersFriendFragment()
+            val bundle = Bundle().apply {
+                putString("userId", userId)
+            }
+            followersFragmentFriend.arguments = bundle
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.nav_host_fragment, followersFragmentFriend)
+                .addToBackStack(null)
+                .commit()
+        }
+
+        val followingTextView = rootView.findViewById<TextView>(R.id.contatoreFollowing)
+        followingTextView.setOnClickListener{
+            val followingFragmentFriend = FollowingFriendFragment()
+            val bundle = Bundle().apply {
+                putString("userId", userId)
+            }
+            followingFragmentFriend.arguments = bundle
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.nav_host_fragment, followingFragmentFriend)
+                .addToBackStack(null)
+                .commit()
+        }
+
 
         // Ottieni il nome utente dell'utente attuale da Firebase
         userReference.child("name").get().addOnSuccessListener { dataSnapshot ->
@@ -237,10 +307,13 @@ class FifthFragment : Fragment() {
             requestsRef.child(currentUserUid).setValue(true)
                 .addOnSuccessListener {
                     Log.d("Firebase", "Richiesta di amicizia inviata all'utente con ID: $userId")
+                    currentUserHasSentRequest = true
                     // Imposta lo stato della richiesta come non accettata
                     isRequestAccepted = false
                     // Salva lo stato del bottone nelle SharedPreferences
                     saveButtonState()
+                    // Aggiorna lo stato del pulsante dopo l'invio della richiesta
+                    aggiornaAspettoPulsante()
                 }
                 .addOnFailureListener {
                     // Gestisci eventuali errori durante l'invio della richiesta di amicizia
@@ -277,6 +350,13 @@ class FifthFragment : Fragment() {
                 .addOnSuccessListener {
                     staSeguendoUtente = true
                     aggiornaAspettoPulsante()
+
+                    // Imposta lo stato della richiesta come accettata
+                    isRequestAccepted = true
+
+                    // Salva lo stato del bottone nelle SharedPreferences
+                    saveButtonState()
+
                     Log.d("Firebase", "Hai iniziato a seguire l'utente con ID: $userId")
                 }
                 .addOnFailureListener {
@@ -321,37 +401,19 @@ class FifthFragment : Fragment() {
     }
 
     private fun aggiornaAspettoPulsante() {
-        when {
-            isRequestAccepted -> {
-                followButton.text = "Following"
-                followButton.setBackgroundResource(R.drawable.unfollow_button_background) // Cambia lo sfondo
-            }
-            currentUserHasSentRequest() -> {
-                followButton.text = "Request Sent"
-                followButton.setBackgroundResource(R.drawable.pending_button_background) // Cambia lo sfondo per indicare "In attesa"
-            }
-            else -> {
-                followButton.text = "Follow"
-                followButton.setBackgroundResource(R.drawable.follow_button_background) // Cambia lo sfondo
-            }
-        }
-    }
 
-    private fun currentUserHasSentRequest(): Boolean {
-        val currentUserUid = FirebaseAuth.getInstance().currentUser?.uid
-        if (currentUserUid != null) {
-            val requestsRef = databaseReference
-                .child("users")
-                .child(userId)
-                .child("requests")
+        //isRequestAccepted = currentUserHasSentRequest // Aggiorna isRequestAccepted
 
-            // Verifica se l'utente corrente ha già inviato una richiesta di amicizia
-//            val hasSentRequest = requestsRef.child(currentUserUid).get().isComplete
-//            Log.d("MyTag", "Utente corrente ha già inviato una richiesta: $hasSentRequest")
-//            return hasSentRequest
-            return requestsRef.child(currentUserUid).get().isComplete
+        if (isRequestAccepted) {
+            followButton.text = "Following"
+            followButton.setBackgroundResource(R.drawable.unfollow_button_background)
+        } else if (currentUserHasSentRequest) {
+            followButton.text = "Request Sent"
+            followButton.setBackgroundResource(R.drawable.pending_button_background)
+        } else {
+            followButton.text = "Follow"
+            followButton.setBackgroundResource(R.drawable.follow_button_background)
         }
-        return false
     }
 }
 

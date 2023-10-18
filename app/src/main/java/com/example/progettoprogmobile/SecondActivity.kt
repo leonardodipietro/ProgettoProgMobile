@@ -64,14 +64,14 @@ class SecondActivity : AppCompatActivity() {
                     transaction.replace(R.id.nav_host_fragment, newFragment, "secondFragment")
                     currentFragment = newFragment
                 }
-                R.id.settings -> {
-                    val newFragment = ThirdFragment()
-                    transaction.replace(R.id.nav_host_fragment, newFragment, "thirdFragment")
-                    currentFragment = newFragment
-                }
                 R.id.notification -> {
                     val newFragment = FourthFragment()
                     transaction.replace(R.id.nav_host_fragment, newFragment, "fourthFragment")
+                    currentFragment = newFragment
+                }
+                R.id.settings -> {
+                    val newFragment = ThirdFragment()
+                    transaction.replace(R.id.nav_host_fragment, newFragment, "thirdFragment")
                     currentFragment = newFragment
                 }
             }
