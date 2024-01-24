@@ -24,6 +24,8 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.util.concurrent.CountDownLatch
 import kotlin.coroutines.resumeWithException
+import com.example.progettoprogmobile.model.Utente
+import com.squareup.picasso.Picasso
 
 
 
@@ -45,6 +47,7 @@ class FirebaseViewModel (application: Application): AndroidViewModel(application
         Log.d("FirebaseViewModel", "cercaUtenti called with query: $query")
         val ref = FirebaseDatabase.getInstance().getReference("users")
         val risultati = mutableListOf<Utente>()
+
         ref.orderByChild("name").startAt(query).endAt(query + "\uf8ff")
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
@@ -52,10 +55,20 @@ class FirebaseViewModel (application: Application): AndroidViewModel(application
                     snapshot.children.forEach {
                         Log.d("FirebaseViewModel", "Raw User Data: ${it.value}")
                         val utente = it.getValue(Utente::class.java)
+
                         if (utente != null) {
                             Log.d("FirebaseViewModel", "Read user name from Firebase: ${utente.name}")
                             Log.d("FirebaseViewModel", "Read ID from Firebase: ${utente.userId}")
-                            risultati.add(utente)
+
+                            // Ora ottieni anche l'URL dell'immagine dell'utente
+                            val userImage = it.child("profile image").getValue(String::class.java)
+                            if (!userImage.isNullOrEmpty()) {
+                                // Crea una nuova istanza di Utente con l'immagine aggiornata
+                                val utenteConImmagine = Utente(utente.userId, utente.name, userImage)
+                                risultati.add(utenteConImmagine)
+                            } else {
+                                risultati.add(utente)
+                            }
                         } else {
                             Log.e("FirebaseViewModel", "Error reading user: $it")
                         }
@@ -419,7 +432,7 @@ class FirebaseViewModel (application: Application): AndroidViewModel(application
             override fun onDataChange(snapshot: DataSnapshot) {
                 val name = snapshot.child("name").getValue(String::class.java) ?: ""
                 val userId = snapshot.child("userId").getValue(String::class.java) ?: ""
-                val userImage = snapshot.child("userId").getValue(String::class.java) ?: ""
+                val userImage = snapshot.child("profile image").getValue(String::class.java) ?: ""
 
                 // Crea un oggetto Utente con dati non nulli
                 val utente = Utente(userId, name, userImage)

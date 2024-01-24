@@ -10,6 +10,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.progettoprogmobile.R
 import com.example.progettoprogmobile.model.Utente
 import android.util.Log
+import com.squareup.picasso.Picasso
+import android.widget.ImageView
+
 
 class UtenteAdapter(private val onUserSelected: (String) -> Unit) :
     ListAdapter<Utente, UtenteAdapter.UtenteViewHolder>(UtenteDiffCallback()) {
@@ -40,10 +43,22 @@ class UtenteAdapter(private val onUserSelected: (String) -> Unit) :
     // ViewHolder per visualizzare gli elementi dell'utente nella RecyclerView
     inner class UtenteViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val textViewNome: TextView = itemView.findViewById(R.id.textViewNome)
+        private val imageView: ImageView = itemView.findViewById(R.id.imageview)
 
         // Associa i dati dell'utente ai widget nella vista
         fun bind(utente: Utente) {
             textViewNome.text = utente.name
+
+            if (utente.userImage.isNotEmpty()) {
+                Picasso.get().load(utente.userImage)
+                    .into(imageView)
+            } else {
+                // Carica un'immagine di fallback o gestisci diversamente
+                // a seconda dei requisiti del tuo progetto.
+                Picasso.get().load(R.drawable.baseline_person_24)
+                    .into(imageView)
+            }
+
         }
     }
 
