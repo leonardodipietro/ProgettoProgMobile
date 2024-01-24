@@ -30,9 +30,8 @@
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:contentDescription="@string/clessidra1"
-                android:background="@drawable/time"
+                android:background="@drawable/twotone_hourglass_full_24"
                 android:layout_centerInParent="true"
-                android:backgroundTint="@color/verde_spotify"
                />
             <View
                 android:layout_width="10dp"

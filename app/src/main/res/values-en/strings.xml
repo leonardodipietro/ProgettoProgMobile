@@ -68,6 +68,7 @@
     <string name="contatorerecensioni">Reviews counter</string>
     <string name="trackImage">Track immage</string>
     <string name="remove">Remove</string>
+    <string name="requestSent">Request sent</string>
 
 
 </resources>

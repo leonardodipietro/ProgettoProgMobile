@@ -40,7 +40,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:textColor="@color/white"
-            android:contentDescription="@string/follow" />
+            android:contentDescription=""/>
 
     </RelativeLayout>
 

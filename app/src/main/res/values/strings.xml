@@ -122,5 +122,6 @@
     <string name="trackImage">Immagine canzone</string>
 
     <string name="remove">Rimuovi</string>
+    <string name="requestSent">Richiesta inviata</string>
 
 </resources>
