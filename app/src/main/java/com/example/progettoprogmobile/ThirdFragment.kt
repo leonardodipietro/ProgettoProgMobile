@@ -300,6 +300,12 @@ open class ThirdFragment : Fragment() {
             }
         }
 
+
+
+        countUserReviews(userId, FirebaseDatabase.getInstance().reference, rootView);
+        countUserFollowers(userId, FirebaseDatabase.getInstance().reference, rootView);
+        countUserFollowing(userId, FirebaseDatabase.getInstance().reference, rootView);
+
         return rootView
     }
 
@@ -375,7 +381,6 @@ open class ThirdFragment : Fragment() {
             }
         }
     }
-
 
     private fun showLanguageDialog() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_edit_language, null)
@@ -544,4 +549,100 @@ open class ThirdFragment : Fragment() {
         val y = location[1] + review.height
         popupWindow.showAtLocation(review, Gravity.NO_GRAVITY, x, y)
     }
+
+
+
+
+
+
+
+    fun countUserReviews(userId: String, databaseReference: DatabaseReference, rootView: View) {
+        val reviewsReference = databaseReference.child("reviews")
+
+        reviewsReference.orderByChild("userId").equalTo(userId)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    val reviewCount = dataSnapshot.childrenCount.toInt()
+
+                    // Ora puoi salvare il conteggio nel nodo dell'utente
+                    saveReviewCountToUserNode(userId, reviewCount, databaseReference)
+
+                    Log.d("CountUserReviews", "Review count for user $userId: $reviewCount")
+
+                    // Aggiorna la TextView con il conteggio delle recensioni
+                    val reviewNumberTextView = rootView.findViewById<TextView>(R.id.reviewNumber)
+                    reviewNumberTextView.text = reviewCount.toString()
+                }
+
+                override fun onCancelled(databaseError: DatabaseError) {
+                    Log.e("CountUserReviews", "Error fetching review count for user $userId: ${databaseError.message}")
+                }
+            })
+    }
+
+    fun countUserFollowers(userId: String, databaseReference: DatabaseReference, rootView: View) {
+        val followersReference = databaseReference.child("users").child(userId).child("followers")
+
+        followersReference.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val followersCount = dataSnapshot.childrenCount.toInt()
+
+                // Ora puoi salvare il conteggio nel nodo dell'utente
+                saveFollowersCountToUserNode(userId, followersCount, databaseReference)
+
+                Log.d("CountUserFollowers", "Followers count for user $userId: $followersCount")
+
+                // Aggiorna la TextView con il conteggio dei followers
+                val followersNumberTextView = rootView.findViewById<TextView>(R.id.followersNumber)
+                followersNumberTextView.text = followersCount.toString()
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.e("CountUserFollowers", "Error fetching followers count for user $userId: ${databaseError.message}")
+            }
+        })
+    }
+
+    fun countUserFollowing(userId: String, databaseReference: DatabaseReference, rootView: View) {
+        val followingReference = databaseReference.child("users").child(userId).child("following")
+
+        followingReference.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val followingCount = dataSnapshot.childrenCount.toInt()
+
+                // Ora puoi salvare il conteggio nel nodo dell'utente
+                saveFollowingCountToUserNode(userId, followingCount, databaseReference)
+
+                Log.d("CountUserFollowing", "Following count for user $userId: $followingCount")
+
+                // Aggiorna la TextView con il conteggio delle recensioni
+                val followingNumberTextView = rootView.findViewById<TextView>(R.id.followingNumber)
+                followingNumberTextView.text = followingCount.toString()
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.e("CountUserFollowing", "Error fetching following count for user $userId: ${databaseError.message}")
+            }
+        })
+    }
+
+    private fun saveReviewCountToUserNode(userId: String, reviewCount: Int, databaseReference: DatabaseReference) {
+        val userReference = databaseReference.child("users").child(userId)
+
+        // Salva il conteggio delle recensioni nel nodo dell'utente
+        userReference.child("reviews counter").setValue(reviewCount)
+    }
+    private fun saveFollowersCountToUserNode(userId: String, followersCount: Int, databaseReference: DatabaseReference) {
+        val userReference = databaseReference.child("users").child(userId)
+
+        // Salva il conteggio delle recensioni nel nodo dell'utente
+        userReference.child("followers counter").setValue(followersCount)
+    }
+    private fun saveFollowingCountToUserNode(userId: String, followingCount: Int, databaseReference: DatabaseReference) {
+        val userReference = databaseReference.child("users").child(userId)
+
+        // Salva il conteggio delle recensioni nel nodo dell'utente
+        userReference.child("following counter").setValue(followingCount)
+    }
+
 }
