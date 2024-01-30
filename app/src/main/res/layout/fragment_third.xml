@@ -507,7 +507,7 @@
             android:backgroundTint="@color/verde_spotify"
             android:contentDescription="@string/signOut"
             android:text="@string/signOut"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             app:layout_constraintBottom_toTopOf="@+id/delete"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -522,7 +522,7 @@
             android:layout_marginTop="10dp"
             android:backgroundTint="@color/verde_spotify"
             android:text="@string/delete"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />

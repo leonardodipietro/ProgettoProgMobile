@@ -11,6 +11,7 @@ import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.graphics.Rect
 import android.Manifest
+import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -33,6 +34,8 @@ import com.google.firebase.storage.StorageReference
 import com.squareup.picasso.Picasso
 import java.io.IOException
 import java.util.Locale
+import android.text.Html
+
 
 open class ThirdFragment : Fragment() {
 
@@ -310,9 +313,15 @@ open class ThirdFragment : Fragment() {
     }
 
     private fun openFileChooser() {
-        val options = arrayOf(getString(R.string.takePicture), getString(R.string.choseFromGallery), getString(R.string.cancel))
 
-        val builder = AlertDialog.Builder(requireContext())
+        // Array di SpannableString con il testo bianco
+        val options = arrayOf(
+            Html.fromHtml("<font color='#FFFFFF'>${getString(R.string.takePicture)}</font>", Html.FROM_HTML_MODE_LEGACY),
+            Html.fromHtml("<font color='#FFFFFF'>${getString(R.string.choseFromGallery)}</font>", Html.FROM_HTML_MODE_LEGACY),
+            Html.fromHtml("<font color='#FFFFFF'>${getString(R.string.cancel)}</font>", Html.FROM_HTML_MODE_LEGACY)
+        )
+
+        val builder = AlertDialog.Builder(requireContext(), R.style.CustomAlertDialogStyle)
         builder.setTitle(getString(R.string.choseAnOption))
         builder.setItems(options) { dialog, which ->
             when (which) {
@@ -557,10 +566,9 @@ open class ThirdFragment : Fragment() {
 
 
     fun countUserReviews(userId: String, databaseReference: DatabaseReference, rootView: View) {
-        val reviewsReference = databaseReference.child("reviews")
+        val reviewsReference = databaseReference.child("users").child(userId).child("reviews")
 
-        reviewsReference.orderByChild("userId").equalTo(userId)
-            .addListenerForSingleValueEvent(object : ValueEventListener {
+        reviewsReference.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     val reviewCount = dataSnapshot.childrenCount.toInt()
 

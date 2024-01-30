@@ -12,7 +12,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
         android:orientation="horizontal">
 
@@ -20,6 +20,7 @@
             android:id="@+id/followersImage"
             android:layout_width="60dp"
             android:layout_height="60dp"
+            android:src="@drawable/baseline_person_24"
             android:contentDescription="@string/userImage"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -30,7 +31,8 @@
         <TextView
             android:id="@+id/followersRequest"
             android:layout_width="151dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="5dp"
             android:gravity="center_vertical"
             android:text="@string/newFollower"
             android:textColor="@color/white"
