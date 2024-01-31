@@ -12,10 +12,6 @@ import com.example.progettoprogmobile.model.Track
 
 class TrackGridAdapter(private var tracks: List<Track>, private val listener: TrackAdapter.OnTrackClickListener) : RecyclerView.Adapter<TrackGridAdapter.TrackGridViewHolder>() {
 
-
-    interface OnTrackClickListener {
-        fun onTrackClicked(data: Track)
-    }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TrackGridViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.recyclerviewbranigridlayout, parent, false)
         return TrackGridViewHolder(view)
@@ -50,6 +46,10 @@ class TrackGridAdapter(private var tracks: List<Track>, private val listener: Tr
             }
 
         }
+    }
+
+    interface OnTrackClickListener {
+        fun onTrackClicked(data: Track)
     }
 
     fun submitList(newTracks: List<Track>) {

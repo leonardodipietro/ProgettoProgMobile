@@ -21,6 +21,7 @@ class TrackAdapter(private var tracks: List<Track>, private val listener: OnTrac
 
     override fun onBindViewHolder(holder: TrackViewHolder, position: Int) {
         val track = tracks[position]
+        Log.d("TrackAdapter", "Associazione traccia alla posizione $position: $track")
         holder.bind(track)
 
     }
@@ -55,6 +56,8 @@ class TrackAdapter(private var tracks: List<Track>, private val listener: OnTrac
     fun submitList(newTracks: List<Track>) {
         tracks = newTracks
         notifyDataSetChanged()
+        Log.d("TrackAdapter", "submitList() chiamato con ${tracks.size} nuove tracce")
+        Log.d("TrackAdapter", "Nuova lista di tracce: $tracks")
     }
 
     interface OnTrackClickListener {

@@ -40,6 +40,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:textColor="@color/white"
+            android:importantForAccessibility="no"
             android:contentDescription=""/>
 
     </RelativeLayout>
@@ -206,10 +207,10 @@
             android:backgroundTint="@color/verde_spotify" />
 
         <Button
-            android:id="@+id/calendario"
+            android:id="@+id/vista"
             android:layout_width="50dp"
             android:layout_height="wrap_content"
-            android:background ="@drawable/outline_calendar_month_24"
+            android:background ="@drawable/baseline_format_list_bulleted_24"
             android:layout_centerVertical="true"
             android:contentDescription="@string/calendario"
             android:layout_toEndOf="@+id/btn_topArtisti"
@@ -239,7 +240,7 @@
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:background="@color/gray"
-        android:layout_below="@+id/recyclerViewUtenteArtist" >
+        android:layout_alignParentBottom="true" >
 
         <TextView
             android:layout_width="wrap_content"

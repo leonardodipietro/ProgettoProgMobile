@@ -263,6 +263,25 @@ class FirebaseViewModel (application: Application): AndroidViewModel(application
         }
     }
 
+    fun fetchTopTracksForUser (userId: String, filter:String, onComplete: (List<Track>) -> Unit) {
+        Log.d("FirebaseViewModel", "fetchTopTracksForUser userId: $userId")
+        if (userId != null) {
+            val userTopTracksRef = database.child("users").child(userId).child("topTracks").child(filter)
+            userTopTracksRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val trackIds = snapshot.children.mapNotNull { it.getValue(String::class.java) }
+                    retrieveTracksDetails(trackIds, onComplete)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("FirebaseError", "Errore durante la lettura degli IDs delle tracce dal database Firebase: ${error.message}")
+                }
+            })
+        } else {
+            Log.e("FirebaseError", "UserId is null")
+        }
+    }
+
     fun retrieveTracksDetails(trackIds: List<String>,onComplete: ((List<Track>) -> Unit)? = null) {
         //L ON COMPLETE SERVE NEL FRAGMENT ARTISTASELEZIONATO
         CoroutineScope(Dispatchers.IO).launch {
@@ -381,8 +400,11 @@ class FirebaseViewModel (application: Application): AndroidViewModel(application
                     val artist = Artist(artistName, genres, artistId, listOf(Image(imageUrl)))
                     artists.add(artist)
 
+                    Log.d("FirebaseData", "Artista aggiunto: $artistName")
+
                     if (artists.size == artistIds.size) {
                         topArtistsfromdb.postValue(artists)
+                        Log.d("FirebaseData", "Tutti gli artisti aggiunti al database")
                     }
                 }
 
@@ -392,6 +414,70 @@ class FirebaseViewModel (application: Application): AndroidViewModel(application
             })
         }
     }
+
+    fun fetchTopArtistsForUser(userId: String, filter:String, onComplete: (List<Artist>) -> Unit) {
+        Log.d("FirebaseViewModel", "fetchTopArtistsForUser userId: $userId")
+        if (userId != null) {
+            val userTopArtistsRef = database.child("users").child(userId).child("topArtists").child(filter)
+            userTopArtistsRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val artistIds = snapshot.children.mapNotNull { it.getValue(String::class.java) }
+                    retrieveArtistsDetails2(artistIds, onComplete)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("FirebaseError", "Errore durante la lettura degli IDs degli artisti dal database Firebase: ${error.message}")
+                }
+            })
+        }
+    }
+
+    private fun retrieveArtistsDetails2(artistIds: List<String>, onComplete: ((List<Artist>) -> Unit)? = null) {
+        val artistsRef = database.child("artists")
+        val artists = mutableListOf<Artist>()
+
+        // Contatore per tenere traccia degli artisti processati
+        var processedArtistCount = 0
+
+        artistIds.forEach { id ->
+            artistsRef.child(id).addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val artistName = snapshot.child("name").getValue(String::class.java) ?: ""
+                    val genresTypeIndicator = object : GenericTypeIndicator<List<String>>() {}
+                    val genres = snapshot.child("genres").getValue(genresTypeIndicator) ?: listOf()
+
+                    val artistId = snapshot.child("id").getValue(String::class.java) ?: ""
+                    val followersTotal = snapshot.child("followers_total").getValue(Int::class.java) ?: 0
+                    val imageUrl = snapshot.child("image_url").getValue(String::class.java) ?: ""
+
+                    val artist = Artist(artistName, genres, artistId, listOf(Image(imageUrl)))
+                    artists.add(artist)
+
+                    Log.d("FirebaseData", "Artista aggiunto: $artistName")
+
+                    // Incrementa il contatore degli artisti processati
+                    processedArtistCount++
+
+                    // Se abbiamo processato tutti gli artisti, chiamiamo onComplete
+                    if (processedArtistCount == artistIds.size) {
+                        onComplete?.invoke(artists) // Chiama onComplete solo se è stato fornito
+                        Log.d("FirebaseData", "Tutti gli artisti aggiunti al database")
+                    }
+
+                    //Leo
+                    /*if (artists.size == artistIds.size) {
+                        topArtistsfromdb.postValue(artists)
+                        Log.d("FirebaseData", "Tutti gli artisti aggiunti al database")
+                    }*/
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("FirebaseError", "Errore durante il recupero dei dettagli dell'artista dal database Firebase: ${error.message}")
+                }
+            })
+        }
+    }
+
     fun retrieveArtistById(artistId: String, onComplete: (Artist?) -> Unit) {
         val database = FirebaseDatabase.getInstance().reference
         val artistRef = database.child("artists").child(artistId)

@@ -11,40 +11,38 @@
         android:id="@+id/imageviewtopbraniGrid"
         android:layout_width="100dp"
         android:layout_height="100dp"
-        android:layout_gravity="center_horizontal"
-        />
-<LinearLayout
-    android:layout_width="wrap_content"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-   >
+        android:layout_gravity="center_horizontal" />
 
-    <TextView
-        android:id="@+id/BranoTopbraniGrid"
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/white"
-        android:textSize="17dp"
-        android:text="Nome Brano"
-        android:layout_gravity="center_horizontal"
-        />
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/AlbumInfoGrid"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/white"
-        android:text="Album"
-        android:layout_gravity="center_horizontal"
-        android:textSize="11dp"
-        />
-    <TextView
-        android:id="@+id/ArtistInfoGrid"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/white"
-        android:layout_gravity="center_horizontal"
-        android:text="Artistam"
-        android:textSize="12dp"/>
-</LinearLayout>
+        <TextView
+            android:id="@+id/BranoTopbraniGrid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="17dp"
+            android:text="Nome Brano"
+            android:layout_gravity="center_horizontal" />
+
+        <TextView
+            android:id="@+id/AlbumInfoGrid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:text="@string/album"
+            android:layout_gravity="center_horizontal"
+            android:textSize="11dp" />
+
+        <TextView
+            android:id="@+id/ArtistInfoGrid"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/artista"
+            android:textSize="12dp" />
+    </LinearLayout>
 </LinearLayout>

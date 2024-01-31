@@ -1,5 +1,6 @@
 package com.example.progettoprogmobile
 
+import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,8 +13,10 @@ import android.widget.Button
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.squareup.picasso.Picasso
-import com.example.progettoprogmobile.adapter.TrackAdapter
 import com.example.progettoprogmobile.adapter.ArtistAdapter
+import com.example.progettoprogmobile.adapter.TrackGridAdapter
+import com.example.progettoprogmobile.adapter.TrackAdapter
+import com.example.progettoprogmobile.adapter.ArtistGridAdapter
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
@@ -25,25 +28,37 @@ import java.util.ArrayList
 import com.example.progettoprogmobile.model.Utente
 import android.os.Handler
 import android.os.Looper
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.lifecycleScope
 import com.example.progettoprogmobile.adapter.UtenteAdapter
+import com.example.progettoprogmobile.model.Album
 import com.example.progettoprogmobile.model.Track
 import com.example.progettoprogmobile.model.Artist
-import com.example.progettoprogmobile.utils.SettingUtils
-import com.google.android.gms.tasks.OnSuccessListener
-import com.google.android.gms.tasks.OnFailureListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
+import com.example.progettoprogmobile.viewModel.SpotifyViewModel
+import android.widget.Toast
+import androidx.recyclerview.widget.GridLayoutManager
+
 
 class FifthFragment : Fragment() {
 
     private lateinit var usernameTextView: TextView
     private lateinit var profileImageView: ImageView
-    private lateinit var topTracksAdapter: TrackAdapter
-    private lateinit var topArtistsAdapter: ArtistAdapter
+    private lateinit var trackGridAdapter: TrackGridAdapter
+    private lateinit var trackAdapter: TrackAdapter
+    private lateinit var artistGridAdapter: ArtistGridAdapter
+    private lateinit var artistAdapter: ArtistAdapter
+
+    private lateinit var topTracksRecyclerView: RecyclerView
+    private lateinit var topArtistsRecyclerView: RecyclerView
+    private lateinit var btnTopBrani: Button
+    private lateinit var btnTopArtisti: Button
+    private lateinit var clessidraButton: Button
+    private lateinit var vistaButton: Button
+
+    private lateinit var spotifyViewModel: SpotifyViewModel
     private val database = FirebaseDatabase.getInstance()
 
     private lateinit var firebaseViewModel: FirebaseViewModel
@@ -73,14 +88,65 @@ class FifthFragment : Fragment() {
     ): View? {
 
         val rootView = inflater.inflate(R.layout.fragment_fifth, container, false)
-        val topTracksRecyclerView: RecyclerView = rootView.findViewById(R.id.recyclerViewUtenteTrack)
-        val topArtistsRecyclerView: RecyclerView = rootView.findViewById(R.id.recyclerViewUtenteArtist)
-        val backButton: Button = rootView.findViewById(R.id.backArrow)
+
+        topTracksRecyclerView = rootView.findViewById(R.id.recyclerViewUtenteTrack)
+        topArtistsRecyclerView = rootView.findViewById(R.id.recyclerViewUtenteArtist)
+        btnTopBrani = rootView.findViewById(R.id.btn_topBrani)
+        btnTopArtisti = rootView.findViewById(R.id.btn_topArtisti)
         followButton = rootView.findViewById(R.id.addFriendButton)
+        val backButton: Button = rootView.findViewById(R.id.backArrow)
+        clessidraButton = rootView.findViewById(R.id.clessidra)
+        vistaButton = rootView.findViewById(R.id.vista)
 
         userId = arguments?.getString("userId") ?: "" //Dichiarazione al livello di classe
         //val userId: String? = arguments?.getString("userId")
         Log.d("FifthFragment", "User ID ricevuto: $userId")
+
+        // Inizializza FirebaseViewModel
+        firebaseViewModel = ViewModelProvider(this).get(FirebaseViewModel::class.java)
+
+        clessidraButton.setOnClickListener {
+            clessidra()
+        }
+
+        /*vistaButton.setOnClickListener {
+            openViewStyleDialog()
+        }*/
+
+        // Inizializza le RecyclerView
+        //topTracksRecyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
+        topArtistsRecyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
+
+        /*btnTopBrani.setOnClickListener {
+            firebaseViewModel.filter = "short_term"
+            firebaseViewModel.fetchTopTracksForUser(userId, firebaseViewModel.filter) { tracks ->
+                activity?.runOnUiThread {
+                    handleReceivedTracks(tracks)
+                    // Nascondi la RecyclerView degli artisti
+                    topArtistsRecyclerView.visibility = View.GONE
+                }
+            }
+        }*/
+
+        /*btnTopArtisti.setOnClickListener {
+            firebaseViewModel.filter = "short_term"
+            firebaseViewModel.fetchTopArtistsForUser(userId, firebaseViewModel.filter) { artists ->
+                activity?.runOnUiThread {
+                    handleReceivedArtists(artists)
+                    Log.d("FifthFragment", "Ho chiamato handleReceivedArtists(artists)")
+                    // Nascondi la RecyclerView dei brani
+                    //topTracksRecyclerView.visibility = View.GONE
+                }
+            }
+        }*/
+
+
+
+
+
+
+
+
 
         // Controlla se currentUserUid(io) sono dentro nodo Followers di userId(Amico)
         val followersRef = databaseReference
@@ -147,7 +213,7 @@ class FifthFragment : Fragment() {
             requireActivity().onBackPressed() // Torna al fragment precedente
         }
 
-        followButton.setOnClickListener {
+        /*followButton.setOnClickListener {
 
             val privacyAmico = databaseReference.child("users")
                 .child(userId)
@@ -202,21 +268,18 @@ class FifthFragment : Fragment() {
                     Log.e("MyTag", "Errore nel recupero del valore di Followers: " + error.message)
                 }
             })
-        }
+        }*/
 
         // Inizializza le SharedPreferences
         sharedPreferences = requireActivity().getPreferences(Context.MODE_PRIVATE)
 
         // Carica lo stato del bottone dalle SharedPreferences, utilizza false come valore di default
         isRequestAccepted = sharedPreferences.getBoolean("isRequestAccepted", false)
-        aggiornaAspettoPulsante()
+        //aggiornaAspettoPulsante()
 
         // Inizializza Firebase
         auth = FirebaseAuth.getInstance()
         storage = FirebaseStorage.getInstance()
-
-        // Inizializza FirebaseViewModel
-        firebaseViewModel = ViewModelProvider(this).get(FirebaseViewModel::class.java)
 
         // Inizializza le views
         usernameTextView = rootView.findViewById(R.id.usernameHeader)
@@ -295,7 +358,194 @@ class FifthFragment : Fragment() {
         return rootView
     }
 
-    private fun inviaRichiestaAmicizia() {
+    private fun saveTimeFilter(context: Context, timeFilter: String) {
+        val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putString("timeFilter", timeFilter)
+        editor.apply()
+    }
+
+    private fun saveViewStyle(context: Context, viewStyle: String) {
+        val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putString("viewStyle", viewStyle)
+        editor.apply()
+    }
+
+    /*private fun handleReceivedTracks(tracks: List<Track>) {
+        activity?.runOnUiThread {
+            if (tracks.isNotEmpty()) {
+                trackAdapter = TrackGridAdapter(tracks, object : TrackAdapter.OnTrackClickListener {
+                    override fun onTrackClicked(data: Any) {
+                        if (data is Track) {
+                            val newFragment = com.example.progettoprogmobile.BranoSelezionato()
+                            val bundle = Bundle()
+                            bundle.putSerializable("trackDetail", data)
+                            newFragment.arguments = bundle
+                            parentFragmentManager.beginTransaction()
+                                .replace(R.id.nav_host_fragment, newFragment)
+                                .addToBackStack(null)
+                                .commit()
+                        }
+                    }
+                })
+
+                if (topTracksRecyclerView.adapter == null) {
+                    topTracksRecyclerView.adapter = trackAdapter
+                }
+
+                // Aggiornamento dell'adapter con i nuovi dati
+                trackAdapter.submitList(tracks)
+
+                Log.d("FifthFragment", "Brani popolati nella RecyclerView")
+
+                topTracksRecyclerView.visibility = View.VISIBLE
+            }
+        }
+    }*/
+
+    private fun handleReceivedArtists(artists: List<Artist>) {
+        Log.d("FifthFragment", "Sto eseguendo handleReceivedArtists")
+        activity?.runOnUiThread {
+            if (artists.isNotEmpty()) {
+                Log.d("FifthFragment", "Artists non è vuoto")
+                artistGridAdapter = ArtistGridAdapter(artists, object : ArtistAdapter.OnArtistClickListener {
+                    override fun onArtistClicked(data: Any) {
+                        Log.d("ArtistClickListener", "Oggetto data: $data")
+                        if (data is Artist) {
+                            Log.d("ArtistClickListener", "Artista cliccato: ${data.name}")
+                            val newFragment = com.example.progettoprogmobile.ArtistaSelezionato()
+                            val bundle = Bundle()
+                            bundle.putSerializable("artistdetails", data)
+                            newFragment.arguments = bundle
+                            parentFragmentManager.beginTransaction()
+                                .replace(R.id.nav_host_fragment, newFragment)
+                                .addToBackStack(null)
+                                .commit()
+                        }
+                    }
+                })
+
+                if (topArtistsRecyclerView.adapter == null) {
+                    topArtistsRecyclerView.adapter = artistGridAdapter
+                    Log.d("FifthFragment", "Adapter per gli artisti impostato")
+                }
+
+                // Aggiornamento dell'adapter con i nuovi dati
+                artistGridAdapter.submitList(artists)
+
+                Log.d("FifthFragment", "Artisti popolati nella RecyclerView")
+
+                topArtistsRecyclerView.visibility = View.VISIBLE
+            } else {
+                Log.d("FifthFragment", "Nessun artista ricevuto")
+            }
+        }
+    }
+
+    private fun clessidra() {
+        val dialogView = layoutInflater.inflate(R.layout.filter_time_alertdialog, null)
+
+        val dialog = AlertDialog.Builder(context)
+            .setView(dialogView)
+            .setCancelable(true) // Permette di chiudere il dialog toccando fuori
+            .create()
+
+        // Gestione dei click per ogni scelta
+        dialogView.findViewById<Button>(R.id.seelast4weeks).setOnClickListener {
+            Log.d("FifthFragment", "Opzione selezionata: short_term")
+            firebaseViewModel.filter = "short_term"
+
+            /*firebaseViewModel.fetchTopTracksForUser(userId, firebaseViewModel.filter) { tracks ->
+                handleReceivedTracks(tracks)
+                saveTimeFilter(requireContext(), "short_term")
+                dialog.dismiss()
+            }*/
+
+            firebaseViewModel.fetchTopArtistsForUser(userId, firebaseViewModel.filter) { artists ->
+                handleReceivedArtists(artists)
+                saveTimeFilter(requireContext(), "short_term")
+                dialog.dismiss()
+            }
+        }
+
+        dialogView.findViewById<Button>(R.id.seelast6month).setOnClickListener {
+            Log.d("FifthFragment", "Opzione selezionata: medium_term")
+            firebaseViewModel.filter = "medium_term"
+
+            /*firebaseViewModel.fetchTopTracksForUser(userId, firebaseViewModel.filter) { tracks ->
+                handleReceivedTracks(tracks)
+                saveTimeFilter(requireContext(), "medium_term")
+                dialog.dismiss()
+            }*/
+
+            firebaseViewModel.fetchTopArtistsForUser(userId, firebaseViewModel.filter) { artists ->
+                handleReceivedArtists(artists)
+                saveTimeFilter(requireContext(), "medium_term")
+                dialog.dismiss()
+            }
+        }
+
+        dialogView.findViewById<Button>(R.id.seeAlltime).setOnClickListener {
+            Log.d("FifthFragment", "Opzione selezionata: long_term")
+            firebaseViewModel.filter = "long_term"
+
+            /*firebaseViewModel.fetchTopTracksForUser(userId, firebaseViewModel.filter) { tracks ->
+                handleReceivedTracks(tracks)
+                saveTimeFilter(requireContext(), "long_term")
+                dialog.dismiss()
+            }*/
+
+            firebaseViewModel.fetchTopArtistsForUser(userId, firebaseViewModel.filter) { artists ->
+                handleReceivedArtists(artists)
+                saveTimeFilter(requireContext(), "long_term")
+                dialog.dismiss()
+            }
+        }
+
+        dialog.show()
+    }
+
+    /*private fun openViewStyleDialog() {
+        val choices = arrayOf("Vista Lineare", "Vista a Griglia")
+        AlertDialog.Builder(requireContext())
+            .setTitle("Scegli Stile di Visualizzazione")
+            .setItems(choices) { _, which ->
+                when(which) {
+                    0 -> { // Vista Lineare
+                        topTracksRecyclerView.adapter = trackAdapter
+                        topTracksRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+                        topArtistsRecyclerView.adapter = artistAdapter
+                        topArtistsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+                        saveViewStyle(requireContext(), "lineare")
+                    }
+                    1 -> { // Vista a Griglia
+                        topTracksRecyclerView.adapter = trackGridAdapter
+                        topTracksRecyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
+                        topArtistsRecyclerView.adapter = artistGridAdapter
+                        topArtistsRecyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
+                        saveViewStyle(requireContext(), "griglia")
+                    }
+                }
+                // Ricarica i dati dopo aver cambiato la visualizzazione
+                val timeFilter = sharedPreferences.getString("timeFilter", "short_term") ?: "short_term"
+                firebaseViewModel.filter = timeFilter
+
+                /*firebaseViewModel.fetchTopTracksForUser(userId, firebaseViewModel.filter) { tracks ->
+                    handleReceivedTracks(tracks)
+                }*/
+
+                firebaseViewModel.fetchTopArtistsForUser(userId, firebaseViewModel.filter) { artists ->
+                    handleReceivedArtists(artists)
+                }
+            }
+            .show()
+    }*/
+
+
+
+    /*private fun inviaRichiestaAmicizia() {
         // Implementa l'azione per inviare una richiesta di amicizia
         if (currentUserUid != null) {
             val requestsRef = databaseReference
@@ -414,98 +664,5 @@ class FifthFragment : Fragment() {
             followButton.text = "Follow"
             followButton.setBackgroundResource(R.drawable.follow_button_background)
         }
-    }
+    }*/
 }
-
-/*
-// Crea un elenco vuoto di oggetti Track e Artist
-        val topTracksList: ArrayList<String> = ArrayList()
-        val topArtistsList: ArrayList<String> = ArrayList()
-
-// Crea gli adapter e passa un'istanza del listener
-        topTracksAdapter = TrackAdapter(emptyList(), object : TrackAdapter.OnTrackClickListener {
-            override fun onTrackClicked(data: Any) {
-                // Gestisci l'evento di clic sulla traccia
-            }
-        })
-
-        topArtistsAdapter = ArtistAdapter(emptyList())
-
-
-        // Inizializza gli adapter con una lista vuota
-//        topTracksAdapter = TrackAdapter(emptyList())
-//        topArtistsAdapter = ArtistAdapter(emptyList())
-
-        // Verifica se gli adapter sono nulli prima di assegnarli alla RecyclerView
-        if (topTracksAdapter != null) {
-            topTracksRecyclerView.adapter = topTracksAdapter
-            topTracksRecyclerView.layoutManager = LinearLayoutManager(context)
-        }
-
-        if (topArtistsAdapter != null) {
-            topArtistsRecyclerView.adapter = topArtistsAdapter
-            topArtistsRecyclerView.layoutManager = LinearLayoutManager(context)
-        }
-
-        // Richiama fetchUserDataFromFirebase passando un listener
-        firebaseViewModel.fetchUserDataFromFirebase(userId ?: "", object : FirebaseViewModel.OnUserFetchedListener {
-            override fun onUserFetched(utente: Utente) {
-                // Esegui le azioni desiderate con l'oggetto Utente ricevuto
-                // Ad esempio, puoi aggiornare direttamente le tue views qui
-
-                // Aggiorna i dati negli adapter e notifica i cambiamenti
-//                topTracksAdapter.submitList(utente.topTracks)
-//                topArtistsAdapter.submitList(utente.topArtists)
-
-                // Notifica all'adapter che i dati sono stati aggiornati
-                topTracksAdapter.notifyDataSetChanged()
-                topArtistsAdapter.notifyDataSetChanged()
-            }
-        })
-
-// Riferimento al nodo delle top track nel database Firebase
-        val topTracksReference = database.reference.child("top_tracks")
-
-        // Ottieni la lista delle top track da Firebase
-        topTracksReference.get().addOnSuccessListener { dataSnapshot ->
-            // Itera attraverso i dati e ottieni le top track
-            for (trackSnapshot in dataSnapshot.children) {
-                val trackName = trackSnapshot.child("track_name").getValue(String::class.java)
-                // Aggiungi il nome della top track alla lista
-                trackName?.let {
-                    topTracksList.add(it)
-                }
-                Log.d("FifthFragment", "Top Tracks List: $topTracksList")
-            }
-            // Notifica all'adapter che i dati sono stati aggiornati
-            topTracksAdapter.notifyDataSetChanged()
-
-            // Ottieni la RecyclerView per le top track
-            val topTracksRecyclerView: RecyclerView = rootView.findViewById(R.id.recyclerViewUtenteTrack)
-            topTracksRecyclerView.adapter = topTracksAdapter
-            topTracksRecyclerView.layoutManager = LinearLayoutManager(context)
-        }
-
-        // Riferimento al nodo delle top artist nel database Firebase
-        val topArtistsReference = database.reference.child("top_artists")
-
-        // Ottieni la lista delle top artist da Firebase
-        topArtistsReference.get().addOnSuccessListener { dataSnapshot ->
-            // Itera attraverso i dati e ottieni le top artist
-            for (artistSnapshot in dataSnapshot.children) {
-                val artistName = artistSnapshot.child("artist_name").getValue(String::class.java)
-                // Aggiungi il nome della top artist alla lista
-                artistName?.let {
-                    topArtistsList.add(it)
-                }
-                Log.d("FifthFragment", "Top Artists List: $topArtistsList")
-            }
-            // Notifica all'adapter che i dati sono stati aggiornati
-            topArtistsAdapter.notifyDataSetChanged()
-
-            // Ottieni la RecyclerView per gli artisti
-            val topArtistsRecyclerView: RecyclerView = rootView.findViewById(R.id.recyclerViewUtenteArtist)
-            topArtistsRecyclerView.adapter = topArtistsAdapter
-            topArtistsRecyclerView.layoutManager = LinearLayoutManager(context)
-        }
- */
