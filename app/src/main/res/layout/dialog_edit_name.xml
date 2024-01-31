@@ -4,8 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/dark_gray"
     android:orientation="horizontal"
+
     tools:context=".ThirdFragment">
 
         <EditText
@@ -14,11 +15,12 @@
             android:layout_height="54dp"
             android:layout_marginTop="16dp"
             android:autofillHints=""
-            android:backgroundTint="@color/gray"
+            android:backgroundTint="@color/white"
             android:hint="@string/enterYourName"
+            android:textColorHint="@color/gray"
             android:inputType="textPersonName"
             android:textAllCaps="false"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.495"
             app:layout_constraintStart_toStartOf="parent"
@@ -37,8 +39,9 @@
             android:layout_width="110dp"
             android:layout_height="51dp"
             android:layout_marginTop="20dp"
-            android:backgroundTint="@color/gray"
+            android:backgroundTint="@color/verde_spotify"
             android:text="@string/cancel"
+            android:textColor="@color/white"
             app:layout_constraintEnd_toStartOf="@+id/saveButton"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/editName" />
@@ -48,8 +51,9 @@
             android:layout_width="114dp"
             android:layout_height="51dp"
             android:layout_marginTop="20dp"
-            android:backgroundTint="@color/gray"
+            android:backgroundTint="@color/verde_spotify"
             android:text="@string/save"
+            android:textColor="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.801"
             app:layout_constraintStart_toStartOf="parent"

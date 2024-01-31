@@ -12,7 +12,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
         android:orientation="horizontal">
 
@@ -29,9 +29,11 @@
         <!--        il testo sotto verrà tolto e inserito dal kt-->
         <TextView
             android:id="@+id/followersRequest"
-            android:layout_width="118dp"
-            android:layout_height="match_parent"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
             android:gravity="center_vertical"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="10dp"
             android:text="@string/newFRequest"
             android:textColor="@color/white"
             android:textSize="16sp"
@@ -45,6 +47,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:baselineAligned="false"
+            android:layout_marginEnd="10dp"
             android:text="@string/confirm"
             android:textSize="11sp"
             app:layout_constraintBottom_toBottomOf="parent"

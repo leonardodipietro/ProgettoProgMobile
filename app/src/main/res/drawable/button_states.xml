@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- res/drawable/button_states.xml -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true">
+        <shape>
+            <solid android:color="#FF5722" /> <!-- Colore del background quando premuto -->
+        </shape>
+    </item>
+    <item android:state_selected="true">
+        <shape>
+            <solid android:color="#FFC107" /> <!-- Color for the focused state -->
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <solid android:color="#2196F3" /> <!-- Colore del background normale -->
+        </shape>
+    </item>
+</selector>

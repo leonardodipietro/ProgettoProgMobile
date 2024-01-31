@@ -27,7 +27,7 @@ class SettingUtils{
             val dialogView =
                 LayoutInflater.from(context).inflate(R.layout.dialog_edit_name, null)
             val builder =
-                AlertDialog.Builder(context).setView(dialogView).setTitle("Edit Name")
+                AlertDialog.Builder(context, R.style.CustomAlertDialogStyle).setView(dialogView).setTitle("Edit Name")
             val alertDialog = builder.create()
             val editName: EditText = dialogView.findViewById(R.id.editName)
             val saveButton = dialogView.findViewById<Button>(R.id.saveButton)
