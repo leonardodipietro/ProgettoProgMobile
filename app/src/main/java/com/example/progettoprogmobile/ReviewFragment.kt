@@ -55,8 +55,7 @@ class ReviewFragment: Fragment() {
                 for (reviewSnapshot in dataSnapshot.children) {
                     val trackId = reviewSnapshot.child("trackId").value.toString()
                     val content = reviewSnapshot.child("content").value.toString()
-                    val timestamp = reviewSnapshot.child("timestamp").getValue(Long::class.java) ?: 0L
-                    val timestampM = timestamp/604800000
+                    val timestamp = reviewSnapshot.child("timestamp").value.toString()
 
                     val tracksRef = database.getReference("tracks").child(trackId)
                     tracksRef.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -82,7 +81,7 @@ class ReviewFragment: Fragment() {
                                         if (artistNameList.size == artistIds.size) {
                                             val reviewData = ReviewData(
                                                 content,
-                                                timestampM,
+                                                timestamp,
                                                 trackName,
                                                 albumName,
                                                 imageUrl,

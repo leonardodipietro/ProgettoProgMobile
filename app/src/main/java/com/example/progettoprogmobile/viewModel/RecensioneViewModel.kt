@@ -15,6 +15,9 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class RecensioneViewModel: ViewModel() {
     private val database: DatabaseReference = FirebaseDatabase.getInstance().reference
@@ -30,12 +33,19 @@ class RecensioneViewModel: ViewModel() {
         hasUserReviewed(trackId, userId) { existingReview ->
             if (existingReview == null) {
                 val commentId = database.push().key!!
+                // Ottieni la data e l'ora attuali.
+                val currentTimestamp = System.currentTimeMillis()
+                val date = Date(currentTimestamp)
+                // Formatta la data/ora per la visualizzazione.
+                val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+                val formattedDateTime = formatter.format(date)
+
 
                 val recensione = Recensione(
                     commentId = commentId,
                     userId = userId,
                     trackId = trackId,
-                    timestamp = System.currentTimeMillis(),
+                    timestamp = formattedDateTime,
                     content = commentContent,
                     artistId = artistId
                 )
@@ -47,17 +57,25 @@ class RecensioneViewModel: ViewModel() {
                         addCommentIdToArtist(commentId, artistId)
                     }
                     .addOnFailureListener {
-                        // Gestisci l'errore
+
                     }
             } else {
-                val updatedReview = existingReview.copy(content = commentContent, timestamp = System.currentTimeMillis())
+                // Ottieni la data e l'ora attuali.
+                val currentTimestamp = System.currentTimeMillis()
+                val date = Date(currentTimestamp)
+                // Formatta la data/ora per la visualizzazione.
+                val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+                val formattedDateTime = formatter.format(date)
+
+                // Creazione di una copia della recensione esistente con il nuovo contenuto e la data formattata.
+                val updatedReview = existingReview.copy(content = commentContent, timestamp = formattedDateTime)
 
                 database.child("reviews").child(updatedReview.commentId).setValue(updatedReview)
                     .addOnSuccessListener {
-                        // Recensione aggiornata con successo
+                        Log.d("aggiornamento completato","aggiornamento vompletato")
                     }
                     .addOnFailureListener {
-                        // Gestisci l'errore
+
                     }
             }
         }
@@ -237,12 +255,17 @@ class RecensioneViewModel: ViewModel() {
             })
     }
 
+    //da collegare ad un pulsante
+    fun deleteRecensione(commentId: String) {
 
+        val reviewsReference = FirebaseDatabase.getInstance().getReference("reviews")
+        reviewsReference.child(commentId).removeValue()
+            .addOnSuccessListener {
 
-
-
-
-
-
+            }
+            .addOnFailureListener { e ->
+                Log.d("qualcosa è andato storto","qualcosa è andato storto")
+            }
+    }
 
 }
