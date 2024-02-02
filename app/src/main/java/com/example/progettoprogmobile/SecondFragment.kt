@@ -13,15 +13,14 @@ import androidx.appcompat.widget.SearchView
 import com.example.progettoprogmobile.viewModel.FirebaseViewModel
 import android.util.Log
 import com.example.progettoprogmobile.adapter.UtenteAdapter
-import com.example.progettoprogmobile.model.Track
 import com.example.progettoprogmobile.model.Utente
 
 class SecondFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
-
     private lateinit var firebaseViewModel: FirebaseViewModel
     private lateinit var utenteAdapter: UtenteAdapter
+    var utente: Utente? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -105,5 +104,9 @@ class SecondFragment : Fragment() {
         } else {
             Log.e("SecondFragment", "Invalid userId: $userId")
         }
+
+        // Imposta l'utente selezionato nel ViewModel
+        firebaseViewModel.setSelectedUser(utente)
+        Log.d("SecondFragment", "Utente impostato nel ViewModel: $utente")
     }
 }

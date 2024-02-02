@@ -26,6 +26,8 @@ import java.util.concurrent.CountDownLatch
 import kotlin.coroutines.resumeWithException
 import com.example.progettoprogmobile.model.Utente
 import com.squareup.picasso.Picasso
+import androidx.lifecycle.LiveData
+
 
 
 
@@ -42,6 +44,17 @@ class FirebaseViewModel (application: Application): AndroidViewModel(application
     // Dichiarazione della variabile per il controllo dello stato di registrazione dell'utente
     private var isUserRegistered = false
     val _users= MutableLiveData<List<Utente>>()
+    val users: LiveData<List<Utente>> = _users
+
+    // Utente selezionato
+    private val _selectedUser = MutableLiveData<Utente?>()
+    val selectedUser: LiveData<Utente?> = _selectedUser
+
+    // Metodo per impostare l'utente selezionato
+    fun setSelectedUser(user: Utente?) {
+        _selectedUser.value = user
+        Log.d("FirebaseViewModel", "Utente selezionato nel ViewModel: $user")
+    }
 
     fun cercaUtenti(query: String) {
         Log.d("FirebaseViewModel", "cercaUtenti called with query: $query")

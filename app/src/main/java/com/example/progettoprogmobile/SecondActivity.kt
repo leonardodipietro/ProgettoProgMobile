@@ -60,9 +60,30 @@ class SecondActivity : AppCompatActivity() {
                     currentFragment = newFragment
                 }
                 R.id.cerca -> {
-                    val newFragment = SecondFragment()
-                    transaction.replace(R.id.nav_host_fragment, newFragment, "secondFragment")
-                    currentFragment = newFragment
+                    val selectedUser = firebaseViewModel.selectedUser.value
+                    Log.d("MainActivity", "Utente selezionato: $selectedUser")
+                    if (selectedUser != null) {
+                        // Se c'è un utente selezionato, vai direttamente al suo profilo
+                        val userId = selectedUser.userId
+                        val bundle = Bundle().apply {
+                            putString("userId", userId)
+                        }
+                        val fifthFragment = FifthFragment()
+                        fifthFragment.arguments = bundle
+                        supportFragmentManager.beginTransaction()
+                            .replace(R.id.nav_host_fragment, fifthFragment)
+                            .addToBackStack(null)
+                            .commit()
+                    } else {
+                        // Altrimenti, vai al SecondFragment
+                        val newFragment = SecondFragment()
+                        transaction.replace(R.id.nav_host_fragment, newFragment, "secondFragment")
+                        currentFragment = newFragment
+                    }
+
+                    /*val newFragment = SecondFragment()
+                        transaction.replace(R.id.nav_host_fragment, newFragment, "secondFragment")
+                        currentFragment = newFragment*/
                 }
                 R.id.notification -> {
                     val newFragment = FourthFragment()

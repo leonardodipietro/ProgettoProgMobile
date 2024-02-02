@@ -66,6 +66,7 @@
             android:layout_toEndOf="@+id/userProfileImage" />
 
         <TextView
+            android:id="@+id/reviews"
             android:layout_width="45dp"
             android:layout_height="45dp"
             android:layout_above="@+id/recensioniContatore"
@@ -76,6 +77,9 @@
             android:layout_marginTop="0dp"
             android:layout_marginEnd="19dp"
             android:layout_marginBottom="0dp"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:autoSizeTextType="uniform"
             app:layout_constraintBottom_toTopOf="@+id/recensioniContatore"
             app:layout_constraintEnd_toEndOf="@+id/contatoreRecensioni"
             app:layout_constraintStart_toStartOf="@+id/contatoreRecensioni" />
@@ -103,6 +107,7 @@
             android:layout_toEndOf="@+id/contatoreRecensioni" />
 
         <TextView
+            android:id="@+id/followers"
             android:layout_width="45dp"
             android:layout_height="45dp"
             android:layout_above="@+id/followersContatore"
@@ -113,6 +118,9 @@
             android:layout_marginTop="0dp"
             android:layout_marginEnd="19dp"
             android:layout_marginBottom="0dp"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:autoSizeTextType="uniform"
             app:layout_constraintBottom_toTopOf="@+id/followersContatore"
             app:layout_constraintEnd_toEndOf="@+id/contatoreFollowers"
             app:layout_constraintStart_toStartOf="@+id/contatoreFollowers" />
@@ -140,6 +148,7 @@
             android:layout_toEndOf="@+id/contatoreFollowers" />
 
         <TextView
+            android:id="@+id/following"
             android:layout_width="45dp"
             android:layout_height="45dp"
             android:layout_above="@+id/followingsContatore"
@@ -150,6 +159,9 @@
             android:layout_marginTop="0dp"
             android:layout_marginEnd="19dp"
             android:layout_marginBottom="0dp"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:autoSizeTextType="uniform"
             app:layout_constraintBottom_toTopOf="@+id/followingsContatore"
             app:layout_constraintEnd_toEndOf="@+id/contatoreFollowing"
             app:layout_constraintStart_toStartOf="@+id/contatoreFollowing" />

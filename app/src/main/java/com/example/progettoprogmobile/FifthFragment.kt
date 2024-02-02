@@ -24,22 +24,15 @@ import android.util.Log
 import androidx.lifecycle.ViewModelProvider
 import com.example.progettoprogmobile.viewModel.FirebaseViewModel
 import android.content.SharedPreferences
-import java.util.ArrayList
-import com.example.progettoprogmobile.model.Utente
 import android.os.Handler
 import android.os.Looper
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.lifecycleScope
-import com.example.progettoprogmobile.adapter.UtenteAdapter
-import com.example.progettoprogmobile.model.Album
-import com.example.progettoprogmobile.model.Track
 import com.example.progettoprogmobile.model.Artist
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.example.progettoprogmobile.viewModel.SpotifyViewModel
-import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
+import com.google.firebase.database.DatabaseReference
 
 
 class FifthFragment : Fragment() {
@@ -139,6 +132,10 @@ class FifthFragment : Fragment() {
                 }
             }
         }*/
+
+        countUserReviews(userId, FirebaseDatabase.getInstance().reference, rootView);
+        countUserFollowers(userId, FirebaseDatabase.getInstance().reference, rootView);
+        countUserFollowing(userId, FirebaseDatabase.getInstance().reference, rootView);
 
 
 
@@ -396,6 +393,7 @@ class FifthFragment : Fragment() {
 
                 // Aggiornamento dell'adapter con i nuovi dati
                 trackAdapter.submitList(tracks)
+                trackAdapter.notifyDataSetChanged()
 
                 Log.d("FifthFragment", "Brani popolati nella RecyclerView")
 
@@ -433,6 +431,7 @@ class FifthFragment : Fragment() {
 
                 // Aggiornamento dell'adapter con i nuovi dati
                 artistGridAdapter.submitList(artists)
+                artistGridAdapter.notifyDataSetChanged()
 
                 Log.d("FifthFragment", "Artisti popolati nella RecyclerView")
 
@@ -543,6 +542,68 @@ class FifthFragment : Fragment() {
             .show()
     }*/
 
+    fun countUserReviews(userId: String, databaseReference: DatabaseReference, rootView: View) {
+        val reviewsReference = databaseReference.child("users").child(userId).child("reviews counter")
+
+        // Aggiorna la TextView con il conteggio delle recensioni
+        val reviewNumberTextView = rootView.findViewById<TextView>(R.id.reviews)
+        // Aggiungi un listener per leggere il valore dal database
+        reviewsReference.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                // Ottieni il valore dallo snapshot
+                val reviewCount = dataSnapshot.value as? Long ?: 0
+                // Aggiorna la TextView con il conteggio delle recensioni
+                reviewNumberTextView.text = reviewCount.toString()
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Gestisci eventuali errori
+                Log.e("Firebase", "Error fetching review count: ${databaseError.message}")
+            }
+        })
+    }
+
+    fun countUserFollowers(userId: String, databaseReference: DatabaseReference, rootView: View) {
+        val followersReference = databaseReference.child("users").child(userId).child("followers counter")
+
+        // Aggiorna la TextView con il conteggio dei followers
+        val followersNumberTextView = rootView.findViewById<TextView>(R.id.followers)
+        // Aggiungi un listener per leggere il valore dal database
+        followersReference.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                // Ottieni il valore dallo snapshot
+                val reviewCount = dataSnapshot.value as? Long ?: 0
+                // Aggiorna la TextView con il conteggio delle recensioni
+                followersNumberTextView.text = reviewCount.toString()
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Gestisci eventuali errori
+                Log.e("Firebase", "Error fetching review count: ${databaseError.message}")
+            }
+        })
+    }
+
+    fun countUserFollowing(userId: String, databaseReference: DatabaseReference, rootView: View) {
+        val followingReference = databaseReference.child("users").child(userId).child("following counter")
+
+        // Aggiorna la TextView con il conteggio delle recensioni
+        val followingNumberTextView = rootView.findViewById<TextView>(R.id.following)
+        // Aggiungi un listener per leggere il valore dal database
+        followingReference.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                // Ottieni il valore dallo snapshot
+                val reviewCount = dataSnapshot.value as? Long ?: 0
+                // Aggiorna la TextView con il conteggio delle recensioni
+                followingNumberTextView.text = reviewCount.toString()
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Gestisci eventuali errori
+                Log.e("Firebase", "Error fetching review count: ${databaseError.message}")
+            }
+        })
+    }
 
 
     /*private fun inviaRichiestaAmicizia() {
