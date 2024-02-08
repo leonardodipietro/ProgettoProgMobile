@@ -1,6 +1,5 @@
 package com.example.progettoprogmobile
 
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -13,17 +12,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.progettoprogmobile.adapter.NotificationItem
 import com.example.progettoprogmobile.adapter.NotificationsAdapter
 import com.example.progettoprogmobile.model.Utente
+import com.example.progettoprogmobile.model.Recensione
+import com.example.progettoprogmobile.model.Track
+import com.example.progettoprogmobile.model.Album
+import com.example.progettoprogmobile.model.Image
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
+import com.google.firebase.database.*
 
 
-class FourthFragment :
-    Fragment(),
+class FourthFragment : Fragment(),
     NotificationsAdapter.OnFollowClickListener,
     NotificationsAdapter.OnConfirmClickListener,
     NotificationsAdapter.OnDeleteClickListener {
@@ -31,9 +28,10 @@ class FourthFragment :
     private val currentUserId = FirebaseAuth.getInstance().currentUser!!.uid
     private val database = FirebaseDatabase.getInstance()
     private lateinit var recyclerView: RecyclerView
-
-    private var notificationList: MutableList<NotificationItem> = mutableListOf()
     private lateinit var notificationsAdapter: NotificationsAdapter
+    private var notificationList: MutableList<NotificationItem> = mutableListOf()
+
+    private var trackList: MutableList<Track> = mutableListOf()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -51,7 +49,8 @@ class FourthFragment :
             this,
             this,
             database,
-            currentUserId
+            currentUserId,
+            trackList
         )
 
         recyclerView.adapter = notificationsAdapter
@@ -59,8 +58,35 @@ class FourthFragment :
         // Recupera i dati dell'utente corrente e inizia a popolare la RecyclerView
         retrieveUserData()
 
+        retrieveReviewsData()
+
+        notificationsAdapter.setReviewItemClickListener(object :
+            NotificationsAdapter.ReviewViewHolder.OnClickListener {
+            override fun onClick(position: Int) {
+                val selectedReview = notificationList[position] as? NotificationItem.ReviewItem
+                selectedReview?.let {
+                    Log.d("MainFragment", "Track to be passed to BranoSelezionato fragment: ${it.track}")
+                    val branoSelezionatoFragment = BranoSelezionato()
+                    val bundle = Bundle()
+                    bundle.putSerializable("trackDetail", it.track)
+                    branoSelezionatoFragment.arguments = bundle
+                    Log.d("MainFragment", "Track set to BranoSelezionato fragment: ${it.track}")
+                    val fragmentManager = requireActivity().supportFragmentManager
+                    fragmentManager.beginTransaction()
+                        .replace(R.id.nav_host_fragment, branoSelezionatoFragment)
+                        .addToBackStack(null)  // Aggiungi la transazione allo stack indietro
+                        .commit()
+                }
+            }
+        })
+
+        // Ora imposta l'adapter sulla RecyclerView
+        recyclerView.adapter = notificationsAdapter
+
         return rootView
     }
+
+
 
     // Metodo per recuperare i dati dell'utente corrente
     private fun retrieveUserData() {
@@ -345,6 +371,9 @@ class FourthFragment :
         // Aggiungi l'utente ai followers
         addFollower(userId)
 
+        // Aggiungi l'utente ai following
+        addUserIdToMyFollowing(userId)
+
         // Rimuovi l'utente dalla lista delle notifiche
         removeNotificationItem(userId)
 
@@ -370,6 +399,7 @@ class FourthFragment :
             when (it) {
                 is NotificationItem.FollowerItem -> it.utente.userId == userId
                 is NotificationItem.RequestItem -> it.utente.userId == userId
+                is NotificationItem.ReviewItem -> it.utente.userId== userId
             }
         }
 
@@ -458,4 +488,134 @@ class FourthFragment :
             }
     }
 
+    // Metodo per aggiungere un utente alla lista "following" dell'utente corrente
+    private fun addUserIdToMyFollowing(userId: String) {
+        val followingReference = database.reference.child("users").child(userId).child("following")
+        followingReference.child(currentUserId).setValue(true)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    // Se l'aggiunta è riuscita, mostra un messaggio di successo
+                    Toast.makeText(requireContext(), "Utente aggiunto con successo alla lista following", Toast.LENGTH_SHORT).show()
+                } else {
+                    // Gestisci eventuali errori durante l'aggiunta
+                    Toast.makeText(requireContext(), "Errore durante l'aggiunta dell'utente alla lista following", Toast.LENGTH_SHORT).show()
+                }
+            }
+    }
+
+
+    private fun retrieveUserDataForReview(userId: String, trackId: String) {
+        val userReference = database.reference.child("users").child(userId)
+        userReference.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    val imageUrl = dataSnapshot.child("profile image").getValue(String::class.java)
+                    val defaultImageUrl = "drawable://" + R.drawable.baseline_person_24
+
+                    val user = Utente(
+                        userId = userId,
+                        name = dataSnapshot.child("name").getValue(String::class.java) ?: "",
+                        userImage = imageUrl.takeIf { !it.isNullOrEmpty() } ?: defaultImageUrl
+                    )
+
+                    // Recupera il nome della traccia
+                    val trackName = FirebaseDatabase.getInstance().reference.child("tracks").child(trackId)
+                    trackName.addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(trackDataSnapshot: DataSnapshot) {
+                            if (trackDataSnapshot.exists()) {
+                                val trackName = trackDataSnapshot.child("trackName").getValue(String::class.java).toString()
+                                // Log del nome della traccia
+                                Log.d("TrackName", "Nome della traccia: $trackName")
+                                val albumName = trackDataSnapshot.child("album").getValue(String::class.java)
+                                val image = trackDataSnapshot.child("image_url").getValue(String::class.java)
+
+                                // Crea un oggetto Image con l'URL dell'immagine
+                                val albumImage = Image(url = image ?: "")
+
+                                // Ottieni altri dati della traccia come gli artisti, durata, ecc. se necessario
+                                // Ora puoi popolare l'oggetto Track con i dati ottenuti
+                                val track = Track(
+                                    name = trackName ?: "",
+                                    album = Album(name = albumName ?: "", images = listOf(albumImage), releaseDate = ""),
+                                    artists = listOf(), // Assicurati di ottenere gli artisti se necessario
+                                    id = trackId
+                                )
+
+                                // Aggiungi l'utente associato alla richiesta alla lista delle notifiche
+                                notificationList.add(NotificationItem.ReviewItem(user, track))
+                                notificationsAdapter.submitList(notificationList)
+                                notificationsAdapter.notifyDataSetChanged()
+
+                                // Stampiamo nel log il fatto che l'oggetto Track sia stato passato all'adapter
+                                Log.d("TrackObject", "Track object passed to adapter: $track")
+
+                            } else {
+                                Log.e("TrackName", "Nome della traccia non trovato")
+                            }
+                        }
+
+                        override fun onCancelled(databaseError: DatabaseError) {
+                            // Gestisci eventuali errori nel recupero dei dati della traccia
+                            Log.e("TrackName", "Errore nel recupero del nome della traccia: ${databaseError.message}")
+                        }
+                    })
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Gestisci eventuali errori nel recupero dei dati dell'utente associato alla recensione
+                Log.e("UserDataForReview", "Error retrieving user data: ${databaseError.message}")
+            }
+        })
+    }
+
+    // Metodo per recuperare le recensioni dal Realtime Database
+    private fun retrieveReviewsData() {
+        val reviewsReference = database.reference.child("reviews")
+        reviewsReference.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(reviewsSnapshot: DataSnapshot) {
+                if (reviewsSnapshot.exists()) {
+                    // Itera sulle recensioni
+                    for (reviewSnapshot in reviewsSnapshot.children) {
+                        // Ottieni i dati della recensione
+                        val review = reviewSnapshot.getValue(Recensione::class.java)
+                        if (review != null) {
+                            // Controlla se l'userId della recensione è presente nella lista "following" dell'utente corrente
+                            isUserFollowing(review.userId) { isFollowing ->
+                                if (isFollowing) {
+                                    // Se l'utente è presente nella lista "following", recupera i dati dell'utente
+                                    retrieveUserDataForReview(review.userId, review.trackId)
+                                } else {
+                                    // Se l'utente non è presente nella lista "following", puoi ignorare la recensione
+                                    Log.d("Following", "User ${review.userId} is not following")
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Gestisci eventuali errori nel recupero delle recensioni
+                Log.e("RetrieveReviews", "Error retrieving reviews: ${databaseError.message}")
+            }
+        })
+    }
+
+    // Metodo per controllare se l'utente è presente nella lista "following"
+    private fun isUserFollowing(userId: String, callback:(Boolean) -> Unit) {
+        val followingReference = database.reference.child("users").child(currentUserId).child("following").child(userId)
+        return followingReference.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                // Restituisce true se l'utente è presente nella lista "following", altrimenti restituisce false
+                callback(dataSnapshot.exists())
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Gestisci eventuali errori nel recupero dei dati
+                Log.e("IsUserFollowing", "Error checking if user is following: ${databaseError.message}")
+                callback(false)
+            }
+        })
+    }
 }

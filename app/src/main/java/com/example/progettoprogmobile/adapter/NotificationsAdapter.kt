@@ -1,10 +1,13 @@
 package com.example.progettoprogmobile.adapter
 
-import android.content.Context
 import android.util.Log
+import android.content.Context
+import android.os.Bundle
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import com.example.progettoprogmobile.model.Utente
+import com.example.progettoprogmobile.model.Track
+import com.example.progettoprogmobile.BranoSelezionato
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
@@ -19,22 +22,26 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.squareup.picasso.Picasso
+import androidx.fragment.app.FragmentActivity
+
 
 // Sealed class che rappresenta due tipi di notifiche: follower e richieste
 sealed class NotificationItem {
     data class FollowerItem(val utente: Utente) : NotificationItem()
     data class RequestItem(val utente: Utente) : NotificationItem()
+    data class ReviewItem (val utente: Utente, val track: Track) : NotificationItem()
 }
 
 // Adapter per la RecyclerView delle notifiche
 class NotificationsAdapter (
     private val context: Context,
-    private val parent: ViewGroup,
+    val parent: ViewGroup,
     private val followClickListener: NotificationsAdapter.OnFollowClickListener,
     private val confirmClickListener: NotificationsAdapter.OnConfirmClickListener,
     private val deleteClickListener: NotificationsAdapter.OnDeleteClickListener,
     private val database: FirebaseDatabase,
-    private val currentUserId: String
+    private val currentUserId: String,
+    private val tracks: List<Track>
 ) : ListAdapter<NotificationItem, RecyclerView.ViewHolder>(NotificationItemDiffCallback()) {
 
     // View utilizzata per l'inflazione del layout del fragment (R.layout.fragment_fourth)
@@ -55,6 +62,14 @@ class NotificationsAdapter (
     // Lista di utenti che seguono l'utente corrente
     private val newFollowers = mutableListOf<Utente>()
 
+    // Aggiungi una variabile per memorizzare il listener del click sull'elemento della recensione
+    private var reviewItemClickListener: ReviewViewHolder.OnClickListener? = null
+
+    // Funzione per impostare il listener del click sull'elemento della recensione
+    fun setReviewItemClickListener(listener: ReviewViewHolder.OnClickListener) {
+        reviewItemClickListener = listener
+    }
+
     // ViewHolder per gli elementi del tipo Follower
     class FollowerViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val followersImage: ImageView = view.findViewById(R.id.followersImage)
@@ -70,6 +85,34 @@ class NotificationsAdapter (
         val deleteButton: Button = view.findViewById(R.id.delete)
     }
 
+    // ViewHolder per gli elementi del tipo Review
+    class ReviewViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val userImage: ImageView = view.findViewById(R.id.followingImage)
+        val userNameText: TextView = view.findViewById(R.id.reviewNotification)
+
+        // bindTrack method to bind track data
+        fun bindTrack(track: Track) {
+            // Here, you can bind the track data to the views in your ViewHolder
+            // For example:
+            // trackNameTextView.text = track.name
+            // artistNameTextView.text = track.artistName
+        }
+        init {
+            view.setOnClickListener {
+                // Notifica l'evento di click all'adapter
+                onClickListener?.onClick(adapterPosition)
+            }
+        }
+
+        // Interfaccia per il listener del click sull'elemento della recensione
+        interface OnClickListener {
+            fun onClick(position: Int)
+        }
+
+        // Variabile per memorizzare il listener del click sull'elemento della recensione
+        var onClickListener: OnClickListener? = null
+    }
+
     // Funzione per sottomettere una nuova lista di utenti al RecyclerView
     fun submitUserList(userList: List<Utente>) {
         val followerItems = userList.map { NotificationItem.FollowerItem(it) }
@@ -81,6 +124,7 @@ class NotificationsAdapter (
         return when (getItem(position)) {
             is NotificationItem.FollowerItem -> TYPE_FOLLOWER
             is NotificationItem.RequestItem -> TYPE_REQUEST
+            is NotificationItem.ReviewItem -> TYPE_REVIEW
             else -> throw IllegalArgumentException("Invalid item type at position $position")
         }
     }
@@ -96,6 +140,12 @@ class NotificationsAdapter (
                 val view = LayoutInflater.from(parent.context).inflate(R.layout.recycler_view_notifiche_nfr, parent, false)
                 RequestViewHolder(view)
             }
+
+            TYPE_REVIEW -> {
+                val view = LayoutInflater.from(parent.context).inflate(R.layout.recycler_view_notifiche_recensioni, parent, false)
+                ReviewViewHolder(view)
+            }
+
             else -> throw IllegalArgumentException("Invalid view type")
         }
     }
@@ -122,7 +172,7 @@ class NotificationsAdapter (
 
     // Verifica se un follower è tra i following dell'utente corrente
     private fun isFollowerInFollowing(followerId: String, onComplete: (Boolean) -> Unit) {
-        val followingReference = database.reference.child("users").child("$currentUserId").child("following")
+        val followingReference = database.reference.child("users").child(currentUserId).child("following")
         followingReference.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(followingSnapshot: DataSnapshot) {
                 val isFollowerInFollowing = followingSnapshot.hasChild(followerId)
@@ -204,12 +254,46 @@ class NotificationsAdapter (
                     deleteClickListener.onDeleteClickListener(utente.userId)
                 }
             }
+            is NotificationItem.ReviewItem -> {
+                val reviewViewHolder = holder as ReviewViewHolder
+                val utente = item.utente
+
+                // Carica l'immagine dell'utente che ha scritto la recensione utilizzando Picasso
+                if (utente.userImage.isNotEmpty()) {
+                    Picasso.get()
+                        .load(utente.userImage)
+                        .placeholder(R.drawable.baseline_person_24)
+                        .into(reviewViewHolder.userImage)
+                }
+
+                // Imposta il nome dell'utente come testo del nome utente
+                val message = utente.name + " " + context.getString(R.string.newReviewNotification) + " " + item.track.name
+                reviewViewHolder.userNameText.text = message
+
+                // Imposta il listener per il click sull'elemento della recensione
+                holder.itemView.setOnClickListener {
+                    val fragment = BranoSelezionato()
+                    val bundle = Bundle().apply {
+                        putSerializable("trackDetail", item.track)
+                    }
+                    bundle.putString("trackId", item.track.id)
+                    fragment.arguments = bundle
+
+                    val context = holder.itemView.context
+                    val fragmentTransaction = (context as FragmentActivity).supportFragmentManager.beginTransaction()
+                    fragmentTransaction.replace(R.id.nav_host_fragment, fragment)
+                    fragmentTransaction.addToBackStack(null)
+                    fragmentTransaction.commit()
+                }
+
+            }
         }
     }
 
     companion object {
         private const val TYPE_FOLLOWER = 1
         private const val TYPE_REQUEST = 2
+        private const val TYPE_REVIEW = 3
     }
 
     // Classe per la gestione delle differenze tra gli elementi della lista

@@ -56,7 +56,7 @@
     <string name="follow">Follow</string>
     <string name="following1">Unfollow</string>
 
-    <string name="newReviewNotification">just wrote a new review</string>
+    <string name="newReviewNotification">ha just written a new review of the song</string>
     <string name="newResponseNotification">just responded to your review</string>
     <string name="newLikedReview">liked your review</string>
     <string name="newDislikedReview">didn\'t like your review</string>
