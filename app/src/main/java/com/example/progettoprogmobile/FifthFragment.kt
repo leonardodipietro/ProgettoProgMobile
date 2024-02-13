@@ -27,15 +27,16 @@ import android.content.SharedPreferences
 import android.os.Handler
 import android.os.Looper
 import com.example.progettoprogmobile.model.Artist
+import com.example.progettoprogmobile.model.Track
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
-import com.example.progettoprogmobile.viewModel.SpotifyViewModel
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.firebase.database.DatabaseReference
 
 
-class FifthFragment : Fragment() {
+class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
+    ArtistAdapter.OnArtistClickListener {
 
     private lateinit var usernameTextView: TextView
     private lateinit var profileImageView: ImageView
@@ -50,30 +51,21 @@ class FifthFragment : Fragment() {
     private lateinit var btnTopArtisti: Button
     private lateinit var clessidraButton: Button
     private lateinit var vistaButton: Button
+    private lateinit var backButton: Button
 
-    private lateinit var spotifyViewModel: SpotifyViewModel
     private val database = FirebaseDatabase.getInstance()
-
     private lateinit var firebaseViewModel: FirebaseViewModel
     private lateinit var auth: FirebaseAuth
     private lateinit var storage: FirebaseStorage
 
     private lateinit var followButton: Button
-    private var staSeguendoUtente = false
     private lateinit var userId: String
-    private var databaseReference = FirebaseDatabase.getInstance().reference
     private val currentUserUid = FirebaseAuth.getInstance().currentUser?.uid
 
-    private enum class ButtonState {
-        ATTENDI_CONFERMA,
-        INIZIA_A_SEGUIRE,
-        SMETTI_DI_SEGUIRE
-    }
-
-    private var currentState = ButtonState.ATTENDI_CONFERMA
-    private var isRequestAccepted = false
     private lateinit var sharedPreferences: SharedPreferences
-    private var currentUserHasSentRequest = false
+
+    private var isFollowing = false
+    private var isRequestSent = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -82,205 +74,130 @@ class FifthFragment : Fragment() {
 
         val rootView = inflater.inflate(R.layout.fragment_fifth, container, false)
 
-        topTracksRecyclerView = rootView.findViewById(R.id.recyclerViewUtenteTrack)
-        topArtistsRecyclerView = rootView.findViewById(R.id.recyclerViewUtenteArtist)
-        btnTopBrani = rootView.findViewById(R.id.btn_topBrani)
-        btnTopArtisti = rootView.findViewById(R.id.btn_topArtisti)
-        followButton = rootView.findViewById(R.id.addFriendButton)
-        val backButton: Button = rootView.findViewById(R.id.backArrow)
-        clessidraButton = rootView.findViewById(R.id.clessidra)
-        vistaButton = rootView.findViewById(R.id.vista)
+        initializeViews(rootView)
+        initializeViewModelAndAdapters()
+        configureRecyclerViews()
+        setButtonClickListeners()
+
+        setupObservers()
 
         userId = arguments?.getString("userId") ?: "" //Dichiarazione al livello di classe
         //val userId: String? = arguments?.getString("userId")
         Log.d("FifthFragment", "User ID ricevuto: $userId")
 
-        // Inizializza FirebaseViewModel
-        firebaseViewModel = ViewModelProvider(this).get(FirebaseViewModel::class.java)
-
-        clessidraButton.setOnClickListener {
-            clessidra()
-        }
-
-        /*vistaButton.setOnClickListener {
-            openViewStyleDialog()
-        }*/
-
-        // Inizializza le RecyclerView
-        //topTracksRecyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
-        topArtistsRecyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
-
-        /*btnTopBrani.setOnClickListener {
-            firebaseViewModel.filter = "short_term"
-            firebaseViewModel.fetchTopTracksForUser(userId, firebaseViewModel.filter) { tracks ->
-                activity?.runOnUiThread {
-                    handleReceivedTracks(tracks)
-                    // Nascondi la RecyclerView degli artisti
-                    topArtistsRecyclerView.visibility = View.GONE
-                }
-            }
-        }*/
-
-        /*btnTopArtisti.setOnClickListener {
-            firebaseViewModel.filter = "short_term"
-            firebaseViewModel.fetchTopArtistsForUser(userId, firebaseViewModel.filter) { artists ->
-                activity?.runOnUiThread {
-                    handleReceivedArtists(artists)
-                    Log.d("FifthFragment", "Ho chiamato handleReceivedArtists(artists)")
-                    // Nascondi la RecyclerView dei brani
-                    //topTracksRecyclerView.visibility = View.GONE
-                }
-            }
-        }*/
+        sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
 
         countUserReviews(userId, FirebaseDatabase.getInstance().reference, rootView);
         countUserFollowers(userId, FirebaseDatabase.getInstance().reference, rootView);
         countUserFollowing(userId, FirebaseDatabase.getInstance().reference, rootView);
 
+        // Recupera lo stile di visualizzazione
+        val viewStyle = sharedPreferences.getString("viewStyle", "lineare")
+        Log.d("ViewStyle", "Stile di visualizzazione recuperato: $viewStyle")
+        when (viewStyle) {
+            "lineare" -> {
+                Log.d("ViewStyle", "Impostazione della vista lineare")
+                topTracksRecyclerView.adapter = trackAdapter
+                topTracksRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+                trackAdapter.notifyDataSetChanged()
 
-
-
-
-
-
-
-
-        // Controlla se currentUserUid(io) sono dentro nodo Followers di userId(Amico)
-        val followersRef = databaseReference
-            .child("users")
-            .child(userId)
-            .child("followers")
-
-        // Crea una query per trovare il nodo figlio con valore uguale a currentUserUid
-        val followersCheck = followersRef.orderByValue().equalTo(true)
-
-        // Controlla se userId(Amico) ha il nodo Followers true o false
-        val privacyAmico = databaseReference.child("users")
-            .child(userId)
-            .child("privacy")
-            .child("account")
-            .child("Followers")
-
-        privacyAmico.addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                val privacyAmicoValue = dataSnapshot.getValue(Boolean::class.java)
-                Log.d("MyTag", "Valore di privacyAmicoValue: $privacyAmicoValue")
-
-                // Utilizza la query per ottenere i dati da followersCheck
-                followersCheck.addListenerForSingleValueEvent(object : ValueEventListener {
-                    override fun onDataChange(dataSnapshot: DataSnapshot) {
-                        // Loop attraverso i risultati della query
-                        for (childSnapshot in dataSnapshot.children) {
-                            val followersCheckValue = childSnapshot.getValue(Boolean::class.java)
-                            Log.d("MyTag", "Valore di followersCheckValue: $followersCheckValue")
-
-                            // Esegui le azioni desiderate se il valore è true
-                            if (privacyAmicoValue == true && followersCheckValue == true) {
-                                // Il valore di "Followers" è true
-                                Log.d("MyTag", "Followers è true.")
-                                // Esegui le azioni desiderate qui
-                            } else {
-                                // Il valore di "Followers" non è true
-                                Log.d("MyTag", "Followers non è true.")
-                            }
-                        }
-                    }
-
-                    override fun onCancelled(databaseError: DatabaseError) {
-                        // Gestisci eventuali errori qui
-                        Log.e(
-                            "MyTag",
-                            "Errore nel recupero del valore di Followers: " + databaseError.message
-                        )
-                    }
-                })
+                topArtistsRecyclerView.adapter = artistAdapter
+                topArtistsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+                artistAdapter.notifyDataSetChanged()
+                saveViewStyle(requireContext(), "lineare")
             }
+            "griglia" -> {
+                Log.d("ViewStyle", "Impostazione della vista a griglia")
+                topTracksRecyclerView.adapter = trackGridAdapter
+                topTracksRecyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
+                trackGridAdapter.notifyDataSetChanged()
 
-            override fun onCancelled(databaseError: DatabaseError) {
-                // Gestisci eventuali errori qui per privacyAmico
-                Log.e(
-                    "MyTag",
-                    "Errore nel recupero del valore di privacyAmico: " + databaseError.message
-                )
+                topArtistsRecyclerView.adapter = artistGridAdapter
+                topArtistsRecyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
+                artistGridAdapter.notifyDataSetChanged()
+                saveViewStyle(requireContext(), "griglia")
             }
-        })
-
-        // Azione da eseguire quando il pulsante freccia viene cliccato
-        backButton.setOnClickListener {
-            requireActivity().onBackPressed() // Torna al fragment precedente
         }
 
-        /*followButton.setOnClickListener {
+        // Recupera il filtro temporale
+        val timeFilter = sharedPreferences.getString("timeFilter", "short_term") ?: "short_term"
+        Log.d("TimeFilter", "Filtro temporale recuperato: $timeFilter")
+        firebaseViewModel.filter = timeFilter
 
-            val privacyAmico = databaseReference.child("users")
-                .child(userId)
-                .child("privacy")
-                .child("account")
-                .child("Followers")
-
-            privacyAmico.addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    val privacyAmicoValue = dataSnapshot.getValue(Boolean::class.java) ?: false
-
-                    if(privacyAmicoValue) {
-                        when (currentState) {
-                            ButtonState.ATTENDI_CONFERMA -> {
-                                // Esegui l'azione per la richiesta di amicizia
-                                // Cambia lo stato del pulsante se la richiesta è stata accettata
-                                currentState = ButtonState.INIZIA_A_SEGUIRE
-                                // Aggiorna l'aspetto del pulsante
-                                aggiornaAspettoPulsante()
-                                // Esegui l'azione per inviare la richiesta di amicizia
-                                inviaRichiestaAmicizia()
-                            }
-
-                            ButtonState.INIZIA_A_SEGUIRE -> {
-                                // Esegui l'azione per smettere di seguire
-                                currentState = ButtonState.SMETTI_DI_SEGUIRE
-                                // Aggiorna l'aspetto del pulsante
-                                aggiornaAspettoPulsante()
-                                // Esegui l'azione per iniziare a seguire
-                                iniziaASeguire()
-                            }
-
-                            ButtonState.SMETTI_DI_SEGUIRE -> {
-                                // Esegui l'azione per smettere di seguire
-                                currentState = ButtonState.INIZIA_A_SEGUIRE
-                                // Aggiorna l'aspetto del pulsante
-                                aggiornaAspettoPulsante()
-                                // Esegui l'azione per smettere di seguire
-                                smettiDiSeguire()
-                            }
-                        }
-                    } else {
-                        // Se Followers è false, esegui l'azione per inviare la richiesta di amicizia
-                        currentState = ButtonState.INIZIA_A_SEGUIRE
-                        inviaRichiestaAmicizia()
-                    }
-                    // Aggiorna l'aspetto del pulsante
-                    aggiornaAspettoPulsante()
+        firebaseViewModel.fetchTopTracksForUser(userId, timeFilter) { tracks ->
+            requireActivity().runOnUiThread {
+                if (isLinearViewSelected()) {
+                    trackAdapter.submitList(tracks)
+                } else {
+                    trackGridAdapter.submitList(tracks)
                 }
-                override fun onCancelled(error: DatabaseError) {
-                    // Gestisci eventuali errori nel recupero del valore di Followers
-                    Log.e("MyTag", "Errore nel recupero del valore di Followers: " + error.message)
+                trackAdapter.notifyDataSetChanged()
+                trackGridAdapter.notifyDataSetChanged()
+            }
+        }
+
+        firebaseViewModel.fetchTopArtistsForUser(userId, timeFilter) { artists ->
+            requireActivity().runOnUiThread {
+                if (isLinearViewSelected()) {
+                    artistAdapter.submitList(artists)
+                } else {
+                    artistGridAdapter.submitList(artists)
                 }
-            })
-        }*/
+                artistAdapter.notifyDataSetChanged()
+                artistGridAdapter.notifyDataSetChanged()
+            }
+        }
 
-        // Inizializza le SharedPreferences
-        sharedPreferences = requireActivity().getPreferences(Context.MODE_PRIVATE)
+        val currentView = sharedPreferences.getString("currentView", "brani")
+        when (currentView) {
+            "brani" -> {
+                handleTracksButtonClick()
+            }
+            "artisti" -> {
+                handleArtistsButtonClick()
+            }
+        }
 
-        // Carica lo stato del bottone dalle SharedPreferences, utilizza false come valore di default
-        isRequestAccepted = sharedPreferences.getBoolean("isRequestAccepted", false)
-        //aggiornaAspettoPulsante()
+        updateFollowButtonState()
+
+        // Carica lo stato del pulsante dalle preferenze condivise
+        loadButtonState()
+
+        // Imposta il testo del pulsante in base allo stato corrente
+        updateFollowButton(isFollowing, isRequestSent)
+
+        // Aggiungi un listener per il click sul pulsante
+        followButton.setOnClickListener {
+            // In base allo stato corrente, esegui l'azione appropriata
+            when {
+                isRequestSent -> {
+                    Log.d("FollowButton", "Canceling follow request")
+                    cancelFollowRequest() // Se la richiesta è stata inviata, annulla la richiesta
+                }
+                isFollowing -> {
+                    Log.d("FollowButton", "Unfollowing user")
+                    unfollowUser() // Se stai già seguendo l'utente, smetti di seguirlo
+                }
+                else -> {
+                    Log.d("FollowButton", "Sending follow request")
+                    sendFollowRequest() // Altrimenti, invia una richiesta di seguimento
+                }
+            }
+            // Dopo aver eseguito l'azione, salva lo stato del pulsante nelle preferenze condivise
+            saveButtonState(isFollowing, isRequestSent)
+        }
+
+
+
+
+
+
+
+
 
         // Inizializza Firebase
         auth = FirebaseAuth.getInstance()
         storage = FirebaseStorage.getInstance()
-
-        // Inizializza le views
-        usernameTextView = rootView.findViewById(R.id.usernameHeader)
-        profileImageView = rootView.findViewById(R.id.userProfileImage)
 
         // Ottieni il riferimento al nodo utente nel database Firebase
         val userReference = database.reference.child("users").child(userId ?: "")
@@ -352,8 +269,62 @@ class FifthFragment : Fragment() {
             // Gestisci l'errore
             Log.e("FifthFragment", "Errore nel recupero dell'URL dell'immagine del profilo: ${exception.message}")
         }
+
         return rootView
     }
+
+    private fun initializeViews(rootView: View) {
+        topTracksRecyclerView = rootView.findViewById(R.id.recyclerViewUtenteTrack)
+        topArtistsRecyclerView = rootView.findViewById(R.id.recyclerViewUtenteArtist)
+
+        btnTopBrani = rootView.findViewById(R.id.btn_topBrani)
+        btnTopArtisti = rootView.findViewById(R.id.btn_topArtisti)
+
+        followButton = rootView.findViewById(R.id.followButton)
+        backButton = rootView.findViewById(R.id.backArrow)
+
+        clessidraButton = rootView.findViewById(R.id.clessidra)
+        vistaButton = rootView.findViewById(R.id.vista)
+
+        usernameTextView = rootView.findViewById(R.id.usernameHeader)
+        profileImageView = rootView.findViewById(R.id.userProfileImage)
+    }
+
+    private fun initializeViewModelAndAdapters() {
+        // Inizializza FirebaseViewModel
+        firebaseViewModel = ViewModelProvider(this).get(FirebaseViewModel::class.java)
+
+        // Inizializzazione degli adapter delle recyclerView
+        trackGridAdapter = TrackGridAdapter(emptyList(), this)
+        artistGridAdapter = ArtistGridAdapter(emptyList(), this)
+        trackAdapter = TrackAdapter(emptyList(), this)
+        artistAdapter = ArtistAdapter(emptyList(), this)
+    }
+
+    private fun configureRecyclerViews() {
+        // Configurazione iniziale delle RecyclerView
+        topTracksRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        topTracksRecyclerView.adapter = trackAdapter
+
+        topArtistsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+        topArtistsRecyclerView.adapter = artistAdapter
+    }
+
+    private fun setButtonClickListeners() {
+        // Imposta i click listener per i pulsanti
+        btnTopBrani.setOnClickListener { handleTracksButtonClick() }
+        btnTopArtisti.setOnClickListener { handleArtistsButtonClick() }
+        clessidraButton.setOnClickListener { openfiltermenu() }
+        vistaButton.setOnClickListener { openViewStyleDialog() }
+        backButton.setOnClickListener {
+            requireActivity().onBackPressed() // Torna al fragment precedente
+        }
+    }
+
+
+
+
+
 
     private fun saveTimeFilter(context: Context, timeFilter: String) {
         val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
@@ -369,143 +340,78 @@ class FifthFragment : Fragment() {
         editor.apply()
     }
 
-    /*private fun handleReceivedTracks(tracks: List<Track>) {
-        activity?.runOnUiThread {
-            if (tracks.isNotEmpty()) {
-                trackAdapter = TrackGridAdapter(tracks, object : TrackAdapter.OnTrackClickListener {
-                    override fun onTrackClicked(data: Any) {
-                        if (data is Track) {
-                            val newFragment = com.example.progettoprogmobile.BranoSelezionato()
-                            val bundle = Bundle()
-                            bundle.putSerializable("trackDetail", data)
-                            newFragment.arguments = bundle
-                            parentFragmentManager.beginTransaction()
-                                .replace(R.id.nav_host_fragment, newFragment)
-                                .addToBackStack(null)
-                                .commit()
-                        }
-                    }
-                })
+    private fun saveCurrentView(context: Context, view: String) {
+        //Vale per la scelta tra Artisti e Brani
+        val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putString("currentView", view)
+        editor.apply()
+    }
 
-                if (topTracksRecyclerView.adapter == null) {
-                    topTracksRecyclerView.adapter = trackAdapter
+    // Fa si che le RecyclerView vengano aggiornate automaticamente quando i dati su Firebase cambiano
+    private fun setupObservers() {
+        // Observers for tracks
+        firebaseViewModel.topTracksfromdb.observe(viewLifecycleOwner) { tracks ->
+            trackAdapter.submitList(tracks)
+            trackGridAdapter.submitList(tracks)
+            Log.d("setupObservers", "LISTA TRACCE INSERITA CON SUCCESSO")
+        }
+
+        // Observers for artists
+        firebaseViewModel.topArtistsfromdb.observe(viewLifecycleOwner) { artists ->
+            artistAdapter.submitList(artists)
+            artistGridAdapter.submitList(artists)
+            Log.d("setupObservers", "LISTA ARTISTI INSERITA CON SUCCESSO")
+        }
+    }
+
+    // Gestione pulsante TopBrani
+    private fun handleTracksButtonClick() {
+        topArtistsRecyclerView.visibility = View.GONE
+        topTracksRecyclerView.visibility = View.VISIBLE
+
+        firebaseViewModel.fetchTopTracksForUser(userId, firebaseViewModel.filter) { tracks ->
+
+            requireActivity().runOnUiThread {
+                if (isLinearViewSelected()) {
+                    trackAdapter.submitList(tracks)
+                } else {
+                    trackGridAdapter.submitList(tracks)
                 }
-
-                // Aggiornamento dell'adapter con i nuovi dati
-                trackAdapter.submitList(tracks)
                 trackAdapter.notifyDataSetChanged()
-
-                Log.d("FifthFragment", "Brani popolati nella RecyclerView")
-
-                topTracksRecyclerView.visibility = View.VISIBLE
+                trackGridAdapter.notifyDataSetChanged()
             }
+            saveCurrentView(requireContext(), "brani")
         }
-    }*/
+    }
 
-    private fun handleReceivedArtists(artists: List<Artist>) {
-        Log.d("FifthFragment", "Sto eseguendo handleReceivedArtists")
-        activity?.runOnUiThread {
-            if (artists.isNotEmpty()) {
-                Log.d("FifthFragment", "Artists non è vuoto")
-                artistGridAdapter = ArtistGridAdapter(artists, object : ArtistAdapter.OnArtistClickListener {
-                    override fun onArtistClicked(data: Any) {
-                        Log.d("ArtistClickListener", "Oggetto data: $data")
-                        if (data is Artist) {
-                            Log.d("ArtistClickListener", "Artista cliccato: ${data.name}")
-                            val newFragment = com.example.progettoprogmobile.ArtistaSelezionato()
-                            val bundle = Bundle()
-                            bundle.putSerializable("artistdetails", data)
-                            newFragment.arguments = bundle
-                            parentFragmentManager.beginTransaction()
-                                .replace(R.id.nav_host_fragment, newFragment)
-                                .addToBackStack(null)
-                                .commit()
-                        }
-                    }
-                })
+    // Gestione pulsante TopArtisti
+    private fun handleArtistsButtonClick() {
+        topTracksRecyclerView.visibility = View.GONE
+        topArtistsRecyclerView.visibility = View.VISIBLE
 
-                if (topArtistsRecyclerView.adapter == null) {
-                    topArtistsRecyclerView.adapter = artistGridAdapter
-                    Log.d("FifthFragment", "Adapter per gli artisti impostato")
+        firebaseViewModel.fetchTopArtistsForUser(userId, firebaseViewModel.filter) { artists ->
+
+            requireActivity().runOnUiThread {
+                if (isLinearViewSelected()) {
+                    artistAdapter.submitList(artists)
+                } else {
+                    artistGridAdapter.submitList(artists)
                 }
-
-                // Aggiornamento dell'adapter con i nuovi dati
-                artistGridAdapter.submitList(artists)
+                artistAdapter.notifyDataSetChanged()
                 artistGridAdapter.notifyDataSetChanged()
-
-                Log.d("FifthFragment", "Artisti popolati nella RecyclerView")
-
-                topArtistsRecyclerView.visibility = View.VISIBLE
-            } else {
-                Log.d("FifthFragment", "Nessun artista ricevuto")
             }
+            saveCurrentView(requireContext(), "artisti")
         }
     }
 
-    private fun clessidra() {
-        val dialogView = layoutInflater.inflate(R.layout.filter_time_alertdialog, null)
-
-        val dialog = AlertDialog.Builder(context)
-            .setView(dialogView)
-            .setCancelable(true) // Permette di chiudere il dialog toccando fuori
-            .create()
-
-        // Gestione dei click per ogni scelta
-        dialogView.findViewById<Button>(R.id.seelast4weeks).setOnClickListener {
-            Log.d("FifthFragment", "Opzione selezionata: short_term")
-            firebaseViewModel.filter = "short_term"
-
-            /*firebaseViewModel.fetchTopTracksForUser(userId, firebaseViewModel.filter) { tracks ->
-                handleReceivedTracks(tracks)
-                saveTimeFilter(requireContext(), "short_term")
-                dialog.dismiss()
-            }*/
-
-            firebaseViewModel.fetchTopArtistsForUser(userId, firebaseViewModel.filter) { artists ->
-                handleReceivedArtists(artists)
-                saveTimeFilter(requireContext(), "short_term")
-                dialog.dismiss()
-            }
-        }
-
-        dialogView.findViewById<Button>(R.id.seelast6month).setOnClickListener {
-            Log.d("FifthFragment", "Opzione selezionata: medium_term")
-            firebaseViewModel.filter = "medium_term"
-
-            /*firebaseViewModel.fetchTopTracksForUser(userId, firebaseViewModel.filter) { tracks ->
-                handleReceivedTracks(tracks)
-                saveTimeFilter(requireContext(), "medium_term")
-                dialog.dismiss()
-            }*/
-
-            firebaseViewModel.fetchTopArtistsForUser(userId, firebaseViewModel.filter) { artists ->
-                handleReceivedArtists(artists)
-                saveTimeFilter(requireContext(), "medium_term")
-                dialog.dismiss()
-            }
-        }
-
-        dialogView.findViewById<Button>(R.id.seeAlltime).setOnClickListener {
-            Log.d("FifthFragment", "Opzione selezionata: long_term")
-            firebaseViewModel.filter = "long_term"
-
-            /*firebaseViewModel.fetchTopTracksForUser(userId, firebaseViewModel.filter) { tracks ->
-                handleReceivedTracks(tracks)
-                saveTimeFilter(requireContext(), "long_term")
-                dialog.dismiss()
-            }*/
-
-            firebaseViewModel.fetchTopArtistsForUser(userId, firebaseViewModel.filter) { artists ->
-                handleReceivedArtists(artists)
-                saveTimeFilter(requireContext(), "long_term")
-                dialog.dismiss()
-            }
-        }
-
-        dialog.show()
+    private fun isLinearViewSelected(): Boolean {
+        val viewStyle = sharedPreferences.getString("viewStyle", "lineare")
+        return viewStyle == "lineare"
     }
 
-    /*private fun openViewStyleDialog() {
+    // Gestione pulsante della vista
+    private fun openViewStyleDialog() {
         val choices = arrayOf("Vista Lineare", "Vista a Griglia")
         AlertDialog.Builder(requireContext())
             .setTitle("Scegli Stile di Visualizzazione")
@@ -514,16 +420,23 @@ class FifthFragment : Fragment() {
                     0 -> { // Vista Lineare
                         topTracksRecyclerView.adapter = trackAdapter
                         topTracksRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+                        trackAdapter.notifyDataSetChanged()
 
                         topArtistsRecyclerView.adapter = artistAdapter
                         topArtistsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+                        artistAdapter.notifyDataSetChanged()
+
                         saveViewStyle(requireContext(), "lineare")
                     }
                     1 -> { // Vista a Griglia
                         topTracksRecyclerView.adapter = trackGridAdapter
                         topTracksRecyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
+                        trackGridAdapter.notifyDataSetChanged()
+
                         topArtistsRecyclerView.adapter = artistGridAdapter
                         topArtistsRecyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
+                        artistGridAdapter.notifyDataSetChanged()
+
                         saveViewStyle(requireContext(), "griglia")
                     }
                 }
@@ -531,17 +444,185 @@ class FifthFragment : Fragment() {
                 val timeFilter = sharedPreferences.getString("timeFilter", "short_term") ?: "short_term"
                 firebaseViewModel.filter = timeFilter
 
-                /*firebaseViewModel.fetchTopTracksForUser(userId, firebaseViewModel.filter) { tracks ->
-                    handleReceivedTracks(tracks)
-                }*/
+                firebaseViewModel.fetchTopTracksForUser(userId, timeFilter) { tracks ->
+                    requireActivity().runOnUiThread {
+                        if (isLinearViewSelected()) {
+                            trackAdapter.submitList(tracks)
+                            trackAdapter.notifyDataSetChanged()
+                        } else {
+                            trackGridAdapter.submitList(tracks)
+                            trackGridAdapter.notifyDataSetChanged()
+                        }
+                    }
+                }
 
-                firebaseViewModel.fetchTopArtistsForUser(userId, firebaseViewModel.filter) { artists ->
-                    handleReceivedArtists(artists)
+                firebaseViewModel.fetchTopArtistsForUser(userId, timeFilter) { artists ->
+                    requireActivity().runOnUiThread {
+                        if (isLinearViewSelected()) {
+                            artistAdapter.submitList(artists)
+                            artistAdapter.notifyDataSetChanged()
+                        } else {
+                            artistGridAdapter.submitList(artists)
+                            artistGridAdapter.notifyDataSetChanged()
+                        }
+                    }
                 }
             }
             .show()
-    }*/
+    }
 
+    // Quando un brano viene cliccato naviga a BranoSelezionato
+    override fun onTrackClicked(data: Any) {
+        Log.d("FragmentClick", "Item clicked with data: $data")
+        if (data is Track) {
+            // Qui naviga verso il nuovo fragment, puoi passare "data" come argomento se necessario
+            val newFragment = com.example.progettoprogmobile.BranoSelezionato()
+            val bundle = Bundle()
+            bundle.putSerializable("trackDetail", data)
+            newFragment.arguments = bundle
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.nav_host_fragment, newFragment)
+                .addToBackStack(null)
+                .commit()
+
+            // Salva lo stato corrente come "brani"
+            saveCurrentView(requireContext(), "brani")
+        }
+    }
+
+    // Quando un brano viene cliccato naviga a ArtistaSelezionato
+    override fun onArtistClicked(data: Any) {
+        Log.d("FragmentClick", "Item clicked with data: $data")
+        if (data is Artist) {
+            // Qui naviga verso il nuovo fragment, puoi passare "data" come argomento se necessario
+            val newFragment = com.example.progettoprogmobile.ArtistaSelezionato()
+            val bundle = Bundle()
+            bundle.putSerializable("artistdetails", data)
+            newFragment.arguments = bundle
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.nav_host_fragment, newFragment)
+                .addToBackStack(null)
+                .commit()
+        }
+    }
+
+    // Gestione pulsante Clessidra
+    private fun openfiltermenu() {
+        val dialogView = layoutInflater.inflate(R.layout.filter_time_alertdialog, null)
+
+
+        val dialog = AlertDialog.Builder(context)
+            .setView(dialogView)
+            .setCancelable(true) // Permette di chiudere il dialog toccando fuori
+            .create()
+
+        // Gestione dei click per ogni scelta
+        dialogView.findViewById<Button>(R.id.seelast4weeks).setOnClickListener {
+            firebaseViewModel.filter = "short_term"
+
+            firebaseViewModel.fetchTopTracksForUser(userId, firebaseViewModel.filter) { tracks ->
+                saveTimeFilter(requireContext(), "short_term")
+                dialog.dismiss()
+                requireActivity().runOnUiThread {
+                    if (isLinearViewSelected()) {
+                        trackAdapter.submitList(tracks)
+                    } else {
+                        trackGridAdapter.submitList(tracks)
+                    }
+                    trackAdapter.notifyDataSetChanged()
+                    trackGridAdapter.notifyDataSetChanged()
+                }
+            }
+
+            firebaseViewModel.fetchTopArtistsForUser(userId, firebaseViewModel.filter) { artists ->
+                saveTimeFilter(requireContext(), "short_term")
+                dialog.dismiss()
+                requireActivity().runOnUiThread {
+                    if (isLinearViewSelected()) {
+                        artistAdapter.submitList(artists)
+                    } else {
+                        artistGridAdapter.submitList(artists)
+                    }
+                    artistAdapter.notifyDataSetChanged()
+                    artistGridAdapter.notifyDataSetChanged()
+                }
+            }
+        }
+
+        dialogView.findViewById<Button>(R.id.seelast6month).setOnClickListener {
+            firebaseViewModel.filter = "medium_term"
+
+            firebaseViewModel.fetchTopTracksForUser(userId, firebaseViewModel.filter) { tracks ->
+                saveTimeFilter(requireContext(), "medium_term")
+                dialog.dismiss()
+                requireActivity().runOnUiThread {
+                    if (isLinearViewSelected()) {
+                        trackAdapter.submitList(tracks)
+                    } else {
+                        trackGridAdapter.submitList(tracks)
+                    }
+                    trackAdapter.notifyDataSetChanged()
+                    trackGridAdapter.notifyDataSetChanged()
+                }
+            }
+
+            firebaseViewModel.fetchTopArtistsForUser(userId, firebaseViewModel.filter) { artists ->
+                saveTimeFilter(requireContext(), "medium_term")
+                dialog.dismiss()
+                requireActivity().runOnUiThread {
+                    if (isLinearViewSelected()) {
+                        artistAdapter.submitList(artists)
+                    } else {
+                        artistGridAdapter.submitList(artists)
+                    }
+                    artistAdapter.notifyDataSetChanged()
+                    artistGridAdapter.notifyDataSetChanged()
+                }
+            }
+        }
+
+        dialogView.findViewById<Button>(R.id.seeAlltime).setOnClickListener {
+            firebaseViewModel.filter = "long_term"
+
+            firebaseViewModel.fetchTopTracksForUser(userId, firebaseViewModel.filter) { tracks ->
+                saveTimeFilter(requireContext(), "long_term")
+                dialog.dismiss()
+                requireActivity().runOnUiThread {
+                    if (isLinearViewSelected()) {
+                        trackAdapter.submitList(tracks)
+                    } else {
+                        trackGridAdapter.submitList(tracks)
+                    }
+                    trackAdapter.notifyDataSetChanged()
+                    trackGridAdapter.notifyDataSetChanged()
+                }
+            }
+
+            firebaseViewModel.fetchTopArtistsForUser(userId, firebaseViewModel.filter) { artists ->
+                saveTimeFilter(requireContext(), "long_term")
+                dialog.dismiss()
+                requireActivity().runOnUiThread {
+                    if (isLinearViewSelected()) {
+                        artistAdapter.submitList(artists)
+                    } else {
+                        artistGridAdapter.submitList(artists)
+                    }
+                    artistAdapter.notifyDataSetChanged()
+                    artistGridAdapter.notifyDataSetChanged()
+                }
+            }
+        }
+
+        dialog.show()
+    }
+
+
+
+
+
+
+
+    // Contatore recensioni
     fun countUserReviews(userId: String, databaseReference: DatabaseReference, rootView: View) {
         val reviewsReference = databaseReference.child("users").child(userId).child("reviews counter")
 
@@ -563,6 +644,7 @@ class FifthFragment : Fragment() {
         })
     }
 
+    // Contatore followers
     fun countUserFollowers(userId: String, databaseReference: DatabaseReference, rootView: View) {
         val followersReference = databaseReference.child("users").child(userId).child("followers counter")
 
@@ -584,6 +666,7 @@ class FifthFragment : Fragment() {
         })
     }
 
+    // Contatore following
     fun countUserFollowing(userId: String, databaseReference: DatabaseReference, rootView: View) {
         val followingReference = databaseReference.child("users").child(userId).child("following counter")
 
@@ -606,124 +689,160 @@ class FifthFragment : Fragment() {
     }
 
 
-    /*private fun inviaRichiestaAmicizia() {
-        // Implementa l'azione per inviare una richiesta di amicizia
-        if (currentUserUid != null) {
-            val requestsRef = databaseReference
-                .child("users")
-                .child(userId)
-                .child("requests")
 
-            // Aggiungi l'utente corrente all'elenco delle richieste nell'utente da seguire
-            requestsRef.child(currentUserUid).setValue(true)
-                .addOnSuccessListener {
-                    Log.d("Firebase", "Richiesta di amicizia inviata all'utente con ID: $userId")
-                    currentUserHasSentRequest = true
-                    // Imposta lo stato della richiesta come non accettata
-                    isRequestAccepted = false
-                    // Salva lo stato del bottone nelle SharedPreferences
-                    saveButtonState()
-                    // Aggiorna lo stato del pulsante dopo l'invio della richiesta
-                    aggiornaAspettoPulsante()
-                }
-                .addOnFailureListener {
-                    // Gestisci eventuali errori durante l'invio della richiesta di amicizia
-                    Log.e("Firebase", "Errore durante l'invio della richiesta di amicizia: $it")
-                }
-        }
-    }
 
-    private fun saveButtonState() {
-        // Salva lo stato del bottone nelle SharedPreferences
+    // Metodo per salvare lo stato del pulsante nelle preferenze condivise
+    private fun saveButtonState(isFollowing: Boolean, isRequestSent: Boolean) {
+        val sharedPreferences = requireContext().getSharedPreferences("ButtonStatePrefs", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
-        editor.putBoolean("isRequestAccepted", isRequestAccepted)
+        editor.putBoolean("isFollowing", isFollowing)
+        editor.putBoolean("isRequestSent", isRequestSent)
         editor.apply()
     }
 
-    // Funzioni per seguire e smettere di seguire
-    private fun iniziaASeguire() {
-        if (isRequestAccepted && currentUserUid != null) {
+    // Metodo per caricare lo stato del pulsante dalle preferenze condivise
+    private fun loadButtonState() {
+        val sharedPreferences = requireContext().getSharedPreferences("ButtonStatePrefs", Context.MODE_PRIVATE)
+        isFollowing = sharedPreferences.getBoolean("isFollowing", false)
+        isRequestSent = sharedPreferences.getBoolean("isRequestSent", false)
+    }
 
-            val usersReference = databaseReference.child("users")
-            val requestsRef = usersReference.child(userId).child("requests").child(currentUserUid)
-            // La richiesta di amicizia è stata accettata, rimuovi l'utente corrente dalle richieste pendenti
-            requestsRef.removeValue()
-                .addOnSuccessListener {
-                    Log.d("Firebase", "Richiesta di amicizia accettata. Richiesta rimossa.")
-                }
-                .addOnFailureListener {
-                    // Gestisci eventuali errori durante la rimozione della richiesta di amicizia
-                    Log.e("Firebase", "Errore durante la rimozione della richiesta di amicizia: $it")
-                }
-
-            // Esegui l'azione per iniziare a seguire
-            databaseReference.child("users").child(userId).child("followers").child(currentUserUid).setValue(true)
-                .addOnSuccessListener {
-                    staSeguendoUtente = true
-                    aggiornaAspettoPulsante()
-
-                    // Imposta lo stato della richiesta come accettata
-                    isRequestAccepted = true
-
-                    // Salva lo stato del bottone nelle SharedPreferences
-                    saveButtonState()
-
-                    Log.d("Firebase", "Hai iniziato a seguire l'utente con ID: $userId")
-                }
-                .addOnFailureListener {
-                    // Gestisci eventuali errori durante l'aggiunta dell'utente come seguace
-                    Log.e("Firebase", "Errore durante l'aggiunta dell'utente come seguace: $it")
-                }
-            databaseReference.child("users").child(currentUserUid).child("following").child(userId).setValue(true)
-        } else {
-            // La richiesta di amicizia non è stata ancora accettata, mostra un messaggio all'utente
-            Log.d("Firebase", "La richiesta di amicizia è ancora in attesa di accettazione.")
-            // Puoi anche mostrare un toast o un avviso per informare l'utente
+    // Metodo per aggiornare il testo del pulsante in base allo stato corrente
+    private fun updateFollowButton(isFollowing: Boolean, isRequestSent: Boolean) {
+        when {
+            isRequestSent -> followButton.text = "Richiesta inviata"
+            isFollowing -> followButton.text = "Segui già"
+            else -> followButton.text = "Segui"
         }
     }
 
-    private fun smettiDiSeguire() {
-        if (currentUserUid != null) {
-            val usersReference = databaseReference.child("users")
-            val requestsRef = usersReference.child(userId).child("requests").child(currentUserUid)
-            // Rimuovi l'utente corrente dalle richieste pendenti
-            requestsRef.removeValue()
-                .addOnSuccessListener {
-                    Log.d("Firebase", "Richiesta di amicizia accettata. Richiesta rimossa.")
-                }
-                .addOnFailureListener {
-                    // Gestisci eventuali errori durante la rimozione della richiesta di amicizia
-                    Log.e("Firebase", "Errore durante la rimozione della richiesta di amicizia: $it")
-                }
+    // Metodo per controllare se l'utente sta già seguendo l'utente target
+    private fun updateFollowButtonState() {
+        val currentUserUid = FirebaseAuth.getInstance().currentUser?.uid!!
 
-            // Rimuovi l'utente corrente dall'elenco dei seguaci dell'utente da smettere di seguire
-            databaseReference.child("users").child(userId).child("followers").child(currentUserUid).removeValue()
-                .addOnSuccessListener {
-                    staSeguendoUtente = false
-                    aggiornaAspettoPulsante()
-                    Log.d("Firebase", "Hai smesso di seguire l'utente con ID: $userId")
-                }
-                .addOnFailureListener {
-                    // Gestisci eventuali errori durante la rimozione dell'utente come seguace
-                    Log.e("Firebase", "Errore durante la rimozione dell'utente come seguace: $it")
-                }
-            databaseReference.child("users").child(currentUserUid).child("following").child(userId).removeValue()
-        }
+        // Ottieni il riferimento al nodo dell'utente target nel database Firebase
+        val userReference = FirebaseDatabase.getInstance().reference.child("users").child(userId ?: "")
+
+        userReference.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val followersSnapshot = dataSnapshot.child("followers")
+                val requestsSnapshot = dataSnapshot.child("requests")
+
+                val isFollowing = followersSnapshot.hasChild(currentUserUid)
+                val isRequestSent = requestsSnapshot.hasChild(currentUserUid)
+
+                Log.d("updateFollowButtonState", "isFollowing: $isFollowing, isRequestSent: $isRequestSent")
+
+                updateFollowButton(isFollowing, isRequestSent)
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Gestisci eventuali errori di lettura dal database
+                Log.e("Firebase", "Error updating follow button state: ${databaseError.message}")
+            }
+        })
     }
 
-    private fun aggiornaAspettoPulsante() {
+    // Metodo per inviare una richiesta di seguimento
+    private fun sendFollowRequest() {
 
-        //isRequestAccepted = currentUserHasSentRequest // Aggiorna isRequestAccepted
+        val currentUserUid = FirebaseAuth.getInstance().currentUser?.uid!!
 
-        if (isRequestAccepted) {
-            followButton.text = "Following"
-            followButton.setBackgroundResource(R.drawable.unfollow_button_background)
-        } else if (currentUserHasSentRequest) {
-            followButton.text = "Request Sent"
-            followButton.setBackgroundResource(R.drawable.pending_button_background)
-        } else {
-            followButton.text = "Follow"
-            followButton.setBackgroundResource(R.drawable.follow_button_background)
-        }
-    }*/
+        // Scrivi nel database Firebase per indicare che l'utente ha inviato una richiesta di seguimento all'utente target
+        val userReference = FirebaseDatabase.getInstance().reference.child("users").child(userId ?: "")
+        userReference.child("requests").child(currentUserUid).setValue(true)
+            .addOnSuccessListener {
+                // Operazione di scrittura completata con successo
+                isRequestSent = true
+                updateFollowButton(isFollowing, isRequestSent)
+                // Aggiorna il pulsante nello stato delle preferenze condivise
+                saveButtonState(isFollowing, isRequestSent)
+            }
+            .addOnFailureListener { exception ->
+                // Gestisci eventuali errori
+                Log.e("Firebase", "Error sending follow request: ${exception.message}")
+            }
+    }
+
+    // Metodo per annullare una richiesta di seguimento
+    private fun cancelFollowRequest() {
+
+        val currentUserUid = FirebaseAuth.getInstance().currentUser?.uid!!
+
+        // Cancella la richiesta di seguimento dal database Firebase
+        val userReference = FirebaseDatabase.getInstance().reference.child("users").child(userId ?: "")
+        userReference.child("requests").child(currentUserUid).removeValue()
+            .addOnSuccessListener {
+                // Operazione di cancellazione completata con successo
+                isRequestSent = false
+                updateFollowButton(isFollowing, isRequestSent)
+                // Aggiorna il pulsante nello stato delle preferenze condivise
+                saveButtonState(isFollowing, isRequestSent)
+            }
+            .addOnFailureListener { exception ->
+                // Gestisci eventuali errori
+                Log.e("Firebase", "Error canceling follow request: ${exception.message}")
+            }
+    }
+
+    // Metodo per iniziare a seguire un utente (non credo serva)
+    private fun startFollowingUser() {
+        val currentUserUid = FirebaseAuth.getInstance().currentUser?.uid!!
+
+        // Aggiungi l'utente alla lista dei seguaci dell'utente target nel database Firebase
+        val userReference = FirebaseDatabase.getInstance().reference.child("users").child(userId ?: "")
+        userReference.child("followers").child(currentUserUid).setValue(true)
+            .addOnSuccessListener {
+                // Operazione di aggiunta completata con successo
+                isFollowing = true
+                updateFollowButton(isFollowing, isRequestSent)
+                // Aggiorna il pulsante nello stato delle preferenze condivise
+                saveButtonState(isFollowing, isRequestSent)
+            }
+            .addOnFailureListener { exception ->
+                // Gestisci eventuali errori
+                Log.e("Firebase", "Error starting to follow user: ${exception.message}")
+            }
+    }
+
+    // Metodo per eseguire l'azione di smettere di seguire un utente
+    private fun unfollowUser() {
+        val currentUserUid = FirebaseAuth.getInstance().currentUser?.uid!!
+        Log.d("UnfollowUser", "Current user ID: $currentUserUid, Target user ID: $userId")
+
+        // Rimuovi l'utente corrente dalla lista dei seguaci dell'altro utente
+        val otherUserReference = FirebaseDatabase.getInstance().reference.child("users").child(userId ?: "")
+        otherUserReference.child("followers").child(currentUserUid).removeValue()
+            .addOnSuccessListener {
+                // Operazione di rimozione completata con successo per l'altro utente
+                Log.d("UnfollowUser", "Successfully removed current user from other user's followers")
+                isFollowing = false
+                updateFollowButton(isFollowing, isRequestSent)
+                // Aggiorna il pulsante nello stato delle preferenze condivise
+                saveButtonState(isFollowing, isRequestSent)
+            }
+            .addOnFailureListener { exception ->
+                // Gestisci eventuali errori
+                Log.e("Firebase", "Error removing current user from other user's followers: ${exception.message}")
+            }
+
+        // Rimuovi l'altro utente dalla lista dei tuoi seguaci
+        val currentUserReference = FirebaseDatabase.getInstance().reference.child("users").child(currentUserUid)
+        currentUserReference.child("following").child(userId ?: "").removeValue()
+            .addOnSuccessListener {
+                // Operazione di rimozione completata con successo per l'utente corrente
+                Log.d("UnfollowUser", "Successfully removed other user from current user's following")
+            }
+            .addOnFailureListener { exception ->
+                // Gestisci eventuali errori
+                Log.e("Firebase", "Error removing other user from current user's following: ${exception.message}")
+            }
+    }
+
+    // Nella funzione onPause() del tuo fragment
+    override fun onPause() {
+        super.onPause()
+        // Quando il fragment va in pausa, salva lo stato del pulsante nelle preferenze condivise
+        saveButtonState(isFollowing, isRequestSent)
+    }
 }

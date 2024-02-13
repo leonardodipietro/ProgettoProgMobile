@@ -44,16 +44,17 @@ class FirebaseViewModel (application: Application): AndroidViewModel(application
     // Dichiarazione della variabile per il controllo dello stato di registrazione dell'utente
     private var isUserRegistered = false
     val _users= MutableLiveData<List<Utente>>()
-    val users: LiveData<List<Utente>> = _users
 
-    // Utente selezionato
-    private val _selectedUser = MutableLiveData<Utente?>()
-    val selectedUser: LiveData<Utente?> = _selectedUser
+    private var selectedUserId: String? = null
 
-    // Metodo per impostare l'utente selezionato
-    fun setSelectedUser(user: Utente?) {
-        _selectedUser.value = user
-        Log.d("FirebaseViewModel", "Utente selezionato nel ViewModel: $user")
+    fun setSelectedUser(userId: String) {
+        selectedUserId = userId
+        Log.d("FirebaseViewModel", "Utente impostato nel ViewModel: $selectedUserId")
+    }
+
+    fun getSelectedUser(): String? {
+        Log.d("FirebaseViewModel", "Utente recuperato dal ViewModel: $selectedUserId")
+        return selectedUserId
     }
 
     fun cercaUtenti(query: String) {

@@ -106,7 +106,7 @@ class SecondFragment : Fragment() {
         }
 
         // Imposta l'utente selezionato nel ViewModel
-        firebaseViewModel.setSelectedUser(utente)
-        Log.d("SecondFragment", "Utente impostato nel ViewModel: $utente")
+        firebaseViewModel.setSelectedUser(userId)
+        Log.d("SecondFragment", "Utente impostato nel ViewModel: $userId")
     }
 }

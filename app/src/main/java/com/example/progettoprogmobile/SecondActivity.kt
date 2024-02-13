@@ -60,13 +60,13 @@ class SecondActivity : AppCompatActivity() {
                     currentFragment = newFragment
                 }
                 R.id.cerca -> {
-                    val selectedUser = firebaseViewModel.selectedUser.value
-                    Log.d("MainActivity", "Utente selezionato: $selectedUser")
-                    if (selectedUser != null) {
+                    // Recupera l'utente selezionato dal ViewModel
+                    val selectedUserId = firebaseViewModel.getSelectedUser()
+                    Log.d("MainActivity", "Utente selezionato: $selectedUserId")
+                    if (!selectedUserId.isNullOrEmpty()) {
                         // Se c'è un utente selezionato, vai direttamente al suo profilo
-                        val userId = selectedUser.userId
                         val bundle = Bundle().apply {
-                            putString("userId", userId)
+                            putString("userId", selectedUserId)
                         }
                         val fifthFragment = FifthFragment()
                         fifthFragment.arguments = bundle
