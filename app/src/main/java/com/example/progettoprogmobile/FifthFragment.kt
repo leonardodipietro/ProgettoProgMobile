@@ -99,22 +99,20 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
                 Log.d("ViewStyle", "Impostazione della vista lineare")
                 topTracksRecyclerView.adapter = trackAdapter
                 topTracksRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-                trackAdapter.notifyDataSetChanged()
 
                 topArtistsRecyclerView.adapter = artistAdapter
                 topArtistsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-                artistAdapter.notifyDataSetChanged()
+
                 saveViewStyle(requireContext(), "lineare")
             }
             "griglia" -> {
                 Log.d("ViewStyle", "Impostazione della vista a griglia")
                 topTracksRecyclerView.adapter = trackGridAdapter
                 topTracksRecyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
-                trackGridAdapter.notifyDataSetChanged()
 
                 topArtistsRecyclerView.adapter = artistGridAdapter
                 topArtistsRecyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
-                artistGridAdapter.notifyDataSetChanged()
+
                 saveViewStyle(requireContext(), "griglia")
             }
         }
@@ -131,8 +129,6 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
                 } else {
                     trackGridAdapter.submitList(tracks)
                 }
-                trackAdapter.notifyDataSetChanged()
-                trackGridAdapter.notifyDataSetChanged()
             }
         }
 
@@ -143,20 +139,14 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
                 } else {
                     artistGridAdapter.submitList(artists)
                 }
-                artistAdapter.notifyDataSetChanged()
-                artistGridAdapter.notifyDataSetChanged()
             }
         }
 
-        val currentView = sharedPreferences.getString("currentView", "brani")
-        when (currentView) {
-            "brani" -> {
-                handleTracksButtonClick()
-            }
-            "artisti" -> {
-                handleArtistsButtonClick()
-            }
+        when (sharedPreferences.getString("currentView", "brani")) {
+            "brani" -> handleTracksButtonClick()
+            "artisti" -> handleArtistsButtonClick()
         }
+
 
         updateFollowButtonState()
 
@@ -378,8 +368,6 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
                 } else {
                     trackGridAdapter.submitList(tracks)
                 }
-                trackAdapter.notifyDataSetChanged()
-                trackGridAdapter.notifyDataSetChanged()
             }
             saveCurrentView(requireContext(), "brani")
         }
@@ -398,8 +386,6 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
                 } else {
                     artistGridAdapter.submitList(artists)
                 }
-                artistAdapter.notifyDataSetChanged()
-                artistGridAdapter.notifyDataSetChanged()
             }
             saveCurrentView(requireContext(), "artisti")
         }
@@ -420,22 +406,18 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
                     0 -> { // Vista Lineare
                         topTracksRecyclerView.adapter = trackAdapter
                         topTracksRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-                        trackAdapter.notifyDataSetChanged()
 
                         topArtistsRecyclerView.adapter = artistAdapter
                         topArtistsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
-                        artistAdapter.notifyDataSetChanged()
 
                         saveViewStyle(requireContext(), "lineare")
                     }
                     1 -> { // Vista a Griglia
                         topTracksRecyclerView.adapter = trackGridAdapter
                         topTracksRecyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
-                        trackGridAdapter.notifyDataSetChanged()
 
                         topArtistsRecyclerView.adapter = artistGridAdapter
                         topArtistsRecyclerView.layoutManager = GridLayoutManager(requireContext(), 3)
-                        artistGridAdapter.notifyDataSetChanged()
 
                         saveViewStyle(requireContext(), "griglia")
                     }
@@ -448,10 +430,8 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
                     requireActivity().runOnUiThread {
                         if (isLinearViewSelected()) {
                             trackAdapter.submitList(tracks)
-                            trackAdapter.notifyDataSetChanged()
                         } else {
                             trackGridAdapter.submitList(tracks)
-                            trackGridAdapter.notifyDataSetChanged()
                         }
                     }
                 }
@@ -460,10 +440,8 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
                     requireActivity().runOnUiThread {
                         if (isLinearViewSelected()) {
                             artistAdapter.submitList(artists)
-                            artistAdapter.notifyDataSetChanged()
                         } else {
                             artistGridAdapter.submitList(artists)
-                            artistGridAdapter.notifyDataSetChanged()
                         }
                     }
                 }
@@ -529,8 +507,6 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
                     } else {
                         trackGridAdapter.submitList(tracks)
                     }
-                    trackAdapter.notifyDataSetChanged()
-                    trackGridAdapter.notifyDataSetChanged()
                 }
             }
 
@@ -543,8 +519,6 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
                     } else {
                         artistGridAdapter.submitList(artists)
                     }
-                    artistAdapter.notifyDataSetChanged()
-                    artistGridAdapter.notifyDataSetChanged()
                 }
             }
         }
@@ -561,8 +535,6 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
                     } else {
                         trackGridAdapter.submitList(tracks)
                     }
-                    trackAdapter.notifyDataSetChanged()
-                    trackGridAdapter.notifyDataSetChanged()
                 }
             }
 
@@ -575,8 +547,6 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
                     } else {
                         artistGridAdapter.submitList(artists)
                     }
-                    artistAdapter.notifyDataSetChanged()
-                    artistGridAdapter.notifyDataSetChanged()
                 }
             }
         }
@@ -593,8 +563,6 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
                     } else {
                         trackGridAdapter.submitList(tracks)
                     }
-                    trackAdapter.notifyDataSetChanged()
-                    trackGridAdapter.notifyDataSetChanged()
                 }
             }
 
@@ -607,8 +575,6 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
                     } else {
                         artistGridAdapter.submitList(artists)
                     }
-                    artistAdapter.notifyDataSetChanged()
-                    artistGridAdapter.notifyDataSetChanged()
                 }
             }
         }
@@ -623,7 +589,7 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
 
 
     // Contatore recensioni
-    fun countUserReviews(userId: String, databaseReference: DatabaseReference, rootView: View) {
+    private fun countUserReviews(userId: String, databaseReference: DatabaseReference, rootView: View) {
         val reviewsReference = databaseReference.child("users").child(userId).child("reviews counter")
 
         // Aggiorna la TextView con il conteggio delle recensioni
@@ -645,7 +611,7 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
     }
 
     // Contatore followers
-    fun countUserFollowers(userId: String, databaseReference: DatabaseReference, rootView: View) {
+    private fun countUserFollowers(userId: String, databaseReference: DatabaseReference, rootView: View) {
         val followersReference = databaseReference.child("users").child(userId).child("followers counter")
 
         // Aggiorna la TextView con il conteggio dei followers
@@ -667,7 +633,7 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
     }
 
     // Contatore following
-    fun countUserFollowing(userId: String, databaseReference: DatabaseReference, rootView: View) {
+    private fun countUserFollowing(userId: String, databaseReference: DatabaseReference, rootView: View) {
         val followingReference = databaseReference.child("users").child(userId).child("following counter")
 
         // Aggiorna la TextView con il conteggio delle recensioni
