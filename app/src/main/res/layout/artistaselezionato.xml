@@ -6,11 +6,39 @@
     tools:context=".ArtistaSelezionato"
     >
     <include layout="@layout/genitore"></include>
+
+    <RelativeLayout
+        android:id="@+id/relativeLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+        <Button
+            android:id="@+id/backArrow"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:background ="@drawable/baseline_arrow_back_24"
+            android:contentDescription="@string/frecciaindietro"
+            android:paddingEnd="16dp"
+            android:paddingStart="8dp"
+            android:layout_marginEnd="8dp"
+            style="@style/CustomArrowStyle" />
+
+        <TextView
+            android:id="@+id/nomeartistaselezionato"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/backArrow"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:layout_centerVertical="true"
+            android:textSize="22sp" />
+
+    </RelativeLayout>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/dark_gray"
-        android:layout_marginTop="40sp"
+        android:layout_below="@id/relativeLayout1"
         android:id="@+id/dettagliartistaselezionato"
         android:layout_centerHorizontal="true">
         <ImageView
@@ -21,28 +49,8 @@
             android:layout_marginTop="40dp"
             android:layout_centerHorizontal="true"
             android:src="@drawable/imgcantante"
-            />
+            tools:ignore="ContentDescription" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:textColor="@color/white"
-            android:id="@+id/nomeartistaselezionato"
-            android:layout_height="wrap_content"
-            android:textSize="30dp"
-            android:layout_centerHorizontal="true"
-            />
-       <!--
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_marginTop="20sp"
-            android:layout_marginLeft="10dp"
-            android:layout_below="@id/nomeartistaselezionato"
-
-            android:textColor="@color/white"
-            android:id="@+id/genereartistaselezionato"
-            android:layout_height="30dp"
-            android:layout_toRightOf="@id/imageartistaselezionato"/>-->
     </RelativeLayout>
 
     <TextView
@@ -51,11 +59,12 @@
         android:layout_marginTop="10dp"
         android:text="Brani recensiti:"
         android:background="@color/gray"
-        android:textColor="@color/verde_spotify"
+        android:textColor="@color/white"
         android:textSize="20sp"
         android:layout_below="@+id/dettagliartistaselezionato"
         android:layout_centerHorizontal="true"
-        android:id="@+id/iniziobranirecensiti" />
+        android:id="@+id/iniziobranirecensiti"
+        tools:ignore="HardcodedText" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"

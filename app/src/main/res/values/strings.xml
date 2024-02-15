@@ -125,5 +125,6 @@
     <string name="requestSent">Richiesta inviata</string>
     <string name="album">Album</string>
     <string name="artista">Artista</string>
+    <string name="Recensioni">Recensioni:</string>
 
 </resources>

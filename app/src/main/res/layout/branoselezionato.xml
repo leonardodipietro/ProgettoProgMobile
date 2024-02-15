@@ -4,35 +4,51 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".BranoSelezionato"
-    >
+    tools:context=".BranoSelezionato" >
+
     <include layout="@layout/genitore"></include>
+
     <RelativeLayout
+        android:id="@+id/relativeLayout1"
         android:layout_width="match_parent"
-        android:layout_below="@id/titolocanzone"
-        android:layout_height="170dp"
-        android:background="@color/dark_gray"
-        android:layout_marginTop="40sp"
-        android:id="@+id/dettaglibranoselezionato"
-        android:layout_centerHorizontal="true">
+        android:layout_height="wrap_content" >
+
+        <Button
+            android:id="@+id/backArrow"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:background ="@drawable/baseline_arrow_back_24"
+            android:contentDescription="@string/frecciaindietro"
+            android:paddingEnd="16dp"
+            android:paddingStart="8dp"
+            android:layout_marginEnd="8dp"
+            style="@style/CustomArrowStyle" />
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/titolocanzone"
+            android:layout_toEndOf="@+id/backArrow"
             android:textColor="@color/white"
-            android:textSize="20sp"
-            android:layout_marginLeft="28sp"
+            android:textStyle="bold"
+            android:layout_centerVertical="true"
+            android:textSize="22sp" />
 
+    </RelativeLayout>
 
-            />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_below="@id/relativeLayout1"
+        android:layout_height="170dp"
+        android:background="@color/dark_gray"
+        android:id="@+id/dettaglibranoselezionato"
+        android:layout_centerHorizontal="true" >
 
         <ImageView
             android:id="@+id/imagebranoselezionato"
             android:layout_width="170dp"
             android:layout_height="match_parent"
-            android:padding="10dp"
-            android:layout_below="@id/titolocanzone"
-            />
+            android:padding="10dp" />
         <TextView
             android:layout_width="match_parent"
             android:layout_marginTop="15sp"
@@ -40,9 +56,7 @@
             android:layout_toRightOf="@id/imagebranoselezionato"
             android:textColor="@color/white"
             android:id="@+id/albumbranoselezionato"
-            android:layout_height="50dp"
-            android:layout_below="@id/titolocanzone"
-            />
+            android:layout_height="50dp" />
         <TextView
             android:layout_width="match_parent"
             android:layout_marginTop="20sp"
@@ -52,19 +66,17 @@
             android:id="@+id/artistabranoselezionato"
             android:clickable="true"
             android:layout_height="50dp"
+            android:contentDescription=""
             android:layout_toRightOf="@id/imagebranoselezionato"/>
-
-
-
     </RelativeLayout>
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="Recensioni:"
+        android:text="@string/Recensioni"
         android:background="@color/gray"
-        android:textColor="@color/verde_spotify"
+        android:textColor="@color/white"
         android:textSize="20sp"
         android:layout_below="@+id/dettaglibranoselezionato"
         android:layout_centerHorizontal="true"
@@ -78,19 +90,18 @@
         android:layout_below="@+id/iniziorecensioni"
         android:layout_marginTop="10dp" />
 
-
-
     <TextView
         android:background="@color/gray"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:text="Lascia un commento:"
-        android:textColor="@color/verde_spotify"
+        android:textColor="@color/white"
         android:textSize="20sp"
         android:layout_below="@+id/recyclerBranoSelezionato"
         android:layout_centerHorizontal="true"
-        android:id="@+id/iniziocommentopersonale" />
+        android:id="@+id/iniziocommentopersonale"
+        tools:ignore="HardcodedText" />
 
     <EditText
         android:id="@+id/recensionepersonale"
@@ -113,7 +124,4 @@
         android:layout_toRightOf="@id/recensionepersonale"
         android:layout_below="@+id/iniziocommentopersonale" />
 
-
-
 </RelativeLayout>
-

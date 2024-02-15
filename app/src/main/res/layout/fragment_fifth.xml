@@ -13,16 +13,17 @@
 
         <Button
             android:id="@+id/backArrow"
-            android:layout_width="50dp"
-            android:layout_height="wrap_content"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:background ="@drawable/baseline_arrow_back_24"
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
             android:contentDescription="@string/frecciaindietro"
-            android:paddingEnd="16dp"
-            android:paddingStart="8dp"
-            android:layout_marginEnd="8dp"
+            android:paddingEnd="8dp"
+            android:paddingStart="4dp"
+            android:layout_marginEnd="4dp"
             style="@style/CustomArrowStyle" />
+
 
         <TextView
             android:id="@+id/usernameHeader"
@@ -32,7 +33,7 @@
             android:textSize="18sp"
             android:textStyle="bold"
             android:layout_toEndOf="@id/backArrow"
-            android:layout_centerVertical="true"/>
+            android:layout_centerVertical="true" />
 
         <Button
             android:id="@+id/followButton"
@@ -187,7 +188,7 @@
         android:id="@+id/section"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/gray"
+        android:layout_marginTop="5dp"
         android:layout_below="@+id/sectionImage" >
 
         <Button
@@ -202,21 +203,39 @@
             android:paddingStart="8dp"
             android:layout_marginEnd="0dp"/>
 
+        <View
+            android:id="@+id/view"
+            android:layout_width="8dp"
+            android:layout_height="5dp"
+            android:layout_toEndOf="@+id/clessidra"/>
+
         <Button
             android:id="@+id/btn_topBrani"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/top_track"
-            android:layout_toEndOf="@+id/clessidra"
+            android:layout_toEndOf="@+id/view"
             android:backgroundTint="@color/verde_spotify" />
+
+        <View
+            android:id="@+id/view2"
+            android:layout_width="10dp"
+            android:layout_height="5dp"
+            android:layout_toEndOf="@+id/btn_topBrani"/>
 
         <Button
             android:id="@+id/btn_topArtisti"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/top_artist"
-            android:layout_toEndOf="@+id/btn_topBrani"
+            android:layout_toEndOf="@+id/view2"
             android:backgroundTint="@color/verde_spotify" />
+
+        <View
+            android:id="@+id/view3"
+            android:layout_width="8dp"
+            android:layout_height="5dp"
+            android:layout_toEndOf="@+id/btn_topArtisti"/>
 
         <Button
             android:id="@+id/vista"
@@ -225,7 +244,7 @@
             android:background ="@drawable/baseline_format_list_bulleted_24"
             android:layout_centerVertical="true"
             android:contentDescription="@string/calendario"
-            android:layout_toEndOf="@+id/btn_topArtisti"
+            android:layout_toEndOf="@+id/view3"
             android:paddingEnd="16dp"
             android:paddingStart="8dp"
             android:layout_marginEnd="8dp"/>

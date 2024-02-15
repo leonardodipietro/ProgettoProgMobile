@@ -27,6 +27,9 @@ class BranoSelezionato : Fragment() {
     private lateinit var recensioneViewModel: RecensioneViewModel
     private lateinit var recyclerView:RecyclerView
     private lateinit var firebaseViewModel: FirebaseViewModel
+
+    private lateinit var backButton: Button
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -48,6 +51,12 @@ class BranoSelezionato : Fragment() {
 
         val recensioneEditText: EditText = rootView.findViewById(R.id.recensionepersonale)
         val inviarRecensioneButton: Button = rootView.findViewById(R.id.inviarrecensione)
+
+        backButton = rootView.findViewById(R.id.backArrow)
+
+        backButton.setOnClickListener {
+            requireActivity().onBackPressed() // Torna al fragment precedente
+        }
 
         // ViewModel
         recensioneViewModel = ViewModelProvider(this).get(RecensioneViewModel::class.java)

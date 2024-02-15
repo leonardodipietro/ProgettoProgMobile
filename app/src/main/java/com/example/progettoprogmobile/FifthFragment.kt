@@ -40,6 +40,7 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
 
     private lateinit var usernameTextView: TextView
     private lateinit var profileImageView: ImageView
+
     private lateinit var trackGridAdapter: TrackGridAdapter
     private lateinit var trackAdapter: TrackAdapter
     private lateinit var artistGridAdapter: ArtistGridAdapter
@@ -47,18 +48,19 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
 
     private lateinit var topTracksRecyclerView: RecyclerView
     private lateinit var topArtistsRecyclerView: RecyclerView
+
     private lateinit var btnTopBrani: Button
     private lateinit var btnTopArtisti: Button
     private lateinit var clessidraButton: Button
     private lateinit var vistaButton: Button
     private lateinit var backButton: Button
+    private lateinit var followButton: Button
 
     private val database = FirebaseDatabase.getInstance()
     private lateinit var firebaseViewModel: FirebaseViewModel
     private lateinit var auth: FirebaseAuth
     private lateinit var storage: FirebaseStorage
 
-    private lateinit var followButton: Button
     private lateinit var userId: String
     private val currentUserUid = FirebaseAuth.getInstance().currentUser?.uid
 
@@ -147,43 +149,30 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
             "artisti" -> handleArtistsButtonClick()
         }
 
-
-        updateFollowButtonState()
-
-        // Carica lo stato del pulsante dalle preferenze condivise
-        loadButtonState()
-
-        // Imposta il testo del pulsante in base allo stato corrente
-        updateFollowButton(isFollowing, isRequestSent)
-
-        // Aggiungi un listener per il click sul pulsante
-        followButton.setOnClickListener {
-            // In base allo stato corrente, esegui l'azione appropriata
-            when {
-                isRequestSent -> {
-                    Log.d("FollowButton", "Canceling follow request")
-                    cancelFollowRequest() // Se la richiesta è stata inviata, annulla la richiesta
+        // Chiamata per ottenere i dati e aggiornare lo stato del pulsante
+        updateFollowButtonState {
+            Log.d("onCreateView", "isFollowing: $isFollowing, isRequestSent: $isRequestSent")
+            // Configura il listener per il click sul pulsante
+            followButton.setOnClickListener {
+                // In base allo stato corrente, esegui l'azione appropriata
+                when {
+                    isRequestSent -> {
+                        Log.d("FollowButton", "Canceling follow request")
+                        cancelFollowRequest() // Se la richiesta è stata inviata, annulla la richiesta
+                    }
+                    isFollowing -> {
+                        Log.d("FollowButton", "Unfollowing user")
+                        unfollowUser() // Se stai già seguendo l'utente, smetti di seguirlo
+                    }
+                    else -> {
+                        Log.d("FollowButton", "Sending follow request")
+                        sendFollowRequest() // Altrimenti, invia una richiesta di seguimento
+                    }
                 }
-                isFollowing -> {
-                    Log.d("FollowButton", "Unfollowing user")
-                    unfollowUser() // Se stai già seguendo l'utente, smetti di seguirlo
-                }
-                else -> {
-                    Log.d("FollowButton", "Sending follow request")
-                    sendFollowRequest() // Altrimenti, invia una richiesta di seguimento
-                }
+                // Dopo aver eseguito l'azione, salva lo stato del pulsante nelle preferenze condivise
+                saveButtonState(isFollowing, isRequestSent)
             }
-            // Dopo aver eseguito l'azione, salva lo stato del pulsante nelle preferenze condivise
-            saveButtonState(isFollowing, isRequestSent)
         }
-
-
-
-
-
-
-
-
 
         // Inizializza Firebase
         auth = FirebaseAuth.getInstance()
@@ -263,6 +252,7 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
         return rootView
     }
 
+    // Configurazioni
     private fun initializeViews(rootView: View) {
         topTracksRecyclerView = rootView.findViewById(R.id.recyclerViewUtenteTrack)
         topArtistsRecyclerView = rootView.findViewById(R.id.recyclerViewUtenteArtist)
@@ -312,10 +302,7 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
     }
 
 
-
-
-
-
+    // Top brani e artisti
     private fun saveTimeFilter(context: Context, timeFilter: String) {
         val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
@@ -583,11 +570,6 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
     }
 
 
-
-
-
-
-
     // Contatore recensioni
     private fun countUserReviews(userId: String, databaseReference: DatabaseReference, rootView: View) {
         val reviewsReference = databaseReference.child("users").child(userId).child("reviews counter")
@@ -655,7 +637,26 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
     }
 
 
+    // Bottone segui
+    private fun checkPrivacySettings(callback: (everyonePrivacy: Boolean, followersPrivacy: Boolean) -> Unit) {
+        val userReference = FirebaseDatabase.getInstance().reference.child("users").child(userId ?: "").child("privacy").child("account")
 
+        userReference.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val everyonePrivacy = dataSnapshot.child("Everyone").getValue(Boolean::class.java)
+                val followersPrivacy = dataSnapshot.child("Followers").getValue(Boolean::class.java)
+
+                Log.d("checkPrivacySettings", "everyonePrivacy: $everyonePrivacy, followersPrivacy: $followersPrivacy")
+
+                callback(everyonePrivacy ?: false, followersPrivacy ?: false)
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Gestisci eventuali errori di lettura dal database
+                Log.e("Firebase", "Errore durante il recupero delle impostazioni di privacy: ${databaseError.message}")
+            }
+        })
+    }
 
     // Metodo per salvare lo stato del pulsante nelle preferenze condivise
     private fun saveButtonState(isFollowing: Boolean, isRequestSent: Boolean) {
@@ -664,17 +665,13 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
         editor.putBoolean("isFollowing", isFollowing)
         editor.putBoolean("isRequestSent", isRequestSent)
         editor.apply()
-    }
 
-    // Metodo per caricare lo stato del pulsante dalle preferenze condivise
-    private fun loadButtonState() {
-        val sharedPreferences = requireContext().getSharedPreferences("ButtonStatePrefs", Context.MODE_PRIVATE)
-        isFollowing = sharedPreferences.getBoolean("isFollowing", false)
-        isRequestSent = sharedPreferences.getBoolean("isRequestSent", false)
+        Log.d("saveButtonState", "isFollowing saved: $isFollowing")
     }
 
     // Metodo per aggiornare il testo del pulsante in base allo stato corrente
     private fun updateFollowButton(isFollowing: Boolean, isRequestSent: Boolean) {
+        Log.d("updateFollowButton", "isFollowing: $isFollowing")
         when {
             isRequestSent -> followButton.text = "Richiesta inviata"
             isFollowing -> followButton.text = "Segui già"
@@ -683,7 +680,7 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
     }
 
     // Metodo per controllare se l'utente sta già seguendo l'utente target
-    private fun updateFollowButtonState() {
+    private fun updateFollowButtonState(callback: () -> Unit) {
         val currentUserUid = FirebaseAuth.getInstance().currentUser?.uid!!
 
         // Ottieni il riferimento al nodo dell'utente target nel database Firebase
@@ -698,8 +695,20 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
                 val isRequestSent = requestsSnapshot.hasChild(currentUserUid)
 
                 Log.d("updateFollowButtonState", "isFollowing: $isFollowing, isRequestSent: $isRequestSent")
+                // Dato che seguo già esce giustamente true
+
+                // Aggiornamento dei valori isFollowing e isRequestSent
+                this@FifthFragment.isFollowing = isFollowing
+                this@FifthFragment.isRequestSent = isRequestSent
 
                 updateFollowButton(isFollowing, isRequestSent)
+                Log.d("dopoFollowButtonState", "isFollowing: $isFollowing")
+                // Qui è ancora true e va bene
+
+                saveButtonState(isFollowing, isRequestSent)
+                Log.d("dopo2FollowButtonState", "isFollowing: $isFollowing")
+
+                callback()
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
@@ -711,23 +720,30 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
 
     // Metodo per inviare una richiesta di seguimento
     private fun sendFollowRequest() {
-
         val currentUserUid = FirebaseAuth.getInstance().currentUser?.uid!!
 
-        // Scrivi nel database Firebase per indicare che l'utente ha inviato una richiesta di seguimento all'utente target
-        val userReference = FirebaseDatabase.getInstance().reference.child("users").child(userId ?: "")
-        userReference.child("requests").child(currentUserUid).setValue(true)
-            .addOnSuccessListener {
-                // Operazione di scrittura completata con successo
-                isRequestSent = true
-                updateFollowButton(isFollowing, isRequestSent)
-                // Aggiorna il pulsante nello stato delle preferenze condivise
-                saveButtonState(isFollowing, isRequestSent)
+        // Verifica lo stato della privacy
+        checkPrivacySettings { everyonePrivacy, followersPrivacy ->
+            if (followersPrivacy) {
+                // La privacy è impostata su "followers", quindi invia una richiesta di seguimento
+                val userReference = FirebaseDatabase.getInstance().reference.child("users").child(userId ?: "")
+                userReference.child("requests").child(currentUserUid).setValue(true)
+                    .addOnSuccessListener {
+                        // Operazione di scrittura completata con successo
+                        isRequestSent = true
+                        updateFollowButton(isFollowing, isRequestSent)
+                        // Aggiorna il pulsante nello stato delle preferenze condivise
+                        saveButtonState(isFollowing, isRequestSent)
+                    }
+                    .addOnFailureListener { exception ->
+                        // Gestisci eventuali errori
+                        Log.e("Firebase", "Error sending follow request: ${exception.message}")
+                    }
+            } else {
+                // La privacy non è impostata su "followers", quindi inizia a seguire l'utente direttamente
+                startFollowingUser()
             }
-            .addOnFailureListener { exception ->
-                // Gestisci eventuali errori
-                Log.e("Firebase", "Error sending follow request: ${exception.message}")
-            }
+        }
     }
 
     // Metodo per annullare una richiesta di seguimento
@@ -751,7 +767,7 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
             }
     }
 
-    // Metodo per iniziare a seguire un utente (non credo serva)
+    // Metodo per iniziare a seguire un utente
     private fun startFollowingUser() {
         val currentUserUid = FirebaseAuth.getInstance().currentUser?.uid!!
 

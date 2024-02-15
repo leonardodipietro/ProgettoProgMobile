@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
@@ -25,6 +26,9 @@ class ArtistaSelezionato : Fragment(), ArtistaSelezionatoAdapter.OnTrackClickLis
     private lateinit var recyclerView: RecyclerView
     private lateinit var firebaseViewModel: FirebaseViewModel
     private lateinit var adapter:ArtistaSelezionatoAdapter
+
+    private lateinit var backButton: Button
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -65,7 +69,11 @@ class ArtistaSelezionato : Fragment(), ArtistaSelezionatoAdapter.OnTrackClickLis
 
         }
 
+        backButton = rootView.findViewById(R.id.backArrow)
 
+        backButton.setOnClickListener {
+            requireActivity().onBackPressed() // Torna al fragment precedente
+        }
 
         return rootView
 }
@@ -84,6 +92,4 @@ class ArtistaSelezionato : Fragment(), ArtistaSelezionatoAdapter.OnTrackClickLis
                 .commit()
         }
     }
-
-
 }
