@@ -64,9 +64,14 @@ class SecondFragment : Fragment() {
                 // Gestisci la ricerca in tempo reale qui
                 if (!newText.isNullOrEmpty()) {
                     firebaseViewModel.cercaUtenti(newText)
+                } else {
+                    // Se il testo di ricerca è vuoto, reimposta la RecyclerView
+                    utenteAdapter.setUtenti(emptyList()) // Passa una lista vuota per pulire la RecyclerView
+                    utenteAdapter.notifyDataSetChanged()
                 }
                 return true
             }
+
         })
         return rootView
     }
