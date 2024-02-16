@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/ReviewFragment1"
     android:layout_width="match_parent"
-    android:layout_height="676dp"
+    android:layout_height="681dp"
     android:background="@color/black"
     tools:context=".ReviewFragment">
 

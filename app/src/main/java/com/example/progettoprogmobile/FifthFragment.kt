@@ -183,42 +183,98 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
 
         val reviewTextView = rootView.findViewById<TextView>(R.id.contatoreRecensioni)
         reviewTextView.setOnClickListener{
-            val reviewFragmentFriend = ReviewFragmentFriend()
-            // Passare l'oggetto Utente al tuo ReviewFragmentFriend
-            val bundle = Bundle().apply {
-                putString("userId", userId)
+            checkPrivacySettings { _, followersPrivacy ->
+                Log.d("reviewTextView", "followersPrivacy: $followersPrivacy, isFollowing: $isFollowing")
+                if (!followersPrivacy) {
+                    val reviewFragmentFriend = ReviewFragmentFriend()
+                    // Passare l'oggetto Utente al tuo ReviewFragmentFriend
+                    val bundle = Bundle().apply {
+                        putString("userId", userId)
+                    }
+                    reviewFragmentFriend.arguments = bundle
+                    parentFragmentManager.beginTransaction()
+                        .replace(R.id.nav_host_fragment, reviewFragmentFriend)
+                        .addToBackStack(null)
+                        .commit()
+                } else if (followersPrivacy && isFollowing) {
+                    val reviewFragmentFriend = ReviewFragmentFriend()
+                    // Passare l'oggetto Utente al tuo ReviewFragmentFriend
+                    val bundle = Bundle().apply {
+                        putString("userId", userId)
+                    }
+                    reviewFragmentFriend.arguments = bundle
+                    parentFragmentManager.beginTransaction()
+                        .replace(R.id.nav_host_fragment, reviewFragmentFriend)
+                        .addToBackStack(null)
+                        .commit()
+                } else {
+                    // Disabilita il click sui contatori
+                    reviewTextView.isClickable = false
+                    Log.d("ReviewFragment", "Il clic sui contatori è stato disabilitato.")
+                }
             }
-            reviewFragmentFriend.arguments = bundle
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.nav_host_fragment, reviewFragmentFriend)
-                .addToBackStack(null)
-                .commit()
         }
 
         val followersTextView = rootView.findViewById<TextView>(R.id.contatoreFollowers)
         followersTextView.setOnClickListener{
-            val followersFragmentFriend = FollowersFriendFragment()
-            val bundle = Bundle().apply {
-                putString("userId", userId)
+            checkPrivacySettings { _, followersPrivacy ->
+                Log.d("followersTextView", "followersPrivacy: $followersPrivacy, isFollowing: $isFollowing")
+                if (!followersPrivacy) {
+                    val followersFragmentFriend = FollowersFriendFragment()
+                    val bundle = Bundle().apply {
+                        putString("userId", userId)
+                    }
+                    followersFragmentFriend.arguments = bundle
+                    parentFragmentManager.beginTransaction()
+                        .replace(R.id.nav_host_fragment, followersFragmentFriend)
+                        .addToBackStack(null)
+                        .commit()
+                } else if (followersPrivacy && isFollowing) {
+                    val followersFragmentFriend = FollowersFriendFragment()
+                    val bundle = Bundle().apply {
+                        putString("userId", userId)
+                    }
+                    followersFragmentFriend.arguments = bundle
+                    parentFragmentManager.beginTransaction()
+                        .replace(R.id.nav_host_fragment, followersFragmentFriend)
+                        .addToBackStack(null)
+                        .commit()
+                } else {
+                    // Disabilita il click sui contatori
+                    reviewTextView.isClickable = false
+                }
             }
-            followersFragmentFriend.arguments = bundle
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.nav_host_fragment, followersFragmentFriend)
-                .addToBackStack(null)
-                .commit()
         }
 
         val followingTextView = rootView.findViewById<TextView>(R.id.contatoreFollowing)
         followingTextView.setOnClickListener{
-            val followingFragmentFriend = FollowingFriendFragment()
-            val bundle = Bundle().apply {
-                putString("userId", userId)
+            checkPrivacySettings { _, followersPrivacy ->
+                Log.d("followingTextView", "followersPrivacy: $followersPrivacy, isFollowing: $isFollowing")
+                if (!followersPrivacy) {
+                    val followingFragmentFriend = FollowingFriendFragment()
+                    val bundle = Bundle().apply {
+                        putString("userId", userId)
+                    }
+                    followingFragmentFriend.arguments = bundle
+                    parentFragmentManager.beginTransaction()
+                        .replace(R.id.nav_host_fragment, followingFragmentFriend)
+                        .addToBackStack(null)
+                        .commit()
+                } else if (followersPrivacy && isFollowing) {
+                    val followingFragmentFriend = FollowingFriendFragment()
+                    val bundle = Bundle().apply {
+                        putString("userId", userId)
+                    }
+                    followingFragmentFriend.arguments = bundle
+                    parentFragmentManager.beginTransaction()
+                        .replace(R.id.nav_host_fragment, followingFragmentFriend)
+                        .addToBackStack(null)
+                        .commit()
+                } else {
+                    // Disabilita il click sui contatori
+                    reviewTextView.isClickable = false
+                }
             }
-            followingFragmentFriend.arguments = bundle
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.nav_host_fragment, followingFragmentFriend)
-                .addToBackStack(null)
-                .commit()
         }
 
 
@@ -638,6 +694,7 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
 
 
     // Bottone segui
+    // Metodo per controllare le impostazioni di privacy e impostare isFollowButtonClickable
     private fun checkPrivacySettings(callback: (everyonePrivacy: Boolean, followersPrivacy: Boolean) -> Unit) {
         val userReference = FirebaseDatabase.getInstance().reference.child("users").child(userId ?: "").child("privacy").child("account")
 

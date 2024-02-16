@@ -48,7 +48,7 @@ class FirstFragment : Fragment(),TrackAdapter.OnTrackClickListener,
     private var token: String? = null
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?): View?     {
+        savedInstanceState: Bundle?): View? {
 
         //TODO SISTEMARE COLORE E STILE DEI BOTTONI
         val rootView = inflater.inflate(R.layout.fragment_first, container, false)
@@ -122,9 +122,6 @@ class FirstFragment : Fragment(),TrackAdapter.OnTrackClickListener,
 
         val changeViewStyleButton: Button = rootView.findViewById(R.id.sceglicomevedere)
         changeViewStyleButton.setOnClickListener { openViewStyleDialog() }
-
-
-
     }
 
     private fun setupRecyclerViews(rootView: View) {
