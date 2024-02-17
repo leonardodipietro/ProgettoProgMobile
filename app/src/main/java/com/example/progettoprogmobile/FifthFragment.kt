@@ -154,8 +154,8 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
         updateFollowButtonState {
             Log.d("onCreateView", "isFollowing: $isFollowing, isRequestSent: $isRequestSent")
 
-            // Dichiarazione globale della variabile includeLayout
-            //var includeLayout: View? = null
+            // Dichiarazione includeLayout
+            var includeLayout: View? = null
 
             checkPrivacySettings { _, followersPrivacy ->
                 Log.d("check", "followersPrivacy: $followersPrivacy, isFollowing: $isFollowing")
@@ -171,18 +171,24 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
 
                     // Includi il layout XML del profilo privato
                     val inflater = LayoutInflater.from(requireContext())
-                    val includeLayout = inflater.inflate(R.layout.fragment_profilo_privato, null)
+                    includeLayout = inflater.inflate(R.layout.fragment_profilo_privato, null) // Assegna alla variabile includeLayout
 
                     // Aggiungi il layout incluso alla vista radice del tuo fragment
-                    val rootLayout = rootView.findViewById<RelativeLayout>(R.id.root_layout) // Sostituisci 'root_layout' con l'id del tuo RelativeLayout rad ice
-                    rootLayout.addView(includeLayout)
+                    val rootLayout = rootView.findViewById<RelativeLayout>(R.id.root_layout)
+                    rootLayout.removeAllViews() // Rimuovi tutti i layout precedentemente aggiunti
+                    includeLayout?.let {
+                        rootLayout.addView(it)
 
-                    // Imposta la visibilità del layout incluso a VISIBLE
-                    //includeLayout.visibility = View.VISIBLE
-                    //includeLayout?.visibility = View.VISIBLE
+                        // Imposta la visibilità del layout incluso a VISIBLE
+                        it.visibility = View.VISIBLE
+                    }
                 } else {
-                    // Se la condizione non è soddisfatta, nascondi il layout incluso
-                    //includeLayout?.visibility = View.GONE
+                    // Rimuovi tutti i layout precedentemente aggiunti
+                    val rootLayout = rootView.findViewById<RelativeLayout>(R.id.root_layout)
+                    rootLayout.removeAllViews()
+
+                    // Imposta la visibilità del layout incluso a GONE
+                    includeLayout?.visibility = View.GONE
                 }
             }
 
