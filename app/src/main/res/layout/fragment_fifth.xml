@@ -252,6 +252,21 @@
 
     </RelativeLayout>
 
+    <RelativeLayout
+        android:id="@+id/root_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/section"
+        android:layout_marginTop="40dp"
+        >
+        <include
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            layout="@layout/fragment_profilo_privato" />
+    </RelativeLayout>
+
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewUtenteTrack"
         android:layout_width="match_parent"

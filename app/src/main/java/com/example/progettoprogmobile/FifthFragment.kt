@@ -33,6 +33,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.firebase.database.DatabaseReference
+import android.widget.RelativeLayout
 
 
 class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
@@ -152,6 +153,39 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
         // Chiamata per ottenere i dati e aggiornare lo stato del pulsante
         updateFollowButtonState {
             Log.d("onCreateView", "isFollowing: $isFollowing, isRequestSent: $isRequestSent")
+
+            // Dichiarazione globale della variabile includeLayout
+            //var includeLayout: View? = null
+
+            checkPrivacySettings { _, followersPrivacy ->
+                Log.d("check", "followersPrivacy: $followersPrivacy, isFollowing: $isFollowing")
+                if (followersPrivacy && (!isFollowing)) {
+                    clessidraButton.isClickable = false
+                    btnTopBrani.isClickable = false
+                    btnTopArtisti.isClickable = false
+                    vistaButton.isClickable = false
+
+                    // Nascondi le RecyclerView dei brani e degli artisti
+                    topTracksRecyclerView.visibility = View.GONE
+                    topArtistsRecyclerView.visibility = View.GONE
+
+                    // Includi il layout XML del profilo privato
+                    val inflater = LayoutInflater.from(requireContext())
+                    val includeLayout = inflater.inflate(R.layout.fragment_profilo_privato, null)
+
+                    // Aggiungi il layout incluso alla vista radice del tuo fragment
+                    val rootLayout = rootView.findViewById<RelativeLayout>(R.id.root_layout) // Sostituisci 'root_layout' con l'id del tuo RelativeLayout rad ice
+                    rootLayout.addView(includeLayout)
+
+                    // Imposta la visibilità del layout incluso a VISIBLE
+                    //includeLayout.visibility = View.VISIBLE
+                    //includeLayout?.visibility = View.VISIBLE
+                } else {
+                    // Se la condizione non è soddisfatta, nascondi il layout incluso
+                    //includeLayout?.visibility = View.GONE
+                }
+            }
+
             // Configura il listener per il click sul pulsante
             followButton.setOnClickListener {
                 // In base allo stato corrente, esegui l'azione appropriata

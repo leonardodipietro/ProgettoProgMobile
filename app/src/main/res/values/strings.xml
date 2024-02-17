@@ -126,5 +126,6 @@
     <string name="album">Album</string>
     <string name="artista">Artista</string>
     <string name="Recensioni">Recensioni:</string>
+    <string name="questo_account_privato">Questo account è privato</string>
 
 </resources>
