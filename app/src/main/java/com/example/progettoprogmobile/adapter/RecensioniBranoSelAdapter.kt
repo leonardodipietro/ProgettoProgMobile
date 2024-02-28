@@ -1,24 +1,125 @@
 package com.example.progettoprogmobile.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
+import com.example.progettoprogmobile.BranoSelezionato
 import com.example.progettoprogmobile.R
 import com.example.progettoprogmobile.model.Recensione
+import com.example.progettoprogmobile.model.Risposta
 import com.example.progettoprogmobile.model.Utente
+import com.squareup.picasso.Picasso
 
+class RecensioniBranoSelAdapter(
+    var recensioni: List<Recensione>,
+    private val listener: OnRecensioneInteractionListener,
+    var usersMap: Map<String, Utente> = mapOf()
 
-class RecensioniBranoSelAdapter(     var recensioni: List<Recensione>,
-                                     var usersMap: Map<String, Utente> = mapOf() ) : RecyclerView.Adapter<RecensioniBranoSelAdapter.ViewHolder>() {
+) : RecyclerView.Adapter<RecensioniBranoSelAdapter.ViewHolder>() {
 
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    var currentUserId: String? = null
+
+    private var risposteMap: MutableMap<String, List<Risposta>> = mutableMapOf()
+
+    var isCommentsVisible: Boolean = false
+    var showComments: Boolean = false
+        set(value) {
+            field = value
+            notifyDataSetChanged() // Notifica i cambiamenti per aggiornare la UI
+        }
+
+    interface OnRecensioneInteractionListener {
+        fun onRecensioneDeleteClicked(commentId: String, userId: String)
+        fun onRecensioneModificaClicked(recensione:Recensione)
+        fun onRecensioneCommentaClicked(recensione: Recensione)
+    }
+
+    inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val imgProfile: ImageView = view.findViewById(R.id.improfBranoSelezionato)
         val txtUserName: TextView = view.findViewById(R.id.nomeutenteBranoselezionato)
         val txtRecensione: TextView = view.findViewById(R.id.recensione1)
+        private val btnDeleteRecensione: Button = view.findViewById(R.id.eliminarecensione)
+        private val btnModificaRecensione: Button = view.findViewById(R.id.modificarecensione)
+        private val btnCommentaRecensione: ImageButton = view.findViewById(R.id.commentarecensione)
+        val risposteRecyclerView:RecyclerView =  view.findViewById(R.id.risposteRecyclerView)
+
+        init {
+            btnDeleteRecensione.setOnClickListener {
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    val recensione = recensioni[position]
+                    listener.onRecensioneDeleteClicked(recensione.commentId, recensione.userId)
+                }
+            }
+            btnModificaRecensione.setOnClickListener {
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    val recensione = recensioni[position]
+                    listener.onRecensioneModificaClicked(recensione)
+                }
+            }
+            btnCommentaRecensione.setOnClickListener{
+                Log.d("DDDD","bottone commento cliccato")
+
+                // Controlla la visibilità corrente della RecyclerView
+                if (risposteRecyclerView.visibility == View.VISIBLE) {
+                    // Se è visibile, nascondila
+                    risposteRecyclerView.visibility = View.GONE
+                } else {
+                    // Se è nascosta, mostrala
+                    risposteRecyclerView.visibility = View.VISIBLE
+                }
+
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    val recensione = recensioni[position]
+                    listener.onRecensioneCommentaClicked(recensione)
+                }
+            }
+        }
+        fun toggleCommentVisibility(showComments: Boolean) {
+            // Aggiorna la visibilità della RecyclerView dei commenti
+            risposteRecyclerView.visibility = if (showComments) View.VISIBLE else View.GONE
+        }
+
+
+        fun bind(recensione: Recensione,showComments: Boolean) {
+            txtRecensione.text = recensione.content
+            usersMap[recensione.userId]?.let { user ->
+                txtUserName.text = user.name
+                /*if (!user.userImage.isNullOrEmpty()) {
+                    Log.d("PicassoLoading", "Caricamento immagine per ${user.name} URL: ${user.userImage}")
+                    Picasso.get().load(user.userImage).into(imgProfile)
+                } else {
+                    // Qui imposti un'immagine di fallback o lasci l'immagine corrente
+                    imgProfile.setImageResource(R.drawable.baseline_person_24) // Immagine di fallback
+                }*/
+            }
+                imgProfile.setImageResource(R.drawable.baseline_person_24) // Immagine di fallback
+            val isUserReview = recensione.userId == currentUserId
+            btnDeleteRecensione.visibility = if (isUserReview) View.VISIBLE else View.GONE
+            btnModificaRecensione.visibility = if (isUserReview) View.VISIBLE else View.GONE
+
+
+            //SIRECUPERA LA LISTA DELLE RISPOSTE
+            val risposte = risposteMap[recensione.commentId] ?: listOf()
+
+            //SI CREA IL NUOVO ADAPTER
+            val adapterRisposte = RisposteAdapterBranoSel(risposte,usersMap, BranoSelezionato())
+            risposteRecyclerView.layoutManager = LinearLayoutManager(itemView.context)
+            risposteRecyclerView.adapter = adapterRisposte
+            risposteRecyclerView.visibility = if (showComments) View.VISIBLE else View.GONE
+
+        }
+
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -27,21 +128,41 @@ class RecensioniBranoSelAdapter(     var recensioni: List<Recensione>,
     }
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val recensione = recensioni[position]
-        val user = usersMap[recensione.userId]
+        val risposte = risposteMap[recensione.commentId] ?: listOf()
 
-        holder.txtRecensione.text = recensione.content // supponendo che Recensione abbia un campo 'content' per il contenuto della recensione
+        holder.bind(recensione, isCommentsVisible)
 
-//        user?.let {
-//            holder.txtUserName.text = it.name
-//            Glide.with(holder.itemView.context)
-//                .load(it.images) // assumendo che l'oggetto utente abbia un campo 'profileImage' per l'URL dell'immagine
-//                .into(holder.imgProfile)
-//        }
+        // Aggiorna l'adapter delle risposte con la nuova mappa degli utenti
+        holder.risposteRecyclerView.adapter?.let { adapter ->
+            if (adapter is RisposteAdapterBranoSel) {
+                adapter.updateUserMap(usersMap)
+            }
+        }
+    }
+    override fun getItemCount(): Int = recensioni.size
+    fun updateData(newRecensioni: List<Recensione>, newUsersMap: Map<String, Utente>) {
+        recensioni = newRecensioni
+        usersMap = newUsersMap
+        notifyDataSetChanged()
+    }
+    fun updateUserMap(newUsersMap: Map<String, Utente>) {
+        this.usersMap = newUsersMap
+        notifyDataSetChanged() // Notifica che i dati sono cambiati per aggiornare la visualizzazione
     }
 
+    fun updateRisposteMap(newRisposteMap: Map<String, List<Risposta>>) {
+        risposteMap.clear()
+        risposteMap.putAll(newRisposteMap)
 
-    override fun getItemCount(): Int = recensioni.size
+        notifyDataSetChanged() // Notifica che i dati sono cambiati per ricaricare la RecyclerView
+    }
+    fun updateNameComment(newUsersMap: Map<String, Utente>) {
+        this.usersMap = newUsersMap
+        // Notifica all'adapter delle risposte di ogni recensione che ci sono stati aggiornamenti
+        recensioni.forEach { recensione ->
+            val risposte = risposteMap[recensione.commentId] ?: listOf()
 
-
-
+        }
+        notifyDataSetChanged() // Notifica che i dati dell'adapter principale sono cambiati
+    }
 }

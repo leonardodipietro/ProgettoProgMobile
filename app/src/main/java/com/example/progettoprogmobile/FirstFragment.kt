@@ -52,7 +52,7 @@ class FirstFragment : Fragment(),TrackAdapter.OnTrackClickListener,
 
         //TODO SISTEMARE COLORE E STILE DEI BOTTONI
         val rootView = inflater.inflate(R.layout.fragment_first, container, false)
-       sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+        sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
 
         setupRecyclerViews(rootView)
 
@@ -217,7 +217,7 @@ class FirstFragment : Fragment(),TrackAdapter.OnTrackClickListener,
             Log.d("TrackGen", "Token is null")
         }
     }
-  /* override fun onCreatePlaylistClicked() {
+   /*override fun onCreatePlaylistClicked() {
         Log.d("Playlistchiamata", "playlistchiamata")
 
         // Assicurati che queste variabili (firebaseViewModel, viewLifecycleOwner, token, spotifyViewModel) siano accessibili in questo contesto.
@@ -230,8 +230,8 @@ class FirstFragment : Fragment(),TrackAdapter.OnTrackClickListener,
             } else
                 Log.d("Playlistchiamata", "playlistchiamata con null")
         }
-    }
-*/
+    }*/
+
 
     private fun handleTracksButtonClick() {
         artistRecyclerView.visibility = View.GONE
