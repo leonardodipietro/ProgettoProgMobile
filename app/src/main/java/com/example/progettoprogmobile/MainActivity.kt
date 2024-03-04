@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity() {
         // Gestisci il click sul pulsante
         signInButton.setOnClickListener {
             // Avvia l'intento di accesso
-            firebaseviewModel.createSignInIntent()
+            firebaseviewModel.createSignInIntent(R.style.Theme_ProgettoProgMobile)
             signInLauncher.launch(firebaseviewModel.signInIntent)
         }
 

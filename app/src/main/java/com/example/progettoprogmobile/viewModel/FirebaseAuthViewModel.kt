@@ -5,9 +5,11 @@ import androidx.activity.result.ActivityResult
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.firebase.ui.auth.AuthUI
+import com.firebase.ui.auth.AuthUI.IdpConfig
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import com.example.progettoprogmobile.MainActivity
+import com.google.firebase.auth.ActionCodeSettings
 import com.google.firebase.auth.FirebaseAuth
 import android.util.Log
 
@@ -52,7 +54,7 @@ class FirebaseAuthViewModel : ViewModel() {
     }
 
     // Crea l'intento per l'accesso con email
-    fun createSignInIntent() {
+    fun createSignInIntent(themeResId: Int) {
         // Choose authentication providers
         val providers = arrayListOf(
             AuthUI.IdpConfig.EmailBuilder().build(),
@@ -63,6 +65,7 @@ class FirebaseAuthViewModel : ViewModel() {
         signInIntent = AuthUI.getInstance()
             .createSignInIntentBuilder()
             .setAvailableProviders(providers)
+            .setTheme(themeResId)
             .setIsSmartLockEnabled(true)
             .build()
     }
@@ -101,28 +104,41 @@ class FirebaseAuthViewModel : ViewModel() {
         val user = FirebaseAuth.getInstance().currentUser
         if (user != null) {
             // L'utente è autenticato, quindi puoi procedere con l'eliminazione
-        AuthUI.getInstance()
-            .delete(context)
+            AuthUI.getInstance()
+                .delete(context)
+                .addOnCompleteListener { task ->
+                    Log.d("MyApp", "Delete completed")
+                    Log.d("MyApp","valore task $task")
+                    if (task.isSuccessful) {
+                        deleteResult.value = DeleteResult.SUCCESS
+                        val intent = Intent(context, MainActivity::class.java)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        context.startActivity(intent)
+                        Log.d("MyApp", "Eliminazione account avvenuta")
+                    } else  {
+                    // L'eliminazione dell'account è fallita
+                    val exception = task.exception
+                    if (exception != null) {
+                        // Gestisci l'errore
+                        Log.e("MyApp", "Eliminazione account fallita: ${exception.message}")
+                    }
+                }
+                }
+            Log.d("MyApp", "After delete")
+        }
+    }
+
+    fun resetPassword(context: Context, email: String) {
+        FirebaseAuth.getInstance().sendPasswordResetEmail(email)
             .addOnCompleteListener { task ->
-                Log.d("MyApp", "Delete completed")
-                Log.d("MyApp","valore task $task")
                 if (task.isSuccessful) {
-                    deleteResult.value = DeleteResult.SUCCESS
-                    val intent = Intent(context, MainActivity::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    context.startActivity(intent)
-                    Log.d("MyApp", "Eliminazione account avvenuta")
-                } else  {
-                // L'eliminazione dell'account è fallita
-                val exception = task.exception
-                if (exception != null) {
-                    // Gestisci l'errore
-                    Log.e("MyApp", "Eliminazione account fallita: ${exception.message}")
+                    // Reset password completato con successo
+                    // Puoi aggiornare l'UI o gestire il successo in altro modo
+                } else {
+                    // Reset password fallito
+                    // Gestisci l'errore, se necessario
                 }
             }
-            }
-        Log.d("MyApp", "After delete")
     }
-}
 
 }

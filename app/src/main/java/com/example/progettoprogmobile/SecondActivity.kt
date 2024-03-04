@@ -121,43 +121,6 @@ class SecondActivity : AppCompatActivity() {
         return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val transaction: FragmentTransaction = fragmentManager.beginTransaction()
-
-        // Rimuovi il fragment corrente
-        transaction.remove(currentFragment)
-
-        when (item.itemId) {
-            R.id.menu_first_fragment -> {
-                val newFragment = FirstFragment()
-                transaction.replace(R.id.nav_host_fragment, newFragment, "firstFragment")
-                currentFragment = newFragment
-                bottomNavigationView.selectedItemId = R.id.home
-            }
-            R.id.menu_second_fragment -> {
-                val newFragment = SecondFragment()
-                transaction.replace(R.id.nav_host_fragment, newFragment, "secondFragment")
-                currentFragment = newFragment
-                bottomNavigationView.selectedItemId = R.id.cerca
-
-            }
-            R.id.menu_third_fragment -> {
-                val newFragment = ThirdFragment()
-                transaction.replace(R.id.nav_host_fragment, newFragment, "thirdFragment")
-                currentFragment = newFragment
-                bottomNavigationView.selectedItemId = R.id.settings
-            }
-            R.id.menu_fourth_fragment -> {
-                val newFragment = ThirdFragment()
-                transaction.replace(R.id.nav_host_fragment, newFragment, "fourthFragment")
-                currentFragment = newFragment
-                bottomNavigationView.selectedItemId = R.id.notification
-            }
-            else -> return super.onOptionsItemSelected(item)
-        }
-        transaction.commit()
-        return true
-    }
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)

@@ -1,17 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <group android:id="@+id/group_fragment" android:checkableBehavior="single">
-        <item
-            android:id="@+id/menu_first_fragment"
-            android:title="Home" />
-        <item
-            android:id="@+id/menu_second_fragment"
-            android:title="Ricerca" />
-        <item
-            android:id="@+id/menu_third_fragment"
-            android:title="Logout" />
-        <item
-            android:id="@+id/menu_fourth_fragment"
-            android:title="Notifiche" />
-    </group>
+
 </menu>
