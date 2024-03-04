@@ -23,6 +23,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.squareup.picasso.Picasso
 import androidx.fragment.app.FragmentActivity
+import com.example.progettoprogmobile.FifthFragment
 
 
 // Sealed class che rappresenta due tipi di notifiche: follower e richieste
@@ -40,8 +41,7 @@ class NotificationsAdapter (
     private val confirmClickListener: NotificationsAdapter.OnConfirmClickListener,
     private val deleteClickListener: NotificationsAdapter.OnDeleteClickListener,
     private val database: FirebaseDatabase,
-    private val currentUserId: String,
-    private val tracks: List<Track>
+    private val currentUserId: String
 ) : ListAdapter<NotificationItem, RecyclerView.ViewHolder>(NotificationItemDiffCallback()) {
 
     // View utilizzata per l'inflazione del layout del fragment (R.layout.fragment_fourth)
@@ -63,6 +63,20 @@ class NotificationsAdapter (
     private val newFollowers = mutableListOf<Utente>()
 
     // Aggiungi una variabile per memorizzare il listener del click sull'elemento della recensione
+    private var followerItemClickListener: FollowerViewHolder.OnClickListener? = null
+    // Funzione per impostare il listener del click sull'elemento della recensione
+    fun setFollowerItemClickListener(listener: FollowerViewHolder.OnClickListener) {
+        followerItemClickListener = listener
+    }
+
+    // Aggiungi una variabile per memorizzare il listener del click sull'elemento della recensione
+    private var requestItemClickListener: RequestViewHolder.OnClickListener? = null
+    // Funzione per impostare il listener del click sull'elemento della recensione
+    fun setRequestItemClickListener(listener: RequestViewHolder.OnClickListener) {
+        requestItemClickListener = listener
+    }
+
+    // Aggiungi una variabile per memorizzare il listener del click sull'elemento della recensione
     private var reviewItemClickListener: ReviewViewHolder.OnClickListener? = null
 
     // Funzione per impostare il listener del click sull'elemento della recensione
@@ -75,6 +89,21 @@ class NotificationsAdapter (
         val followersImage: ImageView = view.findViewById(R.id.followersImage)
         val followersUsername: TextView = view.findViewById(R.id.followersRequest)
         val followButton: ToggleButton = view.findViewById(R.id.followToggleButton)
+
+        init {
+            view.setOnClickListener {
+                // Notifica l'evento di click all'adapter
+                onClickListener?.onClick(adapterPosition)
+            }
+        }
+
+        // Interfaccia per il listener del click sull'elemento della recensione
+        interface OnClickListener {
+            fun onClick(position: Int)
+        }
+
+        // Variabile per memorizzare il listener del click sull'elemento della recensione
+        var onClickListener: OnClickListener? = null
     }
 
     // ViewHolder per gli elementi del tipo Request
@@ -83,6 +112,21 @@ class NotificationsAdapter (
         val followersUsername: TextView = view.findViewById(R.id.followersRequest)
         val confirmButton: Button = view.findViewById(R.id.confirm)
         val deleteButton: Button = view.findViewById(R.id.delete)
+
+        init {
+            view.setOnClickListener {
+                // Notifica l'evento di click all'adapter
+                onClickListener?.onClick(adapterPosition)
+            }
+        }
+
+        // Interfaccia per il listener del click sull'elemento della recensione
+        interface OnClickListener {
+            fun onClick(position: Int)
+        }
+
+        // Variabile per memorizzare il listener del click sull'elemento della recensione
+        var onClickListener: OnClickListener? = null
     }
 
     // ViewHolder per gli elementi del tipo Review
@@ -90,13 +134,6 @@ class NotificationsAdapter (
         val userImage: ImageView = view.findViewById(R.id.followingImage)
         val userNameText: TextView = view.findViewById(R.id.reviewNotification)
 
-        // bindTrack method to bind track data
-        fun bindTrack(track: Track) {
-            // Here, you can bind the track data to the views in your ViewHolder
-            // For example:
-            // trackNameTextView.text = track.name
-            // artistNameTextView.text = track.artistName
-        }
         init {
             view.setOnClickListener {
                 // Notifica l'evento di click all'adapter
@@ -227,6 +264,22 @@ class NotificationsAdapter (
                     followClickListener.onFollowClickListener(utente.userId, isFollowing)
                 }
 
+                // Imposta il listener per il click sull'elemento della recensione
+                holder.itemView.setOnClickListener {
+                    Log.d("NotificationsAdapter", "Item clicked: ${utente.userId}")
+                    val fragment = FifthFragment()
+                    val bundle = Bundle().apply {
+                        putSerializable("utenteDetail", item.utente)
+                    }
+                    bundle.putString("userId", item.utente.userId)
+                    fragment.arguments = bundle
+
+                    val context = holder.itemView.context
+                    val fragmentTransaction = (context as FragmentActivity).supportFragmentManager.beginTransaction()
+                    fragmentTransaction.replace(R.id.nav_host_fragment, fragment)
+                    fragmentTransaction.addToBackStack(null)
+                    fragmentTransaction.commit()
+                }
             }
             is NotificationItem.RequestItem -> {
                 val requestViewHolder = holder as RequestViewHolder
@@ -253,6 +306,24 @@ class NotificationsAdapter (
                 requestViewHolder.deleteButton.setOnClickListener {
                     deleteClickListener.onDeleteClickListener(utente.userId)
                 }
+
+
+                // Imposta il listener per il click sull'elemento della recensione
+                holder.itemView.setOnClickListener {
+                    val fragment = FifthFragment()
+                    val bundle = Bundle().apply {
+                        putSerializable("utenteDetail", item.utente)
+                    }
+                    bundle.putString("userId", item.utente.userId)
+                    fragment.arguments = bundle
+
+                    val context = holder.itemView.context
+                    val fragmentTransaction = (context as FragmentActivity).supportFragmentManager.beginTransaction()
+                    fragmentTransaction.replace(R.id.nav_host_fragment, fragment)
+                    fragmentTransaction.addToBackStack(null)
+                    fragmentTransaction.commit()
+                }
+
             }
             is NotificationItem.ReviewItem -> {
                 val reviewViewHolder = holder as ReviewViewHolder

@@ -11,6 +11,8 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.progettoprogmobile.adapter.FollowersAdapter
+import com.example.progettoprogmobile.adapter.NotificationItem
+import com.example.progettoprogmobile.adapter.NotificationsAdapter
 import com.example.progettoprogmobile.model.Utente
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -45,6 +47,26 @@ class FollowersFragment: Fragment(), FollowersAdapter.OnRemoveFollowerClickListe
         recyclerView.adapter = followersAdapter
 
         setupUtenteObserver()
+
+        followersAdapter.setFollowerItemClickListener(object :
+            NotificationsAdapter.FollowerViewHolder.OnClickListener {
+            override fun onClick(position: Int) {
+                val selectedFollower = followersAdapter.currentList[position]
+                selectedFollower?.let {
+                    Log.d("MainFragment", "Follower to be passed to Follower fragment: $it")
+                    val followerSelezionatoFragment = FifthFragment()
+                    val bundle = Bundle()
+                    bundle.putSerializable("followerDetail", it)
+                    followerSelezionatoFragment.arguments = bundle
+                    Log.d("MainFragment", "Follower set to FollowerSelezionato fragment: $it.")
+                    val fragmentManager = requireActivity().supportFragmentManager
+                    fragmentManager.beginTransaction()
+                        .replace(R.id.nav_host_fragment, followerSelezionatoFragment)
+                        .addToBackStack(null)  // Aggiungi la transazione allo stack indietro
+                        .commit()
+                }
+            }
+        })
 
         return rootView
     }

@@ -372,23 +372,9 @@ class BranoSelezionato : Fragment(), RecensioniBranoSelAdapter.OnRecensioneInter
 }
 
 
-/* override fun onRecensioneModificaClicked(commentId: String) {
-     // Esegui azioni per abilitare la modifica della recensione
-     recensioneEditText.visibility = View.VISIBLE
-     inviarRecensioneButton.visibility = View.VISIBLE
 
-     // (Opzionale) Puoi pre-caricare l'EditText con il testo della recensione esistente se lo desideri
-     // Questo richiederebbe di passare il testo della recensione al Fragment o di recuperarlo in qualche modo
- }*/
 enum class ActionState {
     NONE, COMMENTING, EDITING,AGGIORNA
 }
 
-/* override fun onRecensioneModificaClicked(commentId: String) {
-     // Esegui azioni per abilitare la modifica della recensione
-     recensioneEditText.visibility = View.VISIBLE
-     inviarRecensioneButton.visibility = View.VISIBLE
 
-     // (Opzionale) Puoi pre-caricare l'EditText con il testo della recensione esistente se lo desideri
-     // Questo richiederebbe di passare il testo della recensione al Fragment o di recuperarlo in qualche modo
- }*/

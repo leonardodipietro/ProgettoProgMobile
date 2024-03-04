@@ -1,22 +1,12 @@
 package com.example.progettoprogmobile.model
 
+import java.io.Serializable
+
 data class Utente(
     val userId: String,
     val name: String,
-    var userImage: String
-) {
+    val userImage: String
+): Serializable {
     // Costruttore senza argomenti necessario per Firebase
     constructor() : this("", "", "")
 }
-
-/*
-data class Utente(
-    val userId: String = "",
-    val name: String = ""
-)
-
-{
-    // Costruttore senza argomenti necessario per Firebase
-    constructor() : this("")
-}
- */

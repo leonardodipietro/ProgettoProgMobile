@@ -95,15 +95,14 @@ class RecensioniBranoSelAdapter(
             txtRecensione.text = recensione.content
             usersMap[recensione.userId]?.let { user ->
                 txtUserName.text = user.name
-                /*if (!user.userImage.isNullOrEmpty()) {
+                if (!user.userImage.isNullOrEmpty()) {
                     Log.d("PicassoLoading", "Caricamento immagine per ${user.name} URL: ${user.userImage}")
                     Picasso.get().load(user.userImage).into(imgProfile)
                 } else {
                     // Qui imposti un'immagine di fallback o lasci l'immagine corrente
                     imgProfile.setImageResource(R.drawable.baseline_person_24) // Immagine di fallback
-                }*/
+                }
             }
-                imgProfile.setImageResource(R.drawable.baseline_person_24) // Immagine di fallback
             val isUserReview = recensione.userId == currentUserId
             btnDeleteRecensione.visibility = if (isUserReview) View.VISIBLE else View.GONE
             btnModificaRecensione.visibility = if (isUserReview) View.VISIBLE else View.GONE

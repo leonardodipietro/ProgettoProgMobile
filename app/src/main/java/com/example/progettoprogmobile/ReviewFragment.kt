@@ -1,6 +1,7 @@
 package com.example.progettoprogmobile
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,8 +9,11 @@ import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.progettoprogmobile.adapter.NotificationsAdapter
 import com.example.progettoprogmobile.adapter.ReviewAdapter
+import com.example.progettoprogmobile.model.Album
 import com.example.progettoprogmobile.model.ReviewData
+import com.example.progettoprogmobile.model.Track
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 

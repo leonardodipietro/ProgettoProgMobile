@@ -49,8 +49,7 @@ class FourthFragment : Fragment(),
             this,
             this,
             database,
-            currentUserId,
-            trackList
+            currentUserId
         )
 
         recyclerView.adapter = notificationsAdapter
@@ -59,6 +58,49 @@ class FourthFragment : Fragment(),
         retrieveUserData()
 
         retrieveReviewsData()
+
+
+
+        notificationsAdapter.setFollowerItemClickListener(object :
+            NotificationsAdapter.FollowerViewHolder.OnClickListener {
+            override fun onClick(position: Int) {
+                val selectedFollower = notificationList[position] as? NotificationItem.FollowerItem
+                selectedFollower?.let {
+                    Log.d("MainFragment", "Follower to be passed to Follower fragment: ${it.utente}")
+                    val followerSelezionatoFragment = FifthFragment()
+                    val bundle = Bundle()
+                    bundle.putSerializable("followerDetail", it.utente)
+                    followerSelezionatoFragment.arguments = bundle
+                    Log.d("MainFragment", "Follower set to FollowerSelezionato fragment: ${it.utente}")
+                    val fragmentManager = requireActivity().supportFragmentManager
+                    fragmentManager.beginTransaction()
+                        .replace(R.id.nav_host_fragment, followerSelezionatoFragment)
+                        .addToBackStack(null)  // Aggiungi la transazione allo stack indietro
+                        .commit()
+                }
+            }
+        })
+
+
+        notificationsAdapter.setRequestItemClickListener(object :
+            NotificationsAdapter.RequestViewHolder.OnClickListener {
+            override fun onClick(position: Int) {
+                val selectedRequest = notificationList[position] as? NotificationItem.RequestItem
+                selectedRequest?.let {
+                    Log.d("MainFragment", "Follower to be passed to Follower fragment: ${it.utente}")
+                    val followerSelezionatoFragment = FifthFragment()
+                    val bundle = Bundle()
+                    bundle.putSerializable("followerDetail", it.utente)
+                    followerSelezionatoFragment.arguments = bundle
+                    Log.d("MainFragment", "Follower set to FollowerSelezionato fragment: ${it.utente}")
+                    val fragmentManager = requireActivity().supportFragmentManager
+                    fragmentManager.beginTransaction()
+                        .replace(R.id.nav_host_fragment, followerSelezionatoFragment)
+                        .addToBackStack(null)  // Aggiungi la transazione allo stack indietro
+                        .commit()
+                }
+            }
+        })
 
         notificationsAdapter.setReviewItemClickListener(object :
             NotificationsAdapter.ReviewViewHolder.OnClickListener {
@@ -400,6 +442,7 @@ class FourthFragment : Fragment(),
                 is NotificationItem.FollowerItem -> it.utente.userId == userId
                 is NotificationItem.RequestItem -> it.utente.userId == userId
                 is NotificationItem.ReviewItem -> it.utente.userId== userId
+                else ->  throw IllegalArgumentException("Tipo di item non supportato: $it")
             }
         }
 

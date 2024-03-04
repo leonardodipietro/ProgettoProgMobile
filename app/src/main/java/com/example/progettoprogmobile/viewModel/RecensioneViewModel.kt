@@ -237,12 +237,10 @@ class RecensioneViewModel() : ViewModel() {
                     val usersMap = mutableMapOf<String, Utente>()
                     userIds.forEach { id ->
                         dataSnapshot.child(id).getValue(Utente::class.java)?.let { user ->
-
                             val imageUrl = dataSnapshot.child(id).child("profile image").getValue(String::class.java)
-                            user.userImage = imageUrl ?: "" // Aggiorna l'URL dell'immagine nel tuo oggetto Utente
-
-                            Log.d("FetchUsers", "Utente: ${user.name}, URL Immagine: ${user.userImage}")
-                            usersMap[id] = user // Aggiungi l'utente alla mappa
+                            val updatedUser = user.copy(userImage = imageUrl ?: "") // Crea un nuovo oggetto Utente con l'URL dell'immagine aggiornato
+                            Log.d("FetchUsers", "Utente: ${updatedUser.name}, URL Immagine: ${updatedUser.userImage}")
+                            usersMap[id] = updatedUser // Aggiungi l'utente alla mappa
                         }
                     }
                     usersData.value = usersMap // Aggiorna LiveData con la nuova mappa

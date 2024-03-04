@@ -1,5 +1,7 @@
 package com.example.progettoprogmobile.model
 
+import java.io.Serializable
+
 data class ReviewData(
     val recensione: String,
     val timestamp: String,
@@ -7,4 +9,4 @@ data class ReviewData(
     val album: String,
     val image: String,
     val artist: List<String>
-)
+): Serializable
