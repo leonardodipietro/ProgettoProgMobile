@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Bundle
+import android.text.Html
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -158,8 +159,11 @@ class FirstFragment : Fragment(),TrackAdapter.OnTrackClickListener,
     }
 
     fun openViewStyleDialog() {
-        val choices = arrayOf("Vista Lineare", "Vista a Griglia")
-        AlertDialog.Builder(requireContext())
+        val choices = arrayOf(
+            Html.fromHtml("<font color='#FFFFFF'>${getString(R.string.linear)}</font>", Html.FROM_HTML_MODE_LEGACY),
+            Html.fromHtml("<font color='#FFFFFF'>${getString(R.string.grid)}</font>", Html.FROM_HTML_MODE_LEGACY),
+        )
+        AlertDialog.Builder(requireContext(), R.style.CustomAlertDialogStyle)
             .setTitle("Scegli Stile di Visualizzazione")
             .setItems(choices) { _, which ->
                 when(which) {

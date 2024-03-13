@@ -26,6 +26,7 @@ import com.example.progettoprogmobile.viewModel.FirebaseViewModel
 import android.content.SharedPreferences
 import android.os.Handler
 import android.os.Looper
+import android.text.Html
 import com.example.progettoprogmobile.model.Artist
 import com.example.progettoprogmobile.model.Track
 import com.google.firebase.database.DataSnapshot
@@ -481,8 +482,11 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
 
     // Gestione pulsante della vista
     private fun openViewStyleDialog() {
-        val choices = arrayOf("Vista Lineare", "Vista a Griglia")
-        AlertDialog.Builder(requireContext())
+        val choices = arrayOf(
+            Html.fromHtml("<font color='#FFFFFF'>${getString(R.string.linear)}</font>", Html.FROM_HTML_MODE_LEGACY),
+            Html.fromHtml("<font color='#FFFFFF'>${getString(R.string.grid)}</font>", Html.FROM_HTML_MODE_LEGACY),
+        )
+        AlertDialog.Builder(requireContext(), R.style.CustomAlertDialogStyle)
             .setTitle("Scegli Stile di Visualizzazione")
             .setItems(choices) { _, which ->
                 when(which) {
