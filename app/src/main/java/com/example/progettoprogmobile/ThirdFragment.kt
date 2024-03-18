@@ -53,23 +53,9 @@ open class ThirdFragment : Fragment() {
     private lateinit var editImageButton: ImageButton
     private val cameraPermissionRequestCode = 1002 // Puoi scegliere qualsiasi valore univoco
 
-    private lateinit var language: TextView
-    private lateinit var selectedLanguage: String
-    private lateinit var languageListView: ListView
-
-    private lateinit var switchNotificationButton: SwitchMaterial
-    private lateinit var switchNFNButton: SwitchMaterial
-    private lateinit var switchNFRButton: SwitchMaterial
-    private var isNFRButtonEnabled = false
-    private var isNFNButtonEnabled = false
-
     private lateinit var account: TextView
     private lateinit var selectedAccountPrivacy: String
     private lateinit var accountPrivacyListView: ListView
-
-    private lateinit var review: TextView
-    private lateinit var selectedReviewPrivacy: String
-    private lateinit var reviewPrivacyListView: ListView
 
     private val photoRequestCode = 1
     private val photoRequestCodeFromGallery = 2
@@ -93,13 +79,7 @@ open class ThirdFragment : Fragment() {
         firebaseauthviewModel = ViewModelProvider(this)[FirebaseAuthViewModel::class.java]
 
         //Inizializza le view
-        language= rootView.findViewById(R.id.language)
         editImageButton = rootView.findViewById(R.id.editImageButton)
-
-
-        switchNotificationButton = rootView.findViewById(R.id.switchNotificationButton)
-        switchNFNButton = rootView.findViewById(R.id.switchNFNButton)
-        switchNFRButton = rootView.findViewById(R.id.switchNFRButton)
 
         val database: FirebaseDatabase = FirebaseDatabase.getInstance()
 
@@ -157,70 +137,7 @@ open class ThirdFragment : Fragment() {
         }
 
 
-        // Leggi la lingua preferita dell'utente dalle preferenze condivise o da qualsiasi altra fonte
-        selectedLanguage = sharedPreferences.getString("selectedLanguage", getString(R.string.italian)) ?: getString(R.string.italian)
-        language.text=selectedLanguage
 
-        language.setOnClickListener {
-            showLanguageDialog()
-        }
-
-
-        val notificationEnabled = sharedPreferences.getBoolean("switchNotificationButton", false)
-        switchNotificationButton.isChecked = notificationEnabled
-        // Leggi lo stato di switchNFNButton dalle SharedPreferences
-        val nfnEnabled = sharedPreferences.getBoolean("switchNFNButton", false)
-        switchNFNButton.isChecked = nfnEnabled
-        // Leggi lo stato di switchNFRButton dalle SharedPreferences
-        val nfrEnabled = sharedPreferences.getBoolean("switchNFRButton", false)
-        switchNFRButton.isChecked = nfrEnabled
-
-        // Imposta lo stato iniziale di switchNFNButton in base allo stato iniziale di switchNotificationButton
-        switchNFNButton.isEnabled = switchNotificationButton.isChecked
-        // Imposta lo stato iniziale di switchNFNButton in base allo stato iniziale di switchNotificationButton
-        switchNFRButton.isEnabled = switchNotificationButton.isChecked
-        // Rileva il cambiamento di stato del pulsante switchNotificationButton
-        switchNotificationButton.setOnCheckedChangeListener { _, isChecked ->
-            // Abilita o disabilita switchNFNButton in base allo stato di switchNotificationButton
-            switchNFNButton.isEnabled = isChecked
-            // Abilita o disabilita switchNFRButton in base allo stato di switchNotificationButton
-            switchNFRButton.isEnabled = isChecked
-
-            // Verifica se sia switchNotificationButton che switchNFNButton sono attivi
-            val newFollowerNotificationsEnabled = isChecked && switchNFNButton.isChecked
-            // Aggiorna il valore nel database solo se entrambi i pulsanti sono attivi
-            settingUtils.updateNFNSetting(userId, newFollowerNotificationsEnabled)
-
-            // Verifica se sia switchNotificationButton che switchNFNButton sono attivi
-            val newReviewNotificationsEnabled = isChecked && switchNFRButton.isChecked
-            // Aggiorna il valore nel database solo se entrambi i pulsanti sono attivi
-            settingUtils.updateNFRSetting(userId, newReviewNotificationsEnabled)
-
-            // Salva lo stato di switchNotificationButton nelle SharedPreferences
-            settingUtils.saveSwitchState(requireContext(),"switchNotificationButton", isChecked)
-        }
-        // Rileva il cambiamento di stato del pulsante switchNFNButton
-        switchNFNButton.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                isNFNButtonEnabled = isChecked
-                settingUtils.updateNFNSetting(userId, isChecked)
-            } else {
-                settingUtils.updateNFNSetting(userId,false)
-            }
-            // Salva lo stato di switchNFNButton nelle SharedPreferences
-            settingUtils.saveSwitchState(requireContext(),"switchNFNButton", isChecked)
-        }
-        // Rileva il cambiamento di stato del pulsante switchNFRButton
-        switchNFRButton.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                isNFRButtonEnabled = isChecked
-                settingUtils.updateNFRSetting(userId, isChecked)
-            } else {
-                settingUtils.updateNFRSetting(userId, false)
-            }
-            // Salva lo stato di switchNFRButton nelle SharedPreferences
-            settingUtils.saveSwitchState(requireContext(),"switchNFRButton", isChecked)
-        }
 
 
         account = rootView.findViewById(R.id.account)
@@ -231,16 +148,6 @@ open class ThirdFragment : Fragment() {
         account.setOnClickListener {
             showAPDialog()
         }
-
-        review = rootView.findViewById(R.id.review)
-
-        selectedReviewPrivacy = sharedPreferences.getString("selectedReviewPrivacy", "Tutti") ?: "Tutti"
-        review.text = selectedReviewPrivacy
-
-        review.setOnClickListener {
-            showRPDialog()
-        }
-
 
         // Trova i pulsanti nel layout del fragment
         val signOut = rootView.findViewById<Button>(R.id.signOut)
@@ -390,86 +297,6 @@ open class ThirdFragment : Fragment() {
             }
         }
     }
-
-    private fun showLanguageDialog() {
-        val dialogView = layoutInflater.inflate(R.layout.dialog_edit_language, null)
-        languageListView = dialogView.findViewById(R.id.languageListView)
-
-        val languageOptions = arrayOf(getString(R.string.italian),getString(R.string.english))
-
-        // Crea un adapter per la ListView con le opzioni di privacy
-        val languageAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, languageOptions)
-        languageListView.adapter = languageAdapter
-
-        // Crea una PopupWindow
-        val popupWindow = PopupWindow(dialogView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-
-        languageListView.setOnItemClickListener { _, _, position, _ ->
-            when (position) {
-                0 -> {
-                    // L'utente ha selezionato l'opzione "Italiano"
-                    // Imposta la lingua dell'app su italiano
-                    val locale = Locale("Italian")
-                    Locale.setDefault(locale)
-                    val configuration = Configuration()
-                    configuration.setLocale(locale)
-                    resources.updateConfiguration(configuration, resources.displayMetrics)
-
-                    // Salva la selezione della lingua nelle preferenze condivise
-                    settingUtils.saveSelectedLanguage(requireContext(),"Italian")
-
-                    // Chiudi la finestra di dialogo
-                    popupWindow.dismiss()
-                }
-                1 -> {
-                    // L'utente ha selezionato l'opzione "Inglese"
-                    // Imposta la lingua dell'app su inglese
-                    val locale = Locale("English")
-                    Locale.setDefault(locale)
-                    val configuration = Configuration()
-                    configuration.setLocale(locale)
-                    resources.updateConfiguration(configuration, resources.displayMetrics)
-
-                    // Salva la selezione della lingua nelle preferenze condivise
-                    settingUtils.saveSelectedLanguage(requireContext(),"English")
-
-                    // Chiudi la finestra di dialogo
-                    popupWindow.dismiss()
-                }
-            }
-            // Aggiorna il testo nella TextView con la lingua selezionata
-            selectedLanguage = languageOptions[position]
-
-            // Aggiungi istruzioni di log per verificare i valori
-            Log.d("LanguageDialog", "Selected language: $selectedLanguage")
-
-            language.text = selectedLanguage
-        }
-
-        // Chiudi il popup quando viene toccato fuori
-        dialogView.setOnTouchListener { _, event ->
-            if (event.action == MotionEvent.ACTION_DOWN) {
-                val rect = Rect()
-                dialogView.getGlobalVisibleRect(rect)
-                if (!rect.contains(event.rawX.toInt(), event.rawY.toInt())) {
-                    popupWindow.dismiss()
-                    language.performClick()
-                }
-            }
-            true
-        }
-
-        // Visualizza il popup
-        popupWindow.isOutsideTouchable = true
-        popupWindow.isFocusable = true
-        popupWindow.showAsDropDown(language)
-
-        val location = IntArray(2)
-        language.getLocationOnScreen(location)
-        val x = location[0]
-        val y = location[1] + language.height
-        popupWindow.showAtLocation(language, Gravity.NO_GRAVITY, x, y)
-    }
     private fun showAPDialog() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_edit_account_privacy, null)
         accountPrivacyListView = dialogView.findViewById(R.id.accountPrivacyListView)
@@ -514,49 +341,6 @@ open class ThirdFragment : Fragment() {
         val x = location[0]
         val y = location[1] + account.height
         popupWindow.showAtLocation(account, Gravity.NO_GRAVITY, x, y)
-    }
-    private fun showRPDialog() {
-        val dialogView = layoutInflater.inflate(R.layout.dialog_edit_review_privacy, null)
-        reviewPrivacyListView = dialogView.findViewById(R.id.reviewPrivacyListView)
-
-        val reviewPrivacy = arrayOf(getString(R.string.everyone), getString(R.string.followers), getString(R.string.nobody))
-
-        val reviewAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, reviewPrivacy)
-        reviewPrivacyListView.adapter = reviewAdapter
-
-        val popupWindow = PopupWindow(dialogView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
-
-        reviewPrivacyListView.setOnItemClickListener { _, _, position, _ ->
-            selectedReviewPrivacy = reviewPrivacy[position]
-            settingUtils.saveSelectedRP(requireContext(), selectedReviewPrivacy)
-            settingUtils.updateRPOption(requireContext(), userId, selectedReviewPrivacy)
-            popupWindow.dismiss()
-            review.text = selectedReviewPrivacy
-        }
-
-        // Chiudi il popup quando viene toccato fuori
-        dialogView.setOnTouchListener { _, event ->
-            if (event.action == MotionEvent.ACTION_DOWN) {
-                val rect = Rect()
-                dialogView.getGlobalVisibleRect(rect)
-                if (!rect.contains(event.rawX.toInt(), event.rawY.toInt())) {
-                    popupWindow.dismiss()
-                    review.performClick()
-                }
-            }
-            true
-        }
-
-        // Visualizza il popup
-        popupWindow.isOutsideTouchable = true
-        popupWindow.isFocusable = true
-        popupWindow.showAsDropDown(review)
-
-        val location = IntArray(2)
-        review.getLocationOnScreen(location)
-        val x = location[0]
-        val y = location[1] + review.height
-        popupWindow.showAtLocation(review, Gravity.NO_GRAVITY, x, y)
     }
 
 

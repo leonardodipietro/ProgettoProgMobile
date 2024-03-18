@@ -249,7 +249,7 @@
             android:text="@string/username"
             android:textColor="@color/white"
             android:textSize="20sp"
-            app:layout_constraintBottom_toTopOf="@id/voceLanguage"
+            app:layout_constraintBottom_toTopOf="@id/voceUsername"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.05"
             app:layout_constraintStart_toStartOf="parent"
@@ -265,7 +265,7 @@
             android:layout_toEndOf="@+id/voceUsername"
             android:textColor="@color/white"
             android:textSize="20sp"
-            app:layout_constraintBottom_toTopOf="@+id/voceLanguage"
+            app:layout_constraintBottom_toTopOf="@+id/voceUsername"
             app:layout_constraintStart_toEndOf="@+id/voceUsername"
             app:layout_constraintTop_toBottomOf="@+id/Impostazioni" />
 
@@ -284,152 +284,10 @@
             app:layout_constraintTop_toBottomOf="@+id/Impostazioni" />
 
         <TextView
-            android:id="@+id/voceLanguage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/voceUsername"
-            android:layout_alignParentStart="true"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="10sp"
-            android:gravity="center"
-            android:text="@string/language"
-            android:textColor="@color/white"
-            android:textSize="20sp"
-            app:layout_constraintBottom_toTopOf="@id/notification"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.05"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/voceUsername" />
-
-        <TextView
-            android:id="@+id/language"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/voceUsername"
-            android:layout_marginStart="0dp"
-            android:layout_marginTop="10dp"
-            android:layout_toEndOf="@+id/voceLanguage"
-            android:textColor="@color/white"
-            android:textSize="20sp"
-            app:layout_constraintStart_toEndOf="@+id/voceLanguage"
-            app:layout_constraintTop_toBottomOf="@id/voceUsername" />
-
-        <TextView
-            android:id="@+id/notification"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/voceLanguage"
-            android:layout_alignParentStart="true"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
-            android:gravity="center"
-            android:text="@string/notification"
-            android:textColor="@color/white"
-            android:textSize="20sp"
-            app:layout_constraintBottom_toTopOf="@id/newfollowers"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.05"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/voceLanguage" />
-
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/switchNotificationButton"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_below="@+id/voceLanguage"
-            android:layout_marginStart="0dp"
-            android:layout_marginTop="10dp"
-            android:layout_toEndOf="@+id/notification"
-            android:checked="false"
-            android:contentDescription="@string/switchNotificationButton"
-            android:theme="@style/SwitchThemeOverlay"
-            app:layout_constraintStart_toEndOf="@+id/notification"
-            app:layout_constraintTop_toBottomOf="@+id/voceLanguage" />
-
-        <TextView
-            android:id="@+id/newfollowers"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/notification"
-            android:layout_alignParentStart="true"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
-            android:gravity="center"
-            android:text="@string/newfollowers"
-            android:textColor="@color/white"
-            android:textSize="18sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.05"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/notification" />
-
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/switchNFNButton"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_below="@+id/switchNotificationButton"
-            android:layout_marginStart="0dp"
-            android:layout_marginTop="0dp"
-            android:layout_toEndOf="@+id/newfollowers"
-            android:checked="false"
-            android:contentDescription="@string/switchNFNButton"
-            android:theme="@style/SwitchThemeOverlay"
-            app:layout_constraintStart_toEndOf="@+id/newfollowers"
-            app:layout_constraintTop_toBottomOf="@+id/switchNotificationButton" />
-
-        <TextView
-            android:id="@+id/newreviews"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/newfollowers"
-            android:layout_alignParentStart="true"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
-            android:gravity="center"
-            android:text="@string/newreviews"
-            android:textColor="@color/white"
-            android:textSize="18sp"
-            app:layout_constraintBottom_toTopOf="@id/privacy"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.05"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/newfollowers" />
-
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:id="@+id/switchNFRButton"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_alignBaseline="@id/newreviews"
-            android:layout_marginStart="0dp"
-            android:layout_toEndOf="@+id/newreviews"
-            android:checked="false"
-            android:contentDescription="@string/switchNFRButton"
-            android:theme="@style/SwitchThemeOverlay"
-            app:layout_constraintStart_toEndOf="@+id/newreviews"
-            app:layout_constraintTop_toBottomOf="@+id/switchNFNButton" />
-
-        <TextView
-            android:id="@+id/privacy"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/newreviews"
-            android:layout_alignParentStart="true"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="20dp"
-            android:gravity="center"
-            android:text="@string/privacy"
-            android:textColor="@color/white"
-            android:textSize="20sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.05"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/newreviews" />
-
-        <TextView
             android:id="@+id/voceAccount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/privacy"
+            android:layout_below="@+id/voceUsername"
             android:layout_alignParentStart="true"
             android:layout_marginStart="20dp"
             android:layout_marginTop="10dp"
@@ -440,53 +298,20 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.05"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/privacy" />
+            app:layout_constraintTop_toBottomOf="@id/voceUsername" />
 
         <TextView
             android:id="@+id/account"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/privacy"
+            android:layout_below="@+id/voceUsername"
             android:layout_marginStart="0dp"
             android:layout_marginTop="10dp"
             android:layout_toEndOf="@+id/voceAccount"
             android:textColor="@color/white"
             android:textSize="18sp"
             app:layout_constraintStart_toEndOf="@+id/voceAccount"
-            app:layout_constraintTop_toBottomOf="@id/privacy" />
-
-        <TextView
-            android:id="@+id/voceReview"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/voceAccount"
-            android:layout_alignParentStart="true"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="10dp"
-            android:gravity="center"
-            android:text="@string/review"
-            android:textColor="@color/white"
-            android:textSize="18sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.05"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/voceAccount"/>
-
-        <TextView
-            android:id="@+id/review"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/voceAccount"
-            android:layout_marginStart="0dp"
-            android:layout_marginTop="10dp"
-            android:layout_toEndOf="@+id/voceReview"
-            android:textColor="@color/white"
-            android:textSize="18sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/voceReview"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.673" />
+            app:layout_constraintTop_toBottomOf="@id/voceUsername" />
 
     </RelativeLayout>
 
