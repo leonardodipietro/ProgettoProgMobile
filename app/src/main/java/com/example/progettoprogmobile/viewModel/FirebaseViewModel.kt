@@ -27,8 +27,7 @@ import kotlin.coroutines.resumeWithException
 import com.example.progettoprogmobile.model.Utente
 import com.squareup.picasso.Picasso
 import androidx.lifecycle.LiveData
-
-
+import java.util.Locale
 
 
 class FirebaseViewModel (application: Application): AndroidViewModel(application) {
@@ -62,7 +61,10 @@ class FirebaseViewModel (application: Application): AndroidViewModel(application
         val ref = FirebaseDatabase.getInstance().getReference("users")
         val risultati = mutableListOf<Utente>()
 
-        ref.orderByChild("name").startAt(query).endAt(query + "\uf8ff")
+        // Converti la query in minuscolo per la ricerca case-insensitive
+        val queryLowerCase = query.toLowerCase()
+
+        ref.orderByChild("name")
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     Log.d("FirebaseViewModel", "Raw Data Snapshot: $snapshot")
@@ -74,14 +76,18 @@ class FirebaseViewModel (application: Application): AndroidViewModel(application
                             Log.d("FirebaseViewModel", "Read user name from Firebase: ${utente.name}")
                             Log.d("FirebaseViewModel", "Read ID from Firebase: ${utente.userId}")
 
-                            // Ora ottieni anche l'URL dell'immagine dell'utente
-                            val userImage = it.child("profile image").getValue(String::class.java)
-                            if (!userImage.isNullOrEmpty()) {
-                                // Crea una nuova istanza di Utente con l'immagine aggiornata
-                                val utenteConImmagine = Utente(utente.userId, utente.name, userImage)
-                                risultati.add(utenteConImmagine)
-                            } else {
-                                risultati.add(utente)
+                            // Converti il nome dell'utente in minuscolo per rendere il confronto case insensitive
+                            val userNameLowerCase = utente.name.toLowerCase()
+                            if (userNameLowerCase.contains(queryLowerCase)) {
+                                // Ora ottieni anche l'URL dell'immagine dell'utente
+                                val userImage = it.child("profile image").getValue(String::class.java)
+                                if (!userImage.isNullOrEmpty()) {
+                                    // Crea una nuova istanza di Utente con l'immagine aggiornata
+                                    val utenteConImmagine = Utente(utente.userId, utente.name, userImage)
+                                    risultati.add(utenteConImmagine)
+                                } else {
+                                    risultati.add(utente)
+                                }
                             }
                         } else {
                             Log.e("FirebaseViewModel", "Error reading user: $it")

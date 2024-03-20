@@ -5,42 +5,32 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.res.Configuration
 import android.content.SharedPreferences
 import android.graphics.Bitmap
-import android.graphics.Matrix
 import android.graphics.Rect
 import android.Manifest
-import android.graphics.Color
-import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.text.Html
 import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
-import com.example.progettoprogmobile.utils.SettingUtils
 import com.example.progettoprogmobile.viewModel.FirebaseAuthViewModel
-import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import com.google.firebase.database.ktx.database
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
+import com.google.firebase.ktx.Firebase
 import com.squareup.picasso.Picasso
 import java.io.IOException
-import java.util.Locale
-import android.text.Html
-
+import java.io.ByteArrayOutputStream
 
 open class ThirdFragment : Fragment() {
-
-
-    private val settingUtils = SettingUtils
 
     private lateinit var databaseReference: DatabaseReference
     private lateinit var storageReference: StorageReference
@@ -51,17 +41,15 @@ open class ThirdFragment : Fragment() {
 
     private lateinit var userImage: ImageView
     private lateinit var editImageButton: ImageButton
-    private val cameraPermissionRequestCode = 1002 // Puoi scegliere qualsiasi valore univoco
+    private val cameraPermissionRequestCode = 1002
+    private val photoRequestCode = 1
+    private val photoRequestCodeFromGallery = 2
 
     private lateinit var account: TextView
     private lateinit var selectedAccountPrivacy: String
     private lateinit var accountPrivacyListView: ListView
 
-    private val photoRequestCode = 1
-    private val photoRequestCodeFromGallery = 2
-
     private lateinit var sharedPreferences: SharedPreferences
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -74,17 +62,10 @@ open class ThirdFragment : Fragment() {
         //Inizializza Firebase
         databaseReference = FirebaseDatabase.getInstance().getReference("users")
         storageReference = FirebaseStorage.getInstance().getReference("profile image/$userId")
-
         // Inizializza il ViewModel per la gestione dell'autenticazione Firebase
         firebaseauthviewModel = ViewModelProvider(this)[FirebaseAuthViewModel::class.java]
 
-        //Inizializza le view
-        editImageButton = rootView.findViewById(R.id.editImageButton)
-
-        val database: FirebaseDatabase = FirebaseDatabase.getInstance()
-
         sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
-
 
         userImage = rootView.findViewById(R.id.userImage)
         editImageButton = rootView.findViewById(R.id.editImageButton)
@@ -108,7 +89,6 @@ open class ThirdFragment : Fragment() {
                 .addToBackStack(null)
                 .commit()
         }
-
         val followersTextView = rootView.findViewById<TextView>(R.id.followersTextButton)
         followersTextView.setOnClickListener{
             val followersFragment = FollowersFragment()
@@ -117,7 +97,6 @@ open class ThirdFragment : Fragment() {
                 .addToBackStack(null)
                 .commit()
         }
-
         val followingTextView = rootView.findViewById<TextView>(R.id.followingTextButton)
         followingTextView.setOnClickListener{
             val followingFragment = FollowingFragment()
@@ -128,15 +107,13 @@ open class ThirdFragment : Fragment() {
         }
 
         // Mostra il nome utente
-        settingUtils.displayUsername(userId, rootView)
+        displayUsername(userId, rootView)
 
         // Gestione del cambio nome utente
         val editNameButton: ImageButton = rootView.findViewById(R.id.editNameButton)
         editNameButton.setOnClickListener {
-            settingUtils.showEditNameDialog(requireContext(), userId, rootView)
+            showEditNameDialog(requireContext(), userId, rootView)
         }
-
-
 
 
 
@@ -219,6 +196,7 @@ open class ThirdFragment : Fragment() {
         return rootView
     }
 
+
     private fun openFileChooser() {
 
         // Array di SpannableString con il testo bianco
@@ -251,7 +229,7 @@ open class ThirdFragment : Fragment() {
                     galleryIntent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*")
                     startActivityForResult(galleryIntent, photoRequestCodeFromGallery)
 
-                    }
+                }
 
                 2 -> {
                     // Annulla
@@ -261,13 +239,144 @@ open class ThirdFragment : Fragment() {
         }
         builder.show()
     }
+    private fun saveProfileImageURL(context: Context, userId:String, imageUrl: String) {
+        val sharedPreferences =
+            context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putString("profile image_$userId", imageUrl)
+        editor.apply()
+    }
+    fun uploadImageToFirebaseStorage(context: Context, userId: String, bitmap: Bitmap) {
+        val storage = FirebaseStorage.getInstance()
+        val storageReference = storage.getReference("profile image")
+        val imageRef = storageReference.child("$userId.jpg")
+
+        // Converte la Bitmap in un array di byte
+        val baos = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+        val data = baos.toByteArray()
+
+        // Carica l'immagine nello storage di Firebase
+        val uploadTask = imageRef.putBytes(data)
+
+        // Aggiungi un listener per gestire l'avanzamento dell'upload
+        uploadTask.addOnSuccessListener { taskSnapshot ->
+            // L'upload è stato completato con successo
+            // Puoi ottenere l'URL dell'immagine caricata
+            imageRef.downloadUrl.addOnSuccessListener { uri ->
+                val imageUrl = uri.toString()
+                saveProfileImageURL(context, userId, imageUrl)
+                val userRef: DatabaseReference = FirebaseDatabase.getInstance().reference.child("users").child(userId)
+                userRef.child("profile image").setValue(imageUrl)
+
+                Log.e ("LOG UPLOAD", "Immagine caricata con successo: $imageUrl")
+            }
+        }.addOnFailureListener { exception ->
+            // Si è verificato un errore durante l'upload
+            // Gestisci l'errore come preferisci
+            Log.e ("LOG UPLOAD",  "Errore durante il caricamento dell'immagine.")
+        }
+    }
+
+
+    fun showEditNameDialog(context: Context, userId: String, rootView: View) {
+
+        val dialogView =
+            LayoutInflater.from(context).inflate(R.layout.dialog_edit_name, null)
+        val builder =
+            AlertDialog.Builder(context, R.style.CustomAlertDialogStyle).setView(dialogView).setTitle("Edit Name")
+        val alertDialog = builder.create()
+        val editName: EditText = dialogView.findViewById(R.id.editName)
+        val saveButton = dialogView.findViewById<Button>(R.id.saveButton)
+        val cancelButton = dialogView.findViewById<Button>(R.id.cancelButton)
+
+        saveButton.setOnClickListener {
+            val newName = editName.text.toString()
+            val userRef: DatabaseReference =
+                FirebaseDatabase.getInstance().reference.child("users").child(userId)
+            userRef.child("name").setValue(newName)
+                .addOnSuccessListener {
+                    val usernameTextView = rootView.findViewById<TextView>(R.id.username)
+                    usernameTextView.text = newName
+                    alertDialog.dismiss() // Chiudi il dialog
+                    // Nome utente aggiornato con successo
+                    // Puoi fare qualcosa qui se necessario
+                }
+                .addOnFailureListener { e ->
+                    // Gestisci eventuali errori nell'aggiornamento del nome utente
+                    Log.e("Firebase", "Errore nell'aggiornamento del nome utente: ${e.message}")
+                }
+            alertDialog.dismiss() // Close the dialog
+        }
+
+        cancelButton.setOnClickListener {
+            alertDialog.dismiss()
+        }
+
+        alertDialog.show()
+    }
+    fun displayUsername(userId: String, rootView: View) {
+        val userRef: DatabaseReference =
+            FirebaseDatabase.getInstance().reference.child("users").child(userId)
+
+        userRef.child("name").addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val username = dataSnapshot.value.toString()
+                val usernameTextView = rootView.findViewById<TextView>(R.id.username)
+                usernameTextView.text = username
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.e("Firebase", "Errore nel recupero del nome utente: ${databaseError.message}")
+            }
+        })
+    }
+
+
+    private fun privacyATranslationMap(context: Context): Map<String, String> {
+        return mapOf(
+            context.getString(R.string.everyone) to "Everyone",
+            context.getString(R.string.followers) to "Followers"
+        )
+    }
+    fun saveSelectedAP(context: Context, accountPrivacy: String) {
+        val sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putString("selectedAccountPrivacy", accountPrivacy)
+        editor.apply()
+    }
+    fun updateAPOption(context: Context, userId: String, selectedROption: String) {
+        val userRef: DatabaseReference = Firebase.database.reference
+            .child("users")
+            .child(userId)
+            .child("privacy")
+            .child("account")
+
+        // Invoca la funzione per creare la mappa di traduzione delle opzioni di privacy
+        val privacyATranslationMap = privacyATranslationMap(context)
+
+        // Usa la mappa di traduzione per ottenere la chiave univoca
+        val databaseKey = privacyATranslationMap[selectedROption]
+
+        if (databaseKey != null) {
+            // Imposta solo la chiave univoca nel database Firebase
+            val privacyOptions = privacyATranslationMap.values
+            for (option in privacyOptions) {
+                userRef.child(option).setValue(option == databaseKey)
+            }
+        } else {
+            Log.e("Firebase", "Opzione selezionata non valida: $selectedROption")
+        }
+    }
+
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode==photoRequestCode) {
             if (resultCode == Activity.RESULT_OK) {
                 val bp = data?.extras?.get("data") as Bitmap
                 // Salva l'immagine nello storage di Firebase
-                settingUtils.uploadImageToFirebaseStorage(requireContext(), userId, bp)
+                uploadImageToFirebaseStorage(requireContext(), userId, bp)
                 userImage.setImageBitmap(bp)
 
             }
@@ -287,7 +396,7 @@ open class ThirdFragment : Fragment() {
                             // Aggiorna l'ImageView con la nuova immagine
                             userImage.setImageBitmap(bitmap)
                             // Carica l'immagine su Firebase Storage
-                            settingUtils.uploadImageToFirebaseStorage(requireContext(), userId, bitmap)
+                            uploadImageToFirebaseStorage(requireContext(), userId, bitmap)
                             userImage.setImageBitmap(bitmap)
                         } catch (e: IOException) {
                             e.printStackTrace()
@@ -312,8 +421,8 @@ open class ThirdFragment : Fragment() {
 
         accountPrivacyListView.setOnItemClickListener { _, _, position, _ ->
             selectedAccountPrivacy = accountPrivacy[position]
-            settingUtils.saveSelectedAP(requireContext(), selectedAccountPrivacy)
-            settingUtils.updateAPOption(requireContext(), userId, selectedAccountPrivacy)
+            saveSelectedAP(requireContext(), selectedAccountPrivacy)
+            updateAPOption(requireContext(), userId, selectedAccountPrivacy)
             popupWindow.dismiss()
             account.text = selectedAccountPrivacy
         }
@@ -344,11 +453,6 @@ open class ThirdFragment : Fragment() {
     }
 
 
-
-
-
-
-
     fun countUserReviews(userId: String, databaseReference: DatabaseReference, rootView: View) {
         val reviewsReference = databaseReference.child("users").child(userId).child("reviews")
 
@@ -371,7 +475,6 @@ open class ThirdFragment : Fragment() {
                 }
             })
     }
-
     fun countUserFollowers(userId: String, databaseReference: DatabaseReference, rootView: View) {
         val followersReference = databaseReference.child("users").child(userId).child("followers")
 
@@ -394,7 +497,6 @@ open class ThirdFragment : Fragment() {
             }
         })
     }
-
     fun countUserFollowing(userId: String, databaseReference: DatabaseReference, rootView: View) {
         val followingReference = databaseReference.child("users").child(userId).child("following")
 
@@ -436,5 +538,4 @@ open class ThirdFragment : Fragment() {
         // Salva il conteggio delle recensioni nel nodo dell'utente
         userReference.child("following counter").setValue(followingCount)
     }
-
 }
