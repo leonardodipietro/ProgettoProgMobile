@@ -61,29 +61,9 @@ class SecondActivity : AppCompatActivity() {
                 }
                 R.id.cerca -> {
                     // Recupera l'utente selezionato dal ViewModel
-                    val selectedUserId = firebaseViewModel.getSelectedUser()
-                    Log.d("MainActivity", "Utente selezionato: $selectedUserId")
-                    if (!selectedUserId.isNullOrEmpty()) {
-                        // Se c'è un utente selezionato, vai direttamente al suo profilo
-                        val bundle = Bundle().apply {
-                            putString("userId", selectedUserId)
-                        }
-                        val fifthFragment = FifthFragment()
-                        fifthFragment.arguments = bundle
-                        supportFragmentManager.beginTransaction()
-                            .replace(R.id.nav_host_fragment, fifthFragment)
-                            .addToBackStack(null)
-                            .commit()
-                    } else {
-                        // Altrimenti, vai al SecondFragment
-                        val newFragment = SecondFragment()
-                        transaction.replace(R.id.nav_host_fragment, newFragment, "secondFragment")
-                        currentFragment = newFragment
-                    }
-
-                    /*val newFragment = SecondFragment()
-                        transaction.replace(R.id.nav_host_fragment, newFragment, "secondFragment")
-                        currentFragment = newFragment*/
+                    val newFragment = SecondFragment()
+                    transaction.replace(R.id.nav_host_fragment, newFragment, "secondFragment")
+                    currentFragment = newFragment
                 }
                 R.id.notification -> {
                     val newFragment = FourthFragment()
@@ -120,7 +100,6 @@ class SecondActivity : AppCompatActivity() {
         menuInflater.inflate(R.menu.drawer_menu, menu)
         return true
     }
-
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)

@@ -96,7 +96,6 @@ class SecondFragment : Fragment() {
                     }
                     val fifthFragment = FifthFragment()
                     fifthFragment.arguments = bundle
-                    //val transaction = requireActivity().supportFragmentManager.beginTransaction()
 
                     parentFragmentManager.beginTransaction()
                         .replace(R.id.nav_host_fragment, fifthFragment) //fragment_container_second
@@ -109,9 +108,5 @@ class SecondFragment : Fragment() {
         } else {
             Log.e("SecondFragment", "Invalid userId: $userId")
         }
-
-        // Imposta l'utente selezionato nel ViewModel
-        firebaseViewModel.setSelectedUser(userId)
-        Log.d("SecondFragment", "Utente impostato nel ViewModel: $userId")
     }
 }
