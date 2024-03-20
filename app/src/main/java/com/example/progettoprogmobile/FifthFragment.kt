@@ -35,6 +35,7 @@ import com.google.firebase.database.ValueEventListener
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.firebase.database.DatabaseReference
 import android.widget.RelativeLayout
+import com.google.firebase.database.*
 
 
 class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
@@ -881,6 +882,8 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
                 updateFollowButton(isFollowing, isRequestSent)
                 // Aggiorna il pulsante nello stato delle preferenze condivise
                 saveButtonState(isFollowing, isRequestSent)
+                // Aggiorna il contatore di following
+                updateFollowingCount(userId ?: "", increment = true)
             }
             .addOnFailureListener { exception ->
                 // Gestisci eventuali errori
@@ -903,6 +906,9 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
                 updateFollowButton(isFollowing, isRequestSent)
                 // Aggiorna il pulsante nello stato delle preferenze condivise
                 saveButtonState(isFollowing, isRequestSent)
+                // Aggiorna il numero di follower e following
+                updateFollowerCount(userId ?: "", increment = false)
+                updateFollowingCount(currentUserUid, increment = false)
             }
             .addOnFailureListener { exception ->
                 // Gestisci eventuali errori
@@ -920,6 +926,45 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
                 // Gestisci eventuali errori
                 Log.e("Firebase", "Error removing other user from current user's following: ${exception.message}")
             }
+    }
+
+
+    // Metodo per aggiornare il numero di follower di un utente nel database Firebase
+    private fun updateFollowerCount(userId: String, increment: Boolean) {
+        val userReference = FirebaseDatabase.getInstance().reference.child("users").child(userId)
+        userReference.child("followers counter").runTransaction(object : Transaction.Handler {
+            override fun doTransaction(mutableData: MutableData): Transaction.Result {
+                val currentValue = mutableData.getValue(Int::class.java) ?: 0
+                mutableData.value = if (increment) currentValue + 1 else currentValue - 1
+                return Transaction.success(mutableData)
+            }
+
+            override fun onComplete(databaseError: DatabaseError?, committed: Boolean, dataSnapshot: DataSnapshot?) {
+                if (!committed) {
+                    // Gestisci il fallimento della transazione
+                    Log.e("Firebase", "Error updating follower count: ${databaseError?.message}")
+                }
+            }
+        })
+    }
+
+    // Metodo per aggiornare il numero di following di un utente nel database Firebase
+    private fun updateFollowingCount(userId: String, increment: Boolean) {
+        val userReference = FirebaseDatabase.getInstance().reference.child("users").child(userId)
+        userReference.child("following counter").runTransaction(object : Transaction.Handler {
+            override fun doTransaction(mutableData: MutableData): Transaction.Result {
+                val currentValue = mutableData.getValue(Int::class.java) ?: 0
+                mutableData.value = if (increment) currentValue + 1 else currentValue - 1
+                return Transaction.success(mutableData)
+            }
+
+            override fun onComplete(databaseError: DatabaseError?, committed: Boolean, dataSnapshot: DataSnapshot?) {
+                if (!committed) {
+                    // Gestisci il fallimento della transazione
+                    Log.e("Firebase", "Error updating following count: ${databaseError?.message}")
+                }
+            }
+        })
     }
 
     // Nella funzione onPause() del tuo fragment

@@ -291,6 +291,10 @@ class FourthFragment : Fragment(),
         followersReference.child(currentUserId).setValue(true)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
+                    // Incrementa il contatore dei follower dell'utente seguito
+                    incrementFollowerCount(followedUserId)
+                    // Incrementa il contatore dei following dell'utente corrente
+                    incrementFollowingCount(currentUserId)
                     // Se l'aggiunta è riuscita, mostra un messaggio di successo
                     Toast.makeText(requireContext(), "Utente corrente aggiunto con successo alla lista followers dell'utente seguito", Toast.LENGTH_SHORT).show()
                 } else {
@@ -324,6 +328,10 @@ class FourthFragment : Fragment(),
         followersReference.child(currentUserId).removeValue()
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
+                    // Decrementa il contatore dei follower dell'utente seguito
+                    decrementFollowerCount(followedUserId)
+                    // Decrementa il contatore dei following dell'utente corrente
+                    decrementFollowingCount(currentUserId)
                     // Se la rimozione è riuscita, mostra un messaggio di successo
                     Toast.makeText(requireContext(), "Utente corrente rimosso con successo dalla lista followers dell'utente seguito", Toast.LENGTH_SHORT).show()
                 } else {
@@ -333,6 +341,76 @@ class FourthFragment : Fragment(),
             }
     }
 
+    // Metodo per incrementare il contatore dei follower di un utente
+    private fun incrementFollowerCount(userId: String) {
+        val userReference = database.reference.child("users").child(userId)
+        userReference.child("followers counter").runTransaction(object : Transaction.Handler {
+            override fun doTransaction(mutableData: MutableData): Transaction.Result {
+                val currentValue = mutableData.getValue(Int::class.java)
+                mutableData.value = (currentValue ?: 0) + 1
+                return Transaction.success(mutableData)
+            }
+
+            override fun onComplete(databaseError: DatabaseError?, committed: Boolean, dataSnapshot: DataSnapshot?) {
+                if (!committed) {
+                    // Gestisci il fallimento della transazione
+                }
+            }
+        })
+    }
+
+    // Metodo per decrementare il contatore dei follower di un utente
+    private fun decrementFollowerCount(userId: String) {
+        val userReference = database.reference.child("users").child(userId)
+        userReference.child("followers counter").runTransaction(object : Transaction.Handler {
+            override fun doTransaction(mutableData: MutableData): Transaction.Result {
+                val currentValue = mutableData.getValue(Int::class.java)
+                mutableData.value = (currentValue ?: 0) - 1
+                return Transaction.success(mutableData)
+            }
+
+            override fun onComplete(databaseError: DatabaseError?, committed: Boolean, dataSnapshot: DataSnapshot?) {
+                if (!committed) {
+                    // Gestisci il fallimento della transazione
+                }
+            }
+        })
+    }
+    // Metodo per incrementare il contatore dei following dell'utente corrente
+    private fun incrementFollowingCount(userId: String) {
+        val userReference = database.reference.child("users").child(userId)
+        userReference.child("following counter").runTransaction(object : Transaction.Handler {
+            override fun doTransaction(mutableData: MutableData): Transaction.Result {
+                val currentValue = mutableData.getValue(Int::class.java)
+                mutableData.value = (currentValue ?: 0) + 1
+                return Transaction.success(mutableData)
+            }
+
+            override fun onComplete(databaseError: DatabaseError?, committed: Boolean, dataSnapshot: DataSnapshot?) {
+                if (!committed) {
+                    // Gestisci il fallimento della transazione
+                }
+            }
+        })
+    }
+
+    // Metodo per decrementare il contatore dei following dell'utente corrente
+    private fun decrementFollowingCount(userId: String) {
+        val userReference = database.reference.child("users").child(userId)
+        userReference.child("following counter").runTransaction(object : Transaction.Handler {
+            override fun doTransaction(mutableData: MutableData): Transaction.Result {
+                val currentValue = mutableData.getValue(Int::class.java)
+                mutableData.value = (currentValue ?: 0) - 1
+                return Transaction.success(mutableData)
+            }
+
+            override fun onComplete(databaseError: DatabaseError?, committed: Boolean, dataSnapshot: DataSnapshot?) {
+                if (!committed) {
+                    // Gestisci il fallimento della transazione
+                }
+            }
+        })
+    }
 
     // Metodo per recuperare i dati delle richieste di follow
     private fun retrieveFollowRequestsData() {
@@ -407,6 +485,10 @@ class FourthFragment : Fragment(),
 
     // Metodo chiamato quando si clicca su "Conferma" in una notifica
     override fun onConfirmClickListener(userId: String) {
+        // Incrementa il contatore dei follower dell'utente che ha inviato la richiesta
+        incrementFollowerCount(userId)
+        // Incrementa il contatore dei following dell'utente corrente
+        incrementFollowingCount(currentUserId)
         // Rimuovi la richiesta di follow
         removeFollowRequest(userId)
 
