@@ -188,7 +188,6 @@ open class ThirdFragment : Fragment() {
         }
 
 
-
         countUserReviews(userId, FirebaseDatabase.getInstance().reference, rootView);
         countUserFollowers(userId, FirebaseDatabase.getInstance().reference, rootView);
         countUserFollowing(userId, FirebaseDatabase.getInstance().reference, rootView);
