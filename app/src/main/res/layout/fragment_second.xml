@@ -11,8 +11,13 @@
     <androidx.appcompat.widget.SearchView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
         android:id="@+id/searchviewuser"
+        android:theme="@style/CustomSearchViewStyle"
         app:queryHint="Cerca qui"
+        android:background="@drawable/barra_ricerca"
         app:iconifiedByDefault="false" />
 
     <androidx.recyclerview.widget.RecyclerView

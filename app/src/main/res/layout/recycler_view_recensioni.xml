@@ -79,11 +79,11 @@
                 -->
             <ImageButton
                 android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_height="25dp"
                 android:src="@drawable/commenta"
                 android:id="@+id/commentarecensione"
-                app:tint="@color/black"
-                android:background="@color/verde_spotify"/>
+                app:tint="@color/verde_spotify"
+                android:background="@color/black"/>
             </LinearLayout>
             <LinearLayout
                 android:id="@+id/risposteContainer"
