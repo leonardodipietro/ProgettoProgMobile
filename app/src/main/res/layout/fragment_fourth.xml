@@ -29,7 +29,7 @@
             android:text="@string/notification"
             android:textAlignment="center"
             android:textColor="@color/white"
-            android:textSize="30sp" />
+            android:textSize="25sp" />
 
     </RelativeLayout>
 

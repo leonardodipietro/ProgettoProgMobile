@@ -12,6 +12,7 @@
         android:layout_height="wrap_content"
         android:backgroundTint="@color/verde_spotify"
         android:text="@string/startSpotifyAuthentication"
+        style="@style/CustomButtonStyle2"
         android:textColor="@color/white"
         android:layout_marginTop="15dp"
         android:layout_centerHorizontal="true" />
@@ -41,6 +42,7 @@
         android:layout_height="wrap_content"
         android:backgroundTint="@color/verde_spotify"
         android:text="@string/topTracks"
+        style="@style/CustomButtonStyle2"
         android:textColor="@color/white"
         android:layout_below="@id/sceglicosavedere" />
 
@@ -54,6 +56,7 @@
             android:layout_height="wrap_content"
             android:backgroundTint="@color/verde_spotify"
             android:text="@string/topArtists"
+            style="@style/CustomButtonStyle2"
             android:textColor="@color/white"
             android:layout_toRightOf="@id/gettoptrack"
             android:layout_below="@id/startAuthButton" />

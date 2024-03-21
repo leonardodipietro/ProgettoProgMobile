@@ -1,14 +1,14 @@
 <resources>
 
     <style name="CustomTextStyle">
-        <item name="android:textSize">18sp</item>
+        <item name="android:textSize">15sp</item>
         <item name="android:textColor">@color/dark_green</item>
         <item name="android:textStyle">italic</item>
         <!-- Aggiungi altri attributi di stile desiderati -->
     </style>
 
     <style name="CustomTextStyleWhite">
-        <item name="android:textSize">18sp</item>
+        <item name="android:textSize">15sp</item>
         <item name="android:textColor">@color/white</item>
         <item name="android:textStyle">italic</item>
         <!-- Aggiungi altri attributi di stile desiderati -->
@@ -28,14 +28,14 @@
     </style>
 
     <style name="CustomButtonStyle" parent="Widget.MaterialComponents.Button">
-        <item name="android:textSize">18sp</item>
+        <item name="android:textSize">15sp</item>
         <item name="android:textColor">@color/white</item>
-        <item name="cornerRadius">10dp</item> <!-- Imposta il raggio degli angoli arrotondati -->
+        <item name="cornerRadius">25dp</item> <!-- Imposta il raggio degli angoli arrotondati -->
         <item name="backgroundTint">@color/verde_spotify</item> <!-- Imposta il colore di sfondo -->
     </style>
 
     <style name="CustomToggleButtonStyle">
-        <item name="android:background">@drawable/button</item>
+        <item name="android:background">@drawable/buttonstyle</item>
         <item name="android:textColor">@color/white</item>
     </style>
 
@@ -49,10 +49,10 @@
     </style>
 
     <style name="CustomButtonStyle2" parent="Widget.MaterialComponents.Button">
-        <item name="android:textSize">18sp</item>
-        <item name="android:textColor">@color/black</item>
-        <item name="cornerRadius">5dp</item> <!-- Imposta il raggio degli angoli arrotondati -->
-        <item name="backgroundTint">@color/light_gray</item> <!-- Imposta il colore di sfondo -->
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="cornerRadius">25dp</item> <!-- Imposta il raggio degli angoli arrotondati -->
+        <item name="backgroundTint">@color/verde_spotify</item> <!-- Imposta il colore di sfondo -->
     </style>
 
     <style name="CustomAlertDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
@@ -61,4 +61,15 @@
         <item name="android:textColor">@android:color/white</item>
     </style>
 
+
+    <style name="CustomSearchViewStyle" parent="Widget.AppCompat.SearchView">
+        <!-- Colore del testo -->
+        <item name="android:editTextColor">@color/white</item>
+        <!-- Colore del cursore -->
+        <item name="colorControlNormal">@color/white</item>
+        <item name="linearProgressIndicatorStyle">@color/verde_spotify</item>
+        <item name="android:textColor">@color/white</item> <!-- Colore del testo -->
+        <item name="android:textColorHint">@color/white</item> <!-- Colore del testo di suggerimento -->
+        <item name="android:iconifiedByDefault">false</item> <!-- Barra di ricerca sempre espansa -->
+    </style>
 </resources>

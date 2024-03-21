@@ -35,18 +35,6 @@ class FirebaseViewModel (application: Application): AndroidViewModel(application
     private var isUserRegistered = false
     val _users= MutableLiveData<List<Utente>>()
 
-    private var selectedUserId: String? = null
-
-    fun setSelectedUser(userId: String) {
-        selectedUserId = userId
-        Log.d("FirebaseViewModel", "Utente impostato nel ViewModel: $selectedUserId")
-    }
-
-    fun getSelectedUser(): String? {
-        Log.d("FirebaseViewModel", "Utente recuperato dal ViewModel: $selectedUserId")
-        return selectedUserId
-    }
-
     fun cercaUtenti(query: String) {
         Log.d("FirebaseViewModel", "cercaUtenti called with query: $query")
         val ref = FirebaseDatabase.getInstance().getReference("users")

@@ -1,67 +1,93 @@
-<!-- res/layout/item_layout.xml -->
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
+<androidx.constraintlayout.widget.ConstraintLayout
+xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_marginEnd="5dp"
+android:layout_marginStart="5dp"
+android:layout_width="match_parent"
+android:layout_height="wrap_content"
+android:fitsSystemWindows="true"
+android:orientation="vertical"
+android:padding="10dp"
+android:background="@color/black">
+
+<ImageView
+    android:id="@+id/imageviewtopbrani"
+    android:layout_width="60dp"
+    android:layout_height="60dp"
+    android:layout_marginStart="10dp"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintBottom_toTopOf="@id/linea"
+    tools:layout_editor_absoluteY="20dp" />
+
+
+<TextView
+    android:id="@+id/BranoTopbrani"
+    android:layout_width="300dp"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="16dp"
-    android:background="@color/black"
-    >
+    android:layout_gravity="start"
+    android:layout_marginStart="10dp"
+    android:layout_weight="1"
+    android:textAlignment="viewStart"
+    android:textColor="@color/white"
+    android:textSize="16sp"
+    android:textStyle="bold"
+    app:layout_constraintBottom_toTopOf="@id/ArtistaTopbrani"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintHorizontal_bias="0.0"
+    app:layout_constraintStart_toEndOf="@id/imageviewtopbrani"
+    app:layout_constraintTop_toTopOf="parent" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginBottom="20dp">
+<TextView
+    android:id="@+id/ArtistaTopbrani"
+    android:layout_width="300dp"
+    android:layout_height="wrap_content"
+    android:layout_gravity="start"
+    android:layout_marginStart="10dp"
+    android:layout_weight="1"
+    android:textAlignment="viewStart"
+    android:textColor="@color/gray"
+    android:textSize="14sp"
+    app:layout_constraintBottom_toTopOf="@id/AlbumTopbrani"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintHorizontal_bias="0.0"
+    app:layout_constraintStart_toEndOf="@id/imageviewtopbrani"
+    app:layout_constraintTop_toBottomOf="@id/BranoTopbrani" />
 
-        <ImageView
-            android:id="@+id/imageviewtopbrani"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_gravity="center"
- />
+<TextView
+    android:id="@+id/AlbumTopbrani"
+    android:layout_width="300dp"
+    android:layout_height="wrap_content"
+    android:layout_gravity="start"
+    android:layout_marginStart="10dp"
+    android:layout_marginBottom="10dp"
+    android:layout_weight="1"
+    android:ellipsize="end"
+    android:textAlignment="viewStart"
+    android:textColor="@color/gray"
+    android:textSize="14sp"
+    app:layout_constraintBottom_toTopOf="@+id/linea"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintHorizontal_bias="0.0"
+    app:layout_constraintStart_toEndOf="@id/imageviewtopbrani"
+    app:layout_constraintTop_toBottomOf="@id/ArtistaTopbrani" />
 
-        <TextView
-            android:id="@+id/BranoTopbrani"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="1"
+<!-- Aggiungi un delimitatore tra gli elementi -->
+<View
+    android:id="@+id/linea"
+    android:layout_width="match_parent"
+    android:layout_height="1dp"
+    android:background="@color/gray"
+    android:layout_marginTop="10dp"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintTop_toBottomOf="@id/imageviewtopbrani"
+    tools:layout_editor_absoluteY="138dp" />
 
-            android:textSize="16sp"
-            android:textColor="@color/white"
-            android:layout_marginLeft="10dp"/>
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_gravity="center"
-            android:id="@+id/ArtistaTopbrani"
-            android:textSize="16sp"
-            android:layout_marginLeft="10dp"
-            android:textColor="@color/white"
-            />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_gravity="center"
-            android:id="@+id/AlbumTopbrani"
-            android:textSize="16sp"
-            android:layout_marginLeft="10dp"
-            android:textColor="@color/white"
-            />
-    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
 
 
-    <!-- Aggiungi un delimitatore tra gli elementi -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/dark_gray"/>
 
-</LinearLayout>
 
