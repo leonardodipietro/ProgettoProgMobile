@@ -16,9 +16,11 @@ import android.util.Log
 import com.example.progettoprogmobile.model.AddTracksBody
 import com.example.progettoprogmobile.model.CreatePlaylistBody
 import com.example.progettoprogmobile.model.CreatedPlaylistResponse
+import retrofit2.HttpException
 import retrofit2.http.Body
 import retrofit2.http.Path
 import retrofit2.http.Query
+import java.io.IOException
 
 
 class SpotifyRepository {
@@ -103,14 +105,23 @@ class SpotifyRepository {
             override fun onResponse(call: Call<CreatedPlaylistResponse>, response: Response<CreatedPlaylistResponse>) {
                 if (response.isSuccessful) {
                     Log.d("Spotify", "Playlist creata con successo! Response: ${response.body()}")
+                    callback(response.body(), null)
                 } else {
                     Log.e("Spotify", "Errore nella risposta di creazione playlist. Codice: ${response.code()} - Messaggio: ${response.message()}")
+                    callback(null, Throwable("Errore nella risposta di creazione playlist. Codice: ${response.code()} - Messaggio: ${response.message()}"))
                 }
-                callback(response.body(), null)
             }
 
             override fun onFailure(call: Call<CreatedPlaylistResponse>, t: Throwable) {
-                Log.e("Spotify", "Errore nella chiamata di creazione playlist", t)
+                // Qui utilizziamo la logica migliorata di gestione degli errori
+                when (t) {
+                    is IOException -> Log.e("Spotify", "Errore di rete o API non raggiungibile", t)
+                    is HttpException -> {
+                        val statusCode = t.code()
+                        Log.e("Spotify", "Errore nell'API Spotify, codice di stato: $statusCode", t)
+                    }
+                    else -> Log.e("Spotify", "Errore sconosciuto", t)
+                }
                 callback(null, t)
             }
         })
@@ -120,15 +131,22 @@ class SpotifyRepository {
     fun addTracksToPlaylist(token: String, playlistId: String, body: AddTracksBody, callback: (success: Boolean, error: Throwable?) -> Unit) {
         spotifyApiPlaylistService.addTracksToPlaylist("Bearer $token", playlistId, body).enqueue(object : Callback<Void> {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                callback(response.isSuccessful, null)
+                if (response.isSuccessful) {
+                    callback(true, null)
+                } else {
+                    // Log del corpo della risposta in caso di errore
+                    val errorBody = response.errorBody()?.string()
+                    Log.e("Spotify", "Errore nell'aggiungere tracce alla playlist. Codice: ${response.code()} - Errore: $errorBody")
+                    callback(false, Throwable("Errore nell'aggiungere tracce alla playlist. Codice: ${response.code()} - Errore: $errorBody"))
+                }
             }
 
             override fun onFailure(call: Call<Void>, t: Throwable) {
+                Log.e("Spotify", "Errore di rete o API non raggiungibile", t)
                 callback(false, t)
             }
         })
     }
-
 
 
 

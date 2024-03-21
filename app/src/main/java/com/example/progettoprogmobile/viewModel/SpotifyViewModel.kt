@@ -1,6 +1,4 @@
 package com.example.progettoprogmobile.viewModel
-import android.os.Parcel
-import android.os.Parcelable
 import androidx.lifecycle.ViewModel
 import com.example.progettoprogmobile.api.SpotifyRepository
 import com.example.progettoprogmobile.model.SpotifyTokenResponse
@@ -9,8 +7,6 @@ import com.example.progettoprogmobile.model.TopTracksResponse
 import com.google.firebase.database.*
 import com.example.progettoprogmobile.model.*
 import android.util.Log
-import com.google.firebase.auth.FirebaseAuth
-import java.io.Serializable
 
 class SpotifyViewModel : ViewModel(){
 
@@ -45,11 +41,11 @@ class SpotifyViewModel : ViewModel(){
             }
         }
     }
-     fun createSpotifyPlaylist(token: String,trackIds: List<String>) {
-         Log.d("Playlistchiamata","playlistchiamata")
-        val playlistBody = CreatePlaylistBody(name = "Mia Playlist", description = "Descrizione della mia playlist")
-        val trackUris = trackIds.map { "spotify:track:$it" }
-         Log.d("Playlistchiamata","playlistchiamata con $trackUris")
+    fun createSpotifyPlaylist(token: String, trackUris: List<String>) {
+        Log.d("Playlistchiamata", "playlistchiamata")
+        val playlistBody = CreatePlaylistBody(name = "Top Tracks", description = "ecco le tue top tracks filtrate")
+
+        // Nota che ora `trackUris` è già nel formato corretto, quindi non è necessario mapparlo
         repository.createPlaylist(token, playlistBody) { response, error ->
             if (response != null) {
                 val playlistId = response.id
@@ -67,12 +63,13 @@ class SpotifyViewModel : ViewModel(){
         }
     }
     fun fetchTopTracks(token: String, timeRange: String = "short_term") {
+        Log.d("FetchTopTracks", "Risposta non null ricevuta: chiamata tracce")
         repository.getTopTracks(token, timeRange, 50) { response, error ->
             if (response != null) {
                 when (timeRange) {
-                    "short_term" -> shortTermTracks.postValue(response)
-                    "medium_term" -> mediumTermTracks.postValue(response)
-                    "long_term" -> longTermTracks.postValue(response)
+                    "short_term" -> shortTermTracks!!.postValue(response)
+                    "medium_term" -> mediumTermTracks!!.postValue(response)
+                    "long_term" -> longTermTracks!!.postValue(response)
                 }
                 Log.d("FetchTopTracks", "Risposta non null ricevuta: ${response.items.size} tracce")
                 topTracks.postValue(response)
@@ -88,16 +85,17 @@ class SpotifyViewModel : ViewModel(){
         repository.getTopArtists(token, timeRange,50) { response, error ->
             if (response != null) {
                 when (timeRange) {
-                    "short_term" -> shortTermArtists.postValue(response)
-                    "medium_term" -> mediumTermArtists.postValue(response)
-                    "long_term" -> longTermArtists.postValue(response)
+                    "short_term" -> shortTermArtists!!.postValue(response)
+                    "medium_term" -> mediumTermArtists!!.postValue(response)
+                    "long_term" -> longTermArtists!!.postValue(response)
                 }
-                topArtists.postValue(response)
+                topArtists!!.postValue(response)
             } else if (error != null) {
                 this.error.postValue(error)
             }
         }
 
     }
+
 
 }

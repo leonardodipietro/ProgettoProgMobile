@@ -13,12 +13,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.progettoprogmobile.adapter.TrackAdapter
 import com.example.progettoprogmobile.viewModel.FirebaseViewModel
 import com.example.progettoprogmobile.viewModel.SpotifyViewModel
+import com.example.progettoprogmobile.viewModel.SharedDataViewModel
 import com.google.firebase.auth.FirebaseAuth
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
@@ -46,6 +48,9 @@ class FirstFragment : Fragment(),TrackAdapter.OnTrackClickListener,
 
     private lateinit var sharedPreferences: SharedPreferences
 
+    // Ottieni il ViewModel condiviso
+    val sharedViewModel: SharedDataViewModel by activityViewModels()
+
     private var token: String? = null
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -56,7 +61,6 @@ class FirstFragment : Fragment(),TrackAdapter.OnTrackClickListener,
         sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
 
         setupRecyclerViews(rootView)
-
 
         setupViewModels()
         setupObservers()
@@ -105,6 +109,7 @@ class FirstFragment : Fragment(),TrackAdapter.OnTrackClickListener,
     private fun setupViewModels() {
         spotifyViewModel = ViewModelProvider(this).get(SpotifyViewModel::class.java)
         firebaseViewModel = ViewModelProvider(this).get(FirebaseViewModel::class.java)
+        //sharedViewModel = ViewModelProvider(this).get(SharedDataViewModel::class.java)
 
         firebaseViewModel.filter = "short_term"
        // firebaseViewModel.fetchTopTracksFromFirebase(firebaseViewModel.filter)
@@ -215,6 +220,7 @@ class FirstFragment : Fragment(),TrackAdapter.OnTrackClickListener,
         observeToken()
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
         token?.let { token ->
+
             getTopTracks(token, userId)
             getTopArtists(token, userId)
         } ?: run {
@@ -338,6 +344,7 @@ class FirstFragment : Fragment(),TrackAdapter.OnTrackClickListener,
         }
     }
     private fun getTopTracks(token: String, userId: String) {
+        Log.d("prova nel first","prova  nel first chiamata ")
         val timeRanges = listOf("short_term", "medium_term", "long_term")
         viewLifecycleOwner.lifecycleScope.launch {
             for (timeRange in timeRanges) {
@@ -348,17 +355,24 @@ class FirstFragment : Fragment(),TrackAdapter.OnTrackClickListener,
                 when (timeRange) {
                     "short_term" -> {
                         spotifyViewModel.shortTermTracks.observe(viewLifecycleOwner) { response ->
+                            Log.d("prova nel first","prova  nel first 1 ")
                             handleResponseTrack(response, userId, timeRange)
+                            sharedViewModel.updateShortTermTracks(response)
+                            Log.d("prova nel first","prova  nel first 2 ")
                         }
                     }
                     "medium_term" -> {
                         spotifyViewModel.mediumTermTracks.observe(viewLifecycleOwner) { response ->
                             handleResponseTrack(response, userId, timeRange)
+                            sharedViewModel.updateMediumTermTracks(response)
                         }
                     }
                     "long_term" -> {
                         spotifyViewModel.longTermTracks.observe(viewLifecycleOwner) { response ->
                             handleResponseTrack(response, userId, timeRange)
+                            sharedViewModel.updateLongTermTracks(response)
+                            Log.d("prova nel first long","prova  nel first long ")
+
                         }
                     }
                 }
@@ -401,10 +415,23 @@ class FirstFragment : Fragment(),TrackAdapter.OnTrackClickListener,
         activity?.startActivity(intent)
     }
 
-    private fun observeToken() {
+    /*private fun observeToken() {
         spotifyViewModel.spotifyTokenResponse.observe(viewLifecycleOwner) { tokenResponse ->
             tokenResponse?.access_token?.let { accessToken ->
                 token = accessToken
+                Log.d("SpotifyToken", "Token ottenuto: $accessToken")
+            } ?: run {
+                Log.d("SpotifyToken", "Token non ottenuto")
+            }
+        }
+    }*/
+    private fun observeToken() {
+        spotifyViewModel.spotifyTokenResponse.observe(viewLifecycleOwner) { tokenResponse ->
+            tokenResponse?.access_token?.let { accessToken ->
+                // Aggiorna il token nel ViewModel condiviso
+                sharedViewModel.updateToken(accessToken)
+                token=accessToken
+                Log.d("SpotifyToken", "Token ottenuto: $token")
                 Log.d("SpotifyToken", "Token ottenuto: $accessToken")
             } ?: run {
                 Log.d("SpotifyToken", "Token non ottenuto")

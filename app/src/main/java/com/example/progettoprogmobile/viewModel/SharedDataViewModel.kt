@@ -4,6 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.example.progettoprogmobile.ActionState
+import com.example.progettoprogmobile.model.TopTracksResponse
 import com.example.progettoprogmobile.model.Track
 import com.example.progettoprogmobile.model.Utente
 
@@ -23,4 +24,28 @@ class SharedDataViewModel: ViewModel() {
     val commentJustSubmitted = MutableLiveData<Boolean>().apply { value = false }
     val isEditingReview = MutableLiveData<Boolean>(false)
     val usersMap: MutableLiveData<Map<String, Utente>> = MutableLiveData()
+
+    val shortTermTracksShared = MutableLiveData<TopTracksResponse>()
+    val mediumTermTracksShared = MutableLiveData<TopTracksResponse?>()
+    val longTermTracksShared = MutableLiveData<TopTracksResponse?>()
+
+    val spotifyToken: MutableLiveData<String?> = MutableLiveData()
+
+    fun updateShortTermTracks(data: TopTracksResponse) {
+        shortTermTracksShared.value = data
+    }
+
+    fun updateMediumTermTracks(data: TopTracksResponse?) {
+        mediumTermTracksShared.value = data
+    }
+
+    fun updateLongTermTracks(data: TopTracksResponse?) {
+        longTermTracksShared.value = data
+    }
+
+    fun updateToken(token: String?) {
+        spotifyToken.value = token
+    }
+
+
 }

@@ -18,8 +18,11 @@ import android.widget.*
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import com.example.progettoprogmobile.viewModel.FirebaseAuthViewModel
+import com.example.progettoprogmobile.viewModel.FirebaseViewModel
+import com.example.progettoprogmobile.viewModel.SpotifyViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import com.google.firebase.database.ktx.database
@@ -29,27 +32,33 @@ import com.google.firebase.ktx.Firebase
 import com.squareup.picasso.Picasso
 import java.io.IOException
 import java.io.ByteArrayOutputStream
+import com.example.progettoprogmobile.model.Track
+import com.example.progettoprogmobile.viewModel.SharedDataViewModel
 
 open class ThirdFragment : Fragment() {
 
     private lateinit var databaseReference: DatabaseReference
     private lateinit var storageReference: StorageReference
     private lateinit var firebaseauthviewModel: FirebaseAuthViewModel
-
+    private lateinit var firebaseViewModel: FirebaseViewModel
     private val currentUser = FirebaseAuth.getInstance().currentUser
     private val userId = currentUser?.uid?:""
-
+    private lateinit var spotifyViewModel:SpotifyViewModel
     private lateinit var userImage: ImageView
     private lateinit var editImageButton: ImageButton
     private val cameraPermissionRequestCode = 1002
     private val photoRequestCode = 1
     private val photoRequestCodeFromGallery = 2
-
+    private var token: String? = null
     private lateinit var account: TextView
     private lateinit var selectedAccountPrivacy: String
     private lateinit var accountPrivacyListView: ListView
 
     private lateinit var sharedPreferences: SharedPreferences
+    private val sharedViewModel: SharedDataViewModel by activityViewModels()
+    private val shortTermTracksShared: SharedDataViewModel by activityViewModels()
+    private val mediumTermTracksShared: SharedDataViewModel by activityViewModels()
+    private val longTermTracksShared: SharedDataViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -58,21 +67,28 @@ open class ThirdFragment : Fragment() {
 
         // Legge il layout XML per questo fragment
         val rootView = inflater.inflate(R.layout.fragment_third, container, false)
+        //ottengo il token di spotify
 
         //Inizializza Firebase
         databaseReference = FirebaseDatabase.getInstance().getReference("users")
         storageReference = FirebaseStorage.getInstance().getReference("profile image/$userId")
         // Inizializza il ViewModel per la gestione dell'autenticazione Firebase
         firebaseauthviewModel = ViewModelProvider(this)[FirebaseAuthViewModel::class.java]
-
+        firebaseViewModel =  ViewModelProvider(this)[FirebaseViewModel::class.java]
         sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
-
+        spotifyViewModel  = ViewModelProvider(this)[SpotifyViewModel::class.java]
         userImage = rootView.findViewById(R.id.userImage)
         editImageButton = rootView.findViewById(R.id.editImageButton)
+
+
+
+        //var  filter
         // Gestione del cambio immagine
         editImageButton.setOnClickListener {
             openFileChooser()
         }
+
+
 
         // Carica l'URL dell'immagine di profilo dalle SharedPreferences
         val imageUrl = sharedPreferences.getString("profile image_$userId", null)
@@ -129,6 +145,13 @@ open class ThirdFragment : Fragment() {
         // Trova i pulsanti nel layout del fragment
         val signOut = rootView.findViewById<Button>(R.id.signOut)
         val delete = rootView.findViewById<Button>(R.id.delete)
+
+
+
+
+
+
+
 
         // Imposta un click listener per il pulsante "Sign Out"
         signOut.setOnClickListener {
@@ -192,7 +215,65 @@ open class ThirdFragment : Fragment() {
         countUserFollowers(userId, FirebaseDatabase.getInstance().reference, rootView);
         countUserFollowing(userId, FirebaseDatabase.getInstance().reference, rootView);
 
+        observeToken()
+        //setupButtonListeners()
+        val firstPlaylistButton = rootView?.findViewById<Button>(R.id.playlist1m)
+        val secondPlaylistButton = rootView?.findViewById<Button>(R.id.playlist6m)
+        val thirdPlaylistButton = rootView?.findViewById<Button>(R.id.playlistalways)
+
+        firstPlaylistButton?.setOnClickListener {
+            Log.d("PlaylistButton", "First playlist button clicked")
+            sharedViewModel.shortTermTracksShared.value?.items?.let { items ->
+                if (items.isNullOrEmpty()) {
+                    Log.d("Playlist", "La lista delle tracce è vuota")
+                } else {
+                    Log.d("Playlist", "Chiamata a createPlaylistFromTopTracks con ${items.size} tracce")
+                    createPlaylistFromTopTracks(items)
+                }
+            } ?: run {
+                Log.d("PlaylistButton", "shortTermTracksShared.value è null")
+            }
+        }
+
+        secondPlaylistButton?.setOnClickListener {
+            sharedViewModel.mediumTermTracksShared.value?.items?.let { items ->
+                createPlaylistFromTopTracks(items)
+            }
+        }
+
+        thirdPlaylistButton?.setOnClickListener {
+            sharedViewModel.longTermTracksShared.value?.items?.let { items ->
+                createPlaylistFromTopTracks(items)
+            }
+        }
         return rootView
+    }
+
+
+
+    private fun observeToken() {
+        sharedViewModel.spotifyToken.observe(viewLifecycleOwner) { accessToken ->
+            accessToken?.let {
+                // Qui puoi usare accessToken per le tue chiamate API di Spotify
+                Log.d("SpotifyToken dentro il third", "Token ottenuto: $it")
+                // Chiamata per creare la playlist, o qualsiasi altra operazione che richieda il token
+                token = accessToken
+                Log.d("SpotifyToken dentro il third parte 2", "Token ottenuto: $token")
+            } ?: run {
+                Log.d("SpotifyToken", "Token non ottenuto")
+            }
+        }
+    }
+    private fun createPlaylistFromTopTracks(items: List<Track>) {
+        val currentToken = token // Usa una variabile locale per ridurre l'uso di '!!'
+      Log.d("SpotifyToken dentro il third parte 3", "Token ottenuto: $currentToken")
+        if (currentToken != null) {
+            Log.d("Playlist", "playlist chiamata nel fragment")
+            val trackUris = items.map { "spotify:track:${it.id}" }
+            spotifyViewModel.createSpotifyPlaylist(currentToken, trackUris)
+        } else {
+            Log.e("SpotifyToken", "Token non disponibile")
+        }
     }
 
 

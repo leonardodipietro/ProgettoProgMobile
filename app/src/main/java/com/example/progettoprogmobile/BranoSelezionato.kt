@@ -204,7 +204,7 @@ class BranoSelezionato : Fragment(), RecensioniBranoSelAdapter.OnRecensioneInter
                             val commentContent = EditText.text.toString()
                             if (commentContent.isNotBlank()) {
                                 Log.d("DDDD", "setupSubmission: Contenuto valido, procedendo con l'invio della recensione")
-
+                                recensioneViewModel.saveRecensione(userId, track.id, artistId,commentContent)
                                 Log.d("DDDD", "setupSubmission: Recensione inviata con successo")
                                 finalizeReviewSubmission()
                             } else {

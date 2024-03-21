@@ -1,18 +1,14 @@
 package com.example.progettoprogmobile.viewModel
 
 import android.app.Application
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.database.*
 import com.example.progettoprogmobile.model.*
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import android.content.Context
-import android.os.Bundle
 //import com.example.progettoprogmobile.FifthFragment
-import com.example.progettoprogmobile.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -20,14 +16,9 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
-import java.util.concurrent.CountDownLatch
 import kotlin.coroutines.resumeWithException
 import com.example.progettoprogmobile.model.Utente
-import com.squareup.picasso.Picasso
-import androidx.lifecycle.LiveData
-import java.util.Locale
 
 
 class FirebaseViewModel (application: Application): AndroidViewModel(application) {
@@ -266,7 +257,7 @@ class FirebaseViewModel (application: Application): AndroidViewModel(application
                 Log.e("Firebase", "Errore nel salvataggio degli IDs delle tracce per l'utente $userId: ${it.message}")
             }
     }
-    fun fetchTopTracksFromFirebase(filter:String) {
+    fun fetchTopTracksFromFirebase(filter: String) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         if (userId != null) {
             val userTopTracksRef = database.child("users").child(userId).child("topTracks").child(filter)
@@ -302,6 +293,20 @@ class FirebaseViewModel (application: Application): AndroidViewModel(application
         }
     }
 
+//SERVE PER LE PLAYLIST
+    fun retrieveTrackIdsFromFirebase(callback: (List<String>) -> Unit) {
+        val tracksRef = FirebaseDatabase.getInstance().reference.child("tracks").child(filter)
+        tracksRef.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val trackIds = dataSnapshot.children.mapNotNull { it.key }
+                callback(trackIds)
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.e("Firebase", "Errore nel recupero degli ID delle tracce: ${databaseError.message}")
+            }
+        })
+    }
     fun retrieveTracksDetails(trackIds: List<String>,onComplete: ((List<Track>) -> Unit)? = null) {
         //L ON COMPLETE SERVE NEL FRAGMENT ARTISTASELEZIONATO
         CoroutineScope(Dispatchers.IO).launch {
