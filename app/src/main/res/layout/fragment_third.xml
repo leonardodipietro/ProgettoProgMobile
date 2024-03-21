@@ -188,8 +188,8 @@
     <RelativeLayout
         android:id="@+id/relativeLayout"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
-        android:layout_marginTop="20dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="0dp"
         app:layout_constraintTop_toBottomOf="@id/settingLayout"
         app:layout_constraintStart_toStartOf="parent">
 
@@ -223,6 +223,37 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/playlist1m"
+            android:layout_marginTop="10dp"
+            android:layout_below="@+id/delete"
+            android:text="crea"
+            android:layout_marginLeft="30dp"
+            />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:id="@+id/playlist6m"
+            android:text="crea "
+            android:layout_below="@+id/delete"
+            android:layout_toRightOf="@+id/playlist1m"
+            android:layout_marginLeft="30dp"
+            />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/playlistalways"
+            android:text="crea "
+            android:layout_marginTop="10dp"
+            android:layout_below="@+id/delete"
+            android:layout_toRightOf="@+id/playlist6m"
+            android:layout_marginLeft="30dp"
+            />
 
     </RelativeLayout>
 
