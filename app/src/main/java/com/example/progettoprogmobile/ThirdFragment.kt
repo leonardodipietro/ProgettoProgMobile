@@ -124,6 +124,7 @@ open class ThirdFragment : Fragment() {
 
         // Mostra il nome utente
         displayUsername(userId, rootView)
+        displayEmail(userId, rootView)
 
         // Gestione del cambio nome utente
         val editNameButton: ImageButton = rootView.findViewById(R.id.editNameButton)
@@ -404,6 +405,24 @@ open class ThirdFragment : Fragment() {
                 val username = dataSnapshot.value.toString()
                 val usernameTextView = rootView.findViewById<TextView>(R.id.username)
                 usernameTextView.text = username
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                Log.e("Firebase", "Errore nel recupero del nome utente: ${databaseError.message}")
+            }
+        })
+    }
+
+
+    fun displayEmail(userId: String, rootView: View) {
+        val userRef: DatabaseReference =
+            FirebaseDatabase.getInstance().reference.child("users").child(userId)
+
+        userRef.child("email").addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val email = dataSnapshot.value.toString()
+                val emailTextView = rootView.findViewById<TextView>(R.id.email)
+                emailTextView.text = email
             }
 
             override fun onCancelled(databaseError: DatabaseError) {

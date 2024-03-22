@@ -23,24 +23,25 @@
         tools:ignore="ImageContrastCheck"
         tools:src="@tools:sample/avatars" />
 
-        <ImageButton
-            android:id="@+id/editImageButton"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_alignEnd="@+id/userImage"
-            android:layout_alignBottom="@+id/userImage"
-            android:layout_marginEnd="0dp"
-            android:layout_marginBottom="0dp"
-            android:contentDescription="@string/editImageButton"
-            android:src="@android:drawable/ic_menu_edit"
-            app:layout_constraintBottom_toBottomOf="@+id/userImage"
-            app:layout_constraintEnd_toEndOf="@+id/userImage"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toStartOf="@+id/userImage"
-            app:layout_constraintTop_toTopOf="@+id/userImage"
-            app:layout_constraintVertical_bias="1.0"
-            tools:ignore="ImageContrastCheck"
-            tools:src="@android:drawable/ic_menu_edit" />
+    <ImageButton
+        android:id="@+id/editImageButton"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:backgroundTint="@color/fui_transparent"
+        android:layout_alignEnd="@+id/userImage"
+        android:layout_alignBottom="@+id/userImage"
+        android:layout_marginEnd="-10dp"
+        android:layout_marginBottom="-10dp"
+        android:contentDescription="@string/editImageButton"
+        android:src="@android:drawable/ic_menu_edit"
+        app:layout_constraintBottom_toBottomOf="@+id/userImage"
+        app:layout_constraintEnd_toEndOf="@+id/userImage"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="@+id/userImage"
+        app:layout_constraintTop_toTopOf="@+id/userImage"
+        app:layout_constraintVertical_bias="1.0"
+        tools:ignore="ImageContrastCheck"
+        tools:src="@android:drawable/ic_menu_edit" />
 
     <RelativeLayout
         android:id="@+id/reviewsFollowersLayout"
@@ -53,14 +54,15 @@
 
         <TextView
             android:id="@+id/reviewTextButton"
-            android:layout_width="90dp"
-            android:layout_height="90dp"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
             android:layout_marginEnd="20dp"/>
 
         <TextView
             android:id="@+id/reviewText"
-            android:layout_width="80dp"
-            android:layout_height="35dp"
+            android:textStyle="bold"
+            android:layout_width="60dp"
+            android:layout_height="30dp"
             android:layout_alignStart="@id/reviewTextButton"
             android:layout_alignEnd="@+id/reviewTextButton"
             android:layout_alignBottom="@+id/reviewTextButton"
@@ -75,8 +77,8 @@
 
         <TextView
             android:id="@+id/reviewNumber"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_above="@+id/reviewText"
             android:layout_alignStart="@+id/reviewTextButton"
             android:layout_alignTop="@+id/reviewTextButton"
@@ -94,8 +96,8 @@
 
         <TextView
             android:id="@+id/followersTextButton"
-            android:layout_width="90dp"
-            android:layout_height="90dp"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
             android:layout_marginEnd="20dp"
             android:layout_toEndOf="@+id/reviewTextButton"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -105,8 +107,9 @@
 
         <TextView
             android:id="@+id/followersText"
+            android:textStyle="bold"
             android:layout_width="80dp"
-            android:layout_height="35dp"
+            android:layout_height="30dp"
             android:layout_alignStart="@+id/followersTextButton"
             android:layout_alignEnd="@+id/followersTextButton"
             android:layout_alignBottom="@+id/followersTextButton"
@@ -141,8 +144,8 @@
 
         <TextView
             android:id="@+id/followingTextButton"
-            android:layout_width="90dp"
-            android:layout_height="90dp"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
             android:layout_toEndOf="@+id/followersTextButton"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -152,8 +155,9 @@
 
         <TextView
             android:id="@+id/followingText"
+            android:textStyle="bold"
             android:layout_width="90dp"
-            android:layout_height="35dp"
+            android:layout_height="30dp"
             android:layout_alignStart="@+id/followingTextButton"
             android:layout_alignEnd="@+id/followingTextButton"
             android:layout_alignBottom="@+id/followingTextButton"
@@ -186,74 +190,61 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/relativeLayout"
-        android:layout_width="match_parent"
+        android:id="@+id/playlistLayout"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="0dp"
-        app:layout_constraintTop_toBottomOf="@id/settingLayout"
-        app:layout_constraintStart_toStartOf="parent">
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/reviewsFollowersLayout">
 
-        <Button
-            android:id="@+id/signOut"
+        <TextView
+            android:id="@+id/playlist"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:backgroundTint="@color/verde_spotify"
-            android:contentDescription="@string/signOut"
-            android:text="@string/signOut"
+            android:text="Crea la playlist dei tuoi Top Brani su Spotify: "
             android:textColor="@color/white"
-            app:layout_constraintBottom_toTopOf="@+id/delete"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:textSize="16sp" />
 
-        <Button
-            android:id="@+id/delete"
+        <RelativeLayout
+            android:id="@+id/pulsantiLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/signOut"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="10dp"
-            android:backgroundTint="@color/verde_spotify"
-            android:text="@string/delete"
-            android:textColor="@color/white"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            android:layout_below="@id/playlist"
+            android:layout_marginTop="10dp">
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/playlist1m"
-            android:layout_marginTop="10dp"
-            android:layout_below="@+id/delete"
-            android:text="crea"
-            android:layout_marginLeft="30dp"
-            />
+            <Button
+                android:id="@+id/playlist1m"
+                style="@style/CustomButtonStyle2"
+                android:layout_width="100dp"
+                android:layout_height="50dp"
+                android:text="Ultimo mese"
+                android:textSize="12sp" />
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:id="@+id/playlist6m"
-            android:text="crea "
-            android:layout_below="@+id/delete"
-            android:layout_toRightOf="@+id/playlist1m"
-            android:layout_marginLeft="30dp"
-            />
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/playlistalways"
-            android:text="crea "
-            android:layout_marginTop="10dp"
-            android:layout_below="@+id/delete"
-            android:layout_toRightOf="@+id/playlist6m"
-            android:layout_marginLeft="30dp"
-            />
+
+            <Button
+                android:id="@+id/playlist6m"
+                style="@style/CustomButtonStyle2"
+                android:layout_width="100dp"
+                android:layout_height="50dp"
+                android:layout_marginLeft="10dp"
+                android:layout_toRightOf="@+id/playlist1m"
+                android:text="Ultimi sei mesi "
+                android:textSize="12sp" />
+
+            <Button
+                android:id="@+id/playlistalways"
+                style="@style/CustomButtonStyle2"
+                android:layout_width="100dp"
+                android:layout_height="50dp"
+                android:layout_marginLeft="10dp"
+                android:layout_toRightOf="@+id/playlist6m"
+                android:text="Sempre"
+                android:textSize="12sp" />
+        </RelativeLayout>
 
     </RelativeLayout>
 
@@ -261,78 +252,104 @@
         android:id="@+id/settingLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        app:layout_constraintTop_toBottomOf="@+id/reviewsFollowersLayout"
-        tools:layout_editor_absoluteX="7dp">
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="10dp"
+        app:layout_constraintTop_toBottomOf="@+id/playlistLayout"
+        tools:layout_editor_absoluteX="9dp">
 
         <TextView
-            android:id="@+id/Impostazioni"
+            android:id="@+id/voceUsername"
+            android:textStyle="bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="10dp"
-            android:text="@string/settings"
-            android:textColor="@color/white"
-            android:textSize="25sp"
-            app:layout_constraintBottom_toTopOf="@id/voceUsername"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.05"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/voceUsername"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/Impostazioni"
-            android:layout_alignParentStart="true"
             android:layout_marginStart="20sp"
-            android:layout_marginTop="20sp"
+            android:layout_marginTop="10dp"
             android:gravity="center"
             android:text="@string/username"
             android:textColor="@color/white"
-            android:textSize="20sp"
+            android:textSize="18sp"
             app:layout_constraintBottom_toTopOf="@id/voceUsername"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.05"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/Impostazioni" />
+            app:layout_constraintTop_toBottomOf="parent" />
 
         <TextView
             android:id="@+id/username"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/Impostazioni"
+            android:layout_alignParentTop="true"
             android:layout_marginStart="0dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="10dp"
             android:layout_toEndOf="@+id/voceUsername"
             android:textColor="@color/white"
-            android:textSize="20sp"
+            android:textSize="18sp"
+            android:maxLines="1"
+            android:maxWidth="200dp"
+            android:ellipsize="end"
             app:layout_constraintBottom_toTopOf="@+id/voceUsername"
             app:layout_constraintStart_toEndOf="@+id/voceUsername"
-            app:layout_constraintTop_toBottomOf="@+id/Impostazioni" />
+            app:layout_constraintTop_toBottomOf="parent" />
 
         <ImageButton
             android:id="@+id/editNameButton"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_below="@+id/Impostazioni"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:backgroundTint="@color/fui_transparent"
+            android:layout_alignParentTop="true"
             android:layout_marginStart="5dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="5dp"
             android:layout_marginBottom="0dp"
             android:layout_toEndOf="@+id/username"
             android:contentDescription="@string/editNameButton"
             android:src="@android:drawable/ic_menu_edit"
             app:layout_constraintStart_toEndOf="@+id/username"
-            app:layout_constraintTop_toBottomOf="@+id/Impostazioni" />
+            app:layout_constraintTop_toBottomOf="parent"
+            tools:src="@android:drawable/ic_menu_edit" />
 
         <TextView
-            android:id="@+id/voceAccount"
+            android:id="@+id/voceEmail"
+            android:textStyle="bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/voceUsername"
+            android:layout_marginStart="20sp"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:text="Email: "
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toTopOf="@id/voceUsername"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.05"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/voceUsername" />
+
+        <TextView
+            android:id="@+id/email"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/username"
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="10dp"
+            android:layout_toEndOf="@+id/voceEmail"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:maxLines="1"
+            android:maxWidth="250dp"
+            android:ellipsize="end"
+            app:layout_constraintBottom_toTopOf="@+id/voceEmail"
+            app:layout_constraintStart_toEndOf="@+id/voceEmail"
+            app:layout_constraintTop_toBottomOf="@id/username" />
+
+        <TextView
+            android:id="@+id/voceAccount"
+            android:textStyle="bold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/voceEmail"
             android:layout_alignParentStart="true"
             android:layout_marginStart="20dp"
             android:layout_marginTop="10dp"
@@ -343,20 +360,63 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.05"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/voceUsername" />
+            app:layout_constraintTop_toBottomOf="@id/voceEmail" />
 
         <TextView
             android:id="@+id/account"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/voceUsername"
+            android:layout_below="@+id/email"
             android:layout_marginStart="0dp"
             android:layout_marginTop="10dp"
+            android:layout_marginBottom="0dp"
             android:layout_toEndOf="@+id/voceAccount"
             android:textColor="@color/white"
             android:textSize="18sp"
             app:layout_constraintStart_toEndOf="@+id/voceAccount"
-            app:layout_constraintTop_toBottomOf="@id/voceUsername" />
+            app:layout_constraintTop_toBottomOf="@id/voceEmail" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/relativeLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/settingLayout">
+
+        <Button
+            android:id="@+id/signOut"
+            style="@style/CustomButtonStyle2"
+            android:layout_width="110dp"
+            android:layout_height="50dp"
+            android:backgroundTint="@color/verde_spotify"
+            android:contentDescription="@string/signOut"
+            android:layout_alignParentTop="true"
+            android:text="@string/signOut"
+            android:textColor="@color/white"
+            android:textSize="12dp"
+            android:layout_centerHorizontal="true"
+            app:layout_constraintBottom_toTopOf="@+id/delete"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/delete"
+            style="@style/CustomButtonStyle2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/signOut"
+            android:backgroundTint="@color/verde_spotify"
+            android:text="@string/delete"
+            android:textColor="@color/white"
+            android:textSize="12dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/signOut" />
 
     </RelativeLayout>
 

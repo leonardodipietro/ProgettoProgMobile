@@ -73,14 +73,15 @@
         tools:ignore="HardcodedText" />
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerBranidiArtistaRecensiti"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="20dp"
-        android:id="@+id/recyclerBranidiArtistaRecensiti"
-        android:visibility="visible"
-        android:layout_marginBottom="70dp"
         android:layout_below="@id/iniziobranirecensiti"
-        android:layout_centerHorizontal="true">
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="0dp"
+        android:visibility="visible">
 
     </androidx.recyclerview.widget.RecyclerView>
 
