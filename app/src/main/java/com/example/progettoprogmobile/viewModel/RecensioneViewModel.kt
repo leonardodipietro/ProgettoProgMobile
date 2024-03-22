@@ -20,13 +20,29 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class RecensioneViewModel() : ViewModel() {
-    private val database: DatabaseReference = FirebaseDatabase.getInstance().reference
+
+
+//Per i test
+open class RecensioneViewModel() : ViewModel() {
+    private var database: DatabaseReference = FirebaseDatabase.getInstance().reference
     val recensioniData: MutableLiveData<List<Recensione>> = MutableLiveData()
     var usersData: MutableLiveData<Map<String, Utente>> = MutableLiveData()
     // private lateinit var firebaseViewModel :FirebaseViewModel
     //val StatoRecensioneLiveData = MutableLiveData<Boolean>() //Per l'edit text e il bottone
    private lateinit var sharedEditTextVisibilityManager: SharedEditTextVisibilityManager
+
+
+    // Chiamato normalmente nell'app
+    fun init() {
+        database = FirebaseDatabase.getInstance().reference
+
+    }
+
+    // Utilizzato solo per i test per impostare il mock
+    fun initForTesting(mockDatabase: DatabaseReference) {
+        database = mockDatabase
+    }
+
 
 
     fun setSharedEditTextVisibilityManager(manager: SharedEditTextVisibilityManager) {
@@ -97,7 +113,7 @@ class RecensioneViewModel() : ViewModel() {
             .addOnFailureListener {
                 // Gestione dell'errore
             }
-        sharedEditTextVisibilityManager.hideEditText()
+      //sharedEditTextVisibilityManager.hideEditText()
     }
 
  /*   fun updateRecensione(commentId: String, userId: String, commentContent: String) {
