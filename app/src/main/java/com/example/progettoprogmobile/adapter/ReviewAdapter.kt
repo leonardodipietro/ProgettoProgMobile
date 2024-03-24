@@ -16,9 +16,9 @@ import com.example.progettoprogmobile.model.ReviewData
 import com.squareup.picasso.Picasso
 
 
-class ReviewAdapter (parent: ViewGroup) : ListAdapter<ReviewData, ReviewAdapter.ViewHolder>(ReviewDataDiffCallback()) {
+class ReviewAdapter (private val activity: FragmentActivity) : ListAdapter<ReviewData, ReviewAdapter.ViewHolder>(ReviewDataDiffCallback()) {
 
-    val view: View = LayoutInflater.from(parent.context).inflate(R.layout.recycler_view_recensioni_profilo, parent, false)
+    //val view: View = LayoutInflater.from(parent.context).inflate(R.layout.recycler_view_recensioni_profilo, parent, false)
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val copertina: ImageView = view.findViewById(R.id.copertina)
@@ -27,6 +27,19 @@ class ReviewAdapter (parent: ViewGroup) : ListAdapter<ReviewData, ReviewAdapter.
         val album: TextView = view.findViewById(R.id.album)
         val recensione: TextView = view.findViewById(R.id.content)
         val timestamp: TextView = view.findViewById(R.id.timestamp)
+    }
+
+    // Aggiungi un'interfaccia di callback per gestire i clic sugli elementi
+    interface OnReviewItemClickListener {
+        fun onReviewItemClick(reviewData: ReviewData)
+    }
+
+    // Aggiungi una variabile per memorizzare il listener di clic
+    private var listener: OnReviewItemClickListener? = null
+
+    // Aggiungi un metodo per impostare il listener di clic
+    fun setOnReviewItemClickListener(listener: OnReviewItemClickListener) {
+        this.listener = listener
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -43,6 +56,10 @@ class ReviewAdapter (parent: ViewGroup) : ListAdapter<ReviewData, ReviewAdapter.
         holder.album.text = reviewData.album
         holder.recensione.text = reviewData.recensione
         holder.timestamp.text = reviewData.timestamp.toString()
+
+        holder.itemView.setOnClickListener {
+            listener?.onReviewItemClick(reviewData)
+        }
     }
 
     class ReviewDataDiffCallback : DiffUtil.ItemCallback<ReviewData>() {

@@ -15,6 +15,7 @@ import com.example.progettoprogmobile.model.Utente
 import com.example.progettoprogmobile.model.Recensione
 import com.example.progettoprogmobile.model.Track
 import com.example.progettoprogmobile.model.Album
+import com.example.progettoprogmobile.model.Artist
 import com.example.progettoprogmobile.model.Image
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
@@ -32,6 +33,7 @@ class FourthFragment : Fragment(),
     private var notificationList: MutableList<NotificationItem> = mutableListOf()
 
     private var trackList: MutableList<Track> = mutableListOf()
+    private lateinit var artistsList: MutableList<Artist>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -648,31 +650,77 @@ class FourthFragment : Fragment(),
                     trackName.addListenerForSingleValueEvent(object : ValueEventListener {
                         override fun onDataChange(trackDataSnapshot: DataSnapshot) {
                             if (trackDataSnapshot.exists()) {
-                                val trackName = trackDataSnapshot.child("trackName").getValue(String::class.java).toString()
+                                val trackName = trackDataSnapshot.child("trackName").value.toString()
                                 // Log del nome della traccia
                                 Log.d("TrackName", "Nome della traccia: $trackName")
-                                val albumName = trackDataSnapshot.child("album").getValue(String::class.java)
-                                val image = trackDataSnapshot.child("image_url").getValue(String::class.java)
+                                val albumName = trackDataSnapshot.child("album").value.toString()
+                                val imageUrl = trackDataSnapshot.child("image_url").value.toString()
 
-                                // Crea un oggetto Image con l'URL dell'immagine
-                                val albumImage = Image(url = image ?: "")
+                                val artistIdsSnapshot = trackDataSnapshot.child("artists")
+                                val artistIds = ArrayList<String>()
+                                for (artistIdSnapshot in artistIdsSnapshot.children) {
+                                    val artistId = artistIdSnapshot.value.toString()
+                                    artistIds.add(artistId)
+                                }
 
-                                // Ottieni altri dati della traccia come gli artisti, durata, ecc. se necessario
-                                // Ora puoi popolare l'oggetto Track con i dati ottenuti
-                                val track = Track(
-                                    name = trackName ?: "",
-                                    album = Album(name = albumName ?: "", images = listOf(albumImage), releaseDate = ""),
-                                    artists = listOf(), // Assicurati di ottenere gli artisti se necessario
-                                    id = trackId
-                                )
+                                val artistNameList = mutableListOf<String>()
 
-                                // Aggiungi l'utente associato alla richiesta alla lista delle notifiche
-                                notificationList.add(NotificationItem.ReviewItem(user, track))
-                                notificationsAdapter.submitList(notificationList)
-                                notificationsAdapter.notifyDataSetChanged()
+                                for (artistId in artistIds) {
+                                    val artistRef = database.getReference("artists").child(artistId)
+                                    artistRef.addListenerForSingleValueEvent(object : ValueEventListener {
+                                        override fun onDataChange(artistDataSnapshot: DataSnapshot) {
+                                            val artistName =
+                                                artistDataSnapshot.child("name").value.toString()
+                                            artistNameList.add(artistName)
 
-                                // Stampiamo nel log il fatto che l'oggetto Track sia stato passato all'adapter
-                                Log.d("TrackObject", "Track object passed to adapter: $track")
+                                            if (artistNameList.size == artistIds.size) {
+                                                // All artist information has been retrieved
+                                                val artistImages =
+                                                    artistNameList.map { Image(url = it) }
+                                                val artist = Artist(
+                                                    id = artistId,
+                                                    name = artistNameList.joinToString(),
+                                                    genres = emptyList(),
+                                                    images = artistImages
+                                                )
+
+                                                // Create Track object
+                                                val albumImage = Image(url = imageUrl)
+                                                val track = Track(
+                                                    name = trackName,
+                                                    album = Album(
+                                                        name = albumName,
+                                                        images = listOf(albumImage),
+                                                        releaseDate = ""
+                                                    ),
+                                                    artists = listOf(artist),
+                                                    id = trackId
+                                                )
+
+
+                                                // Aggiungi l'utente associato alla richiesta alla lista delle notifiche
+                                                notificationList.add(
+                                                    NotificationItem.ReviewItem(
+                                                        user,
+                                                        track
+                                                    )
+                                                )
+                                                notificationsAdapter.submitList(notificationList)
+                                                notificationsAdapter.notifyDataSetChanged()
+
+                                                // Stampiamo nel log il fatto che l'oggetto Track sia stato passato all'adapter
+                                                Log.d(
+                                                    "TrackObject",
+                                                    "Track object passed to adapter: $track"
+                                                )
+                                            }
+                                        }
+                                        override fun onCancelled(databaseError: DatabaseError) {
+                                            // Gestione degli errori nell'ottenere i dati dell'artista
+                                            Log.e("ArtistData", "Errore nel recupero dei dati dell'artista: ${databaseError.message}")
+                                        }
+                                    })
+                                }
 
                             } else {
                                 Log.e("TrackName", "Nome della traccia non trovato")

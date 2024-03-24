@@ -8,5 +8,6 @@ data class ReviewData(
     val track: String,
     val album: String,
     val image: String,
-    val artist: List<String>
+    val artist: List<String>,
+    val trackId: String
 ): Serializable
