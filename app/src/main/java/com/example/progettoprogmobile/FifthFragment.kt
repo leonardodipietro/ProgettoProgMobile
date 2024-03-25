@@ -767,9 +767,9 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
     private fun updateFollowButton(isFollowing: Boolean, isRequestSent: Boolean) {
         Log.d("updateFollowButton", "isFollowing: $isFollowing")
         when {
-            isRequestSent -> followButton.text = "Richiesta inviata"
-            isFollowing -> followButton.text = "Segui già"
-            else -> followButton.text = "Segui"
+            isRequestSent -> followButton.text = getText(R.string.requestSent)
+            isFollowing -> followButton.text = getString(R.string.segui_già)
+            else -> followButton.text = getText(R.string.follow)
         }
     }
 

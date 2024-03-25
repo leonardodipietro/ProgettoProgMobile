@@ -38,6 +38,7 @@
 
         <Button
             android:id="@+id/followButton"
+            style="@style/CustomButtonStyle2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
@@ -212,6 +213,7 @@
 
         <Button
             android:id="@+id/btn_topBrani"
+            style="@style/CustomButtonStyle2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/top_track"
@@ -226,6 +228,7 @@
 
         <Button
             android:id="@+id/btn_topArtisti"
+            style="@style/CustomButtonStyle2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/top_artist"

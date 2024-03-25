@@ -169,7 +169,7 @@ class FirstFragment : Fragment(),TrackAdapter.OnTrackClickListener,
             Html.fromHtml("<font color='#FFFFFF'>${getString(R.string.grid)}</font>", Html.FROM_HTML_MODE_LEGACY),
         )
         AlertDialog.Builder(requireContext(), R.style.CustomAlertDialogStyle)
-            .setTitle("Scegli Stile di Visualizzazione")
+            .setTitle(getString(R.string.view_style))
             .setItems(choices) { _, which ->
                 when(which) {
                     0 -> { // Vista Lineare
@@ -227,21 +227,6 @@ class FirstFragment : Fragment(),TrackAdapter.OnTrackClickListener,
             Log.d("TrackGen", "Token is null")
         }
     }
-   /*override fun onCreatePlaylistClicked() {
-        Log.d("Playlistchiamata", "playlistchiamata")
-
-        // Assicurati che queste variabili (firebaseViewModel, viewLifecycleOwner, token, spotifyViewModel) siano accessibili in questo contesto.
-        firebaseViewModel.topTracksfromdb.observe(viewLifecycleOwner) { tracks ->
-            val trackIds = tracks.map { it.id }
-            if (trackIds.isNotEmpty() && token != null) {
-                Log.d("Playlistchiamata", "playlistchiamata $token")
-                Log.d("Playlistchiamata", "playlistchiamata $trackIds")
-                spotifyViewModel.createSpotifyPlaylist(token!!, trackIds)
-            } else
-                Log.d("Playlistchiamata", "playlistchiamata con null")
-        }
-    }*/
-
 
     private fun handleTracksButtonClick() {
         artistRecyclerView.visibility = View.GONE

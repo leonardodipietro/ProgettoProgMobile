@@ -21,7 +21,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="ImageContrastCheck"
-        tools:src="@tools:sample/avatars" />
+        android:background="@color/dark_gray"
+        tools:src="@drawable/default_profile_image" />
 
     <ImageButton
         android:id="@+id/editImageButton"
@@ -225,7 +226,7 @@
                 style="@style/CustomButtonStyle2"
                 android:layout_width="100dp"
                 android:layout_height="50dp"
-                android:text="Ultimo mese"
+                android:text="@string/lastMonth"
                 android:textSize="12sp" />
 
 
@@ -236,7 +237,7 @@
                 android:layout_height="50dp"
                 android:layout_marginLeft="10dp"
                 android:layout_toRightOf="@+id/playlist1m"
-                android:text="Ultimi sei mesi "
+                android:text="@string/lastSixMonths"
                 android:textSize="12sp" />
 
             <Button
@@ -246,7 +247,7 @@
                 android:layout_height="50dp"
                 android:layout_marginLeft="10dp"
                 android:layout_toRightOf="@+id/playlist6m"
-                android:text="Sempre"
+                android:text="@string/ever"
                 android:textSize="12sp" />
         </RelativeLayout>
 
