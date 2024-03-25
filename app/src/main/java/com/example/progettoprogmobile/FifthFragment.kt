@@ -19,7 +19,6 @@ import com.example.progettoprogmobile.adapter.TrackAdapter
 import com.example.progettoprogmobile.adapter.ArtistGridAdapter
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.storage.FirebaseStorage
 import android.util.Log
 import androidx.lifecycle.ViewModelProvider
 import com.example.progettoprogmobile.viewModel.FirebaseViewModel
@@ -61,11 +60,8 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
 
     private val database = FirebaseDatabase.getInstance()
     private lateinit var firebaseViewModel: FirebaseViewModel
-    private lateinit var auth: FirebaseAuth
-    private lateinit var storage: FirebaseStorage
 
     private lateinit var userId: String
-    private val currentUserUid = FirebaseAuth.getInstance().currentUser?.uid
 
     private lateinit var sharedPreferences: SharedPreferences
 
@@ -215,10 +211,6 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
                 saveButtonState(isFollowing, isRequestSent)
             }
         }
-
-        // Inizializza Firebase
-        auth = FirebaseAuth.getInstance()
-        storage = FirebaseStorage.getInstance()
 
         // Ottieni il riferimento al nodo utente nel database Firebase
         val userReference = database.reference.child("users").child(userId ?: "")

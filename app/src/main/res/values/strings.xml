@@ -129,5 +129,17 @@
     <string name="linear" translatable="false">Vista lineare</string>
     <string name="grid" translatable="false">Vista a griglia</string>
     <string name="Click_to_login" translatable="false">Register</string>
+    <string name="la_noia">La noia</string>
+    <string name="angelina_mango">Angelina Mango</string>
+    <string name="tuta_gold">TUTA GOLD</string>
+    <string name="mahmood">Mahmood</string>
+    <string name="sinceramente">Sinceramente</string>
+    <string name="annalisa">Annalisa</string>
+    <string name="casa_mia">Casa Mia</string>
+    <string name="ghali">Ghali</string>
+    <string name="i_p_me_tu_p_te">I P\' ME, TU P\' TE</string>
+    <string name="geolier">Geolier</string>
+    <string name="click_boom">CLICK BOOM!</string>
+    <string name="rose_villain">Rose Villain</string>
 
 </resources>
