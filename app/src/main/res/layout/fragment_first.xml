@@ -75,7 +75,7 @@
             android:layout_toEndOf="@+id/view3"
             android:paddingEnd="16dp"
             android:paddingStart="8dp"
-            android:layout_marginEnd="8dp"/>
+            android:layout_marginEnd="8dp" />
 
     </LinearLayout>
 

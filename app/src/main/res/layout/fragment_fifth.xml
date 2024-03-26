@@ -281,7 +281,7 @@
         android:id="@+id/recyclerViewUtenteArtist"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/section">
+        android:layout_below="@+id/section" >
     </androidx.recyclerview.widget.RecyclerView>
 
 </RelativeLayout>
