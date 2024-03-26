@@ -68,7 +68,7 @@
         <Button
             android:id="@+id/sceglicomevedere"
             android:layout_width="50dp"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:background ="@drawable/baseline_format_list_bulleted_24"
             android:layout_centerVertical="true"
             android:contentDescription="@string/calendario"
