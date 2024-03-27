@@ -333,6 +333,12 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
                     Picasso.get().load(it).into(profileImageView) //Glide.with(this).load(it).into(profileImageView)
                     Log.d("FifthFragment", "Profile Image URL: $it")
                 }
+            }?: run {
+                // Se l'URL dell'immagine del profilo è nullo o vuoto, carica l'immagine di default
+                Handler(Looper.getMainLooper()).post {
+                    profileImageView.setImageResource(R.drawable.default_profile_image)
+                    Log.d("FifthFragment", "Profile Image URL not found. Loading default image.")
+                }
             }
         }.addOnFailureListener { exception ->
             // Gestisci l'errore

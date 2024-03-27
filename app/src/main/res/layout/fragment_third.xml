@@ -20,9 +20,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="ImageContrastCheck"
-        android:background="@color/dark_gray"
-        tools:src="@drawable/default_profile_image" />
+        tools:ignore="ImageContrastCheck" />
 
     <ImageButton
         android:id="@+id/editImageButton"

@@ -53,12 +53,10 @@ class UtenteAdapter(private val onUserSelected: (String) -> Unit) :
                 Picasso.get().load(utente.userImage)
                     .into(imageView)
             } else {
-                // Carica un'immagine di fallback o gestisci diversamente
-                // a seconda dei requisiti del tuo progetto.
-                Picasso.get().load(R.drawable.baseline_person_24)
-                    .into(imageView)
+                Log.d("UtenteAdapter", "userImage è vuoto, carica default image for user ${utente.userId}")
+                // Carica un'immagine di fallback
+                imageView.setImageResource(R.drawable.default_profile_image)
             }
-
         }
     }
 
