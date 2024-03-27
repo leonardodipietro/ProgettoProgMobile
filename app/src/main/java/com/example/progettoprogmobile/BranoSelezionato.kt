@@ -9,6 +9,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -122,6 +123,13 @@ class BranoSelezionato : Fragment(), RecensioniBranoSelAdapter.OnRecensioneInter
         recensioneViewModel.usersData.observe(viewLifecycleOwner, Observer { users ->
             adapter.updateData(adapter.recensioni, users)
         })
+        recensioneViewModel.flagReview.observe(viewLifecycleOwner) { hasReviewed ->
+            if (hasReviewed) {
+
+            } else {
+               setupSubmission()
+            }
+        }
 
         risposteViewModel.commentiData.observe(viewLifecycleOwner, Observer { risposte ->
             // Crea o aggiorna la mappa delle risposte basata sugli ID delle recensioni
@@ -178,53 +186,69 @@ class BranoSelezionato : Fragment(), RecensioniBranoSelAdapter.OnRecensioneInter
         val artistId = currentArtistId
         Log.d("DDDD", "${track?.id}")
         Log.d("DDDD", "setupSubmission: Inizio")
+
         if (!isInCommentMode && sharedDataViewModel.isEditingReview.value != true) {
             Log.d("DDDD", "setupSubmission: Non in modalità commento, configurazione pulsante invio")
             val userId = FirebaseAuth.getInstance().currentUser?.uid
-            if (userId != null && track != null) {
-                Log.d("DDDD", "setupSubmission: Utente e traccia verificati, procedendo con la verifica recensione")
-                recensioneViewModel.hasUserReviewed(track.id, userId) { existingReview ->
-                    if (existingReview == null) {
-                        Log.d("DDDD", "setupSubmission: Nessuna recensione esistente, configurazione per nuova recensione")
-                        inviarButton.setOnClickListener {
-                            val commentContent = EditText.text.toString()
-                            if (commentContent.isNotBlank()) {
-                                Log.d("DDDD", "setupSubmission: Contenuto valido, procedendo con l'invio della recensione")
-                                recensioneViewModel.saveRecensione(userId, track.id,artistId!!  ,commentContent)
-                                sharedDataViewModel.editTextContent.value = "" // Resetta il campo dopo l'invio
-                                Log.d("DDDD", "setupSubmission: Recensione inviata con successo")
-                                //finalizeReviewSubmission()
-                            } else {
-                                Log.d("DDDD", "setupSubmission: Dati non validi, invio annullato")
-                            }
-                        }
-                    } else {
-                        Log.d("DDDD", "setupSubmission: Recensione esistente trovata, invio bloccato")
 
+            // Aggiungere qui l'osservazione su hasReviewedTrack
+            recensioneViewModel.flagReview.observe(viewLifecycleOwner, Observer { hasReviewed ->
+                if (!hasReviewed) {
+                    setupButtonForSubmission(userId, track, artistId)
+                } else {
 
+                    inviarButton.setOnClickListener {
+                        Toast.makeText(context, "Hai già recensito questo brano.", Toast.LENGTH_LONG).show()
                     }
                 }
-            } else {
-                Log.d("DDDD", "setupSubmission: Utente o traccia non validi, azione bloccata")
-            }
-        } else {
-            Log.d("DDDD", "setupSubmission: Condizione non consentita per l'invio di recensioni")
-
-        }
-    }
-
-    override fun onRecensioneDeleteClicked(commentId: String, userId: String) {
-        val currentUserID = FirebaseAuth.getInstance().currentUser?.uid
-        var track =currentTrack
-        if (userId == currentUserID) {
-            recensioneViewModel.deleteRecensione(commentId,userId, onSuccess = {
-                   setupSubmission()
-            }, onFailure = {
-             Log.d("errore","errore")
-
             })
         }
     }
+
+    private fun setupButtonForSubmission(userId: String?, track: Track?, artistId: String?) {
+        if (userId != null && track != null) {
+            Log.d("DDDD", "setupSubmission: Utente e traccia verificati, procedendo con la verifica recensione")
+            recensioneViewModel.hasUserReviewed(track.id, userId) { existingReview ->
+                if (existingReview == null) {
+                    Log.d("DDDD", "setupSubmission: Nessuna recensione esistente, configurazione per nuova recensione")
+                    inviarButton.setOnClickListener {
+                        val commentContent = EditText.text.toString()
+                        if (commentContent.isNotBlank()) {
+                            Log.d("DDDD", "setupSubmission: Contenuto valido, procedendo con l'invio della recensione")
+                            recensioneViewModel.saveRecensione(userId, track.id, artistId!!, commentContent)
+                            sharedDataViewModel.editTextContent.value = "" // Resetta il campo dopo l'invio
+                            Log.d("DDDD", "setupSubmission: Recensione inviata con successo")
+                            // Il valore di hasReviewedTrack verrà aggiornato automaticamente nel ViewModel
+                        } else {
+                            Log.d("DDDD", "setupSubmission: Dati non validi, invio annullato")
+                        }
+                    }
+                } else {
+                    Toast.makeText(context, "Hai già recensito questo brano.", Toast.LENGTH_LONG).show()
+                    Log.d("DDDD", "setupSubmission: Recensione esistente trovata, invio bloccato")
+                }
+            }
+        } else {
+            Log.d("DDDD", "setupSubmission: Utente o traccia non validi, azione bloccata")
+        }
+    }
+    override fun onRecensioneDeleteClicked(commentId: String, userId: String) {
+        val currentUserID = FirebaseAuth.getInstance().currentUser?.uid
+        val track = currentTrack
+        if (userId == currentUserID && track != null) {
+            recensioneViewModel.deleteRecensione(commentId, userId, onSuccess = {
+                recensioneViewModel.flagReview.value = false
+                sharedDataViewModel.currentActionState.value = ActionState.NONE
+                Toast.makeText(context, "Recensione eliminata.", Toast.LENGTH_LONG).show()
+                sharedDataViewModel.editTextContent.value = ""
+
+            }, onFailure = {
+                Log.d("errore", "Errore nella cancellazione della recensione")
+                Toast.makeText(context, "Errore nella cancellazione della recensione", Toast.LENGTH_LONG).show()
+            })
+        }
+    }
+
 
     override fun onRecensioneModificaClicked(recensione: Recensione) {
         Log.d("DDDD", "onRecensioneModificaClicked: Inizio modifica recensione")

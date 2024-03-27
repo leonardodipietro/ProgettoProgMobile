@@ -37,6 +37,16 @@ class RecensioneViewModel @JvmOverloads constructor(
     //val StatoRecensioneLiveData = MutableLiveData<Boolean>() //Per l'edit text e il bottone
    private lateinit var sharedEditTextVisibilityManager: SharedEditTextVisibilityManager
 
+   val flagReview = MutableLiveData<Boolean>()
+    init {
+        // Inizializza il valore a false
+        flagReview.value = false
+    }
+
+    // Metodo per aggiornare lo stato dopo l'invio di una recensione
+    fun updateReviewStatus(hasReviewed: Boolean) {
+        flagReview.value = hasReviewed
+    }
 
     // Chiamato normalmente nell'app
     fun init() {
@@ -110,7 +120,9 @@ class RecensioneViewModel @JvmOverloads constructor(
                 addCommentIdToTrack(commentId, trackId)
                 addCommentIdToUser(commentId, userId)
                 addCommentIdToArtist(commentId, artistId)
+                flagReview.value = true
             }
+
             .addOnFailureListener {
                 // Gestione dell'errore
             }
