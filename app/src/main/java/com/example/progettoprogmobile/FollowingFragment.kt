@@ -17,6 +17,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.MutableData
+import com.google.firebase.database.Transaction
 import com.google.firebase.database.ValueEventListener
 
 class FollowingFragment: Fragment(), FollowingAdapter.OnFollowingButtonClickListener {
@@ -87,6 +89,8 @@ class FollowingFragment: Fragment(), FollowingAdapter.OnFollowingButtonClickList
 
                     val usersRef = database.getReference("users")
 
+                    utenteList.clear()
+
                     for (followerId in followerIds) {
                         val userRef = usersRef.child(followerId)
                         userRef.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -136,6 +140,10 @@ class FollowingFragment: Fragment(), FollowingAdapter.OnFollowingButtonClickList
 
             currentFollowingRef.removeValue().addOnSuccessListener {
                 userFollowersRef.removeValue().addOnSuccessListener {
+                    // Aggiorna il contatore dei followers dell'altro utente
+                    decrementFollowerCount(userId)
+                    // Aggiorna il contatore dei tuoi following
+                    decrementFollowingCount(currentUserId)
                     val position = findUserPosition(userId)
                     if (position != -1) {
                         utenteList.removeAt(position)
@@ -150,6 +158,48 @@ class FollowingFragment: Fragment(), FollowingAdapter.OnFollowingButtonClickList
             }
         }
     }
+
+    private fun decrementFollowerCount(userId: String) {
+        val userReference = FirebaseDatabase.getInstance().getReference("users").child(userId)
+        val followersCounterRef = userReference.child("followers counter")
+
+        followersCounterRef.runTransaction(object : Transaction.Handler {
+            override fun doTransaction(mutableData: MutableData): Transaction.Result {
+                val currentValue = mutableData.getValue(Int::class.java) ?: 0
+                mutableData.value = currentValue - 1
+                return Transaction.success(mutableData)
+            }
+
+            override fun onComplete(databaseError: DatabaseError?, committed: Boolean, dataSnapshot: DataSnapshot?) {
+                if (!committed) {
+                    // Gestisci il fallimento della transazione
+                    Log.e("DecrementFollowers", "Transaction failed.")
+                }
+            }
+        })
+    }
+
+    private fun decrementFollowingCount(userId: String) {
+        val userReference = FirebaseDatabase.getInstance().getReference("users").child(userId)
+        val followingCounterRef = userReference.child("following counter")
+
+        followingCounterRef.runTransaction(object : Transaction.Handler {
+            override fun doTransaction(mutableData: MutableData): Transaction.Result {
+                val currentValue = mutableData.getValue(Int::class.java) ?: 0
+                mutableData.value = currentValue - 1
+                return Transaction.success(mutableData)
+            }
+
+            override fun onComplete(databaseError: DatabaseError?, committed: Boolean, dataSnapshot: DataSnapshot?) {
+                if (!committed) {
+                    // Gestisci il fallimento della transazione
+                    Log.e("DecrementFollowing", "Transaction failed.")
+                }
+            }
+        })
+    }
+
+
 
     private fun showToast(message: String) {
         val toast = Toast.makeText(context, message, Toast.LENGTH_SHORT)

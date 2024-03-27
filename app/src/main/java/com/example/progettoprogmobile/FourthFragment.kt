@@ -41,6 +41,8 @@ class FourthFragment : Fragment(),
     ): View? {
         val rootView = inflater.inflate(R.layout.fragment_fourth, container, false)
 
+        notificationList.clear()
+
         recyclerView = rootView.findViewById(R.id.newFollowersRecyclerView)
         recyclerView.layoutManager = LinearLayoutManager(context)
 
@@ -265,8 +267,6 @@ class FourthFragment : Fragment(),
             removeUserIdFromFollowing(userId)
         }
 
-        // Esempio di messaggio Toast per confermare il click su "Follow"
-        Toast.makeText(requireContext(), "Hai cliccato su Follow per l'utente con ID: $userId", Toast.LENGTH_SHORT).show()
     }
 
     // Metodo per aggiungere un utente alla lista "following" dell'utente corrente
@@ -277,8 +277,6 @@ class FourthFragment : Fragment(),
                 if (task.isSuccessful) {
                     // Se l'aggiunta è riuscita, aggiungi l'utente corrente alla lista "followers" dell'utente seguito
                     addCurrentUserToFollower(userId)
-                    // L'utente è stato aggiunto con successo alla lista "following"
-                    Toast.makeText(requireContext(), "Utente aggiunto con successo alla lista following", Toast.LENGTH_SHORT).show()
                 } else {
                     // Gestisci eventuali errori durante l'aggiunta
                     Toast.makeText(requireContext(), "Errore durante l'aggiunta dell'utente alla lista following", Toast.LENGTH_SHORT).show()
@@ -334,8 +332,6 @@ class FourthFragment : Fragment(),
                     decrementFollowerCount(followedUserId)
                     // Decrementa il contatore dei following dell'utente corrente
                     decrementFollowingCount(currentUserId)
-                    // Se la rimozione è riuscita, mostra un messaggio di successo
-                    Toast.makeText(requireContext(), "Utente corrente rimosso con successo dalla lista followers dell'utente seguito", Toast.LENGTH_SHORT).show()
                 } else {
                     // Gestisci eventuali errori durante la rimozione
                     Toast.makeText(requireContext(), "Errore durante la rimozione dell'utente corrente dalla lista followers dell'utente seguito", Toast.LENGTH_SHORT).show()

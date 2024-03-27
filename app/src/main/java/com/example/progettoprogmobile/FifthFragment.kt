@@ -871,6 +871,23 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
     private fun startFollowingUser() {
         val currentUserUid = FirebaseAuth.getInstance().currentUser?.uid!!
 
+        // Aggiungi l'utente alla lista dei seguiti dell'utente corrente nel database Firebase
+        val currentUserReference = FirebaseDatabase.getInstance().reference.child("users").child(currentUserUid ?: "")
+        currentUserReference.child("following").child(userId).setValue(true)
+            .addOnSuccessListener {
+                // Operazione di aggiunta completata con successo
+                isFollowing = true
+                updateFollowButton(isFollowing, isRequestSent)
+                // Aggiorna il pulsante nello stato delle preferenze condivise
+                saveButtonState(isFollowing, isRequestSent)
+                // Aggiorna il contatore di following
+                updateFollowingCount(currentUserUid ?: "", increment = true)
+            }
+            .addOnFailureListener { exception ->
+                // Gestisci eventuali errori
+                Log.e("Firebase", "Error starting to follow user: ${exception.message}")
+            }
+
         // Aggiungi l'utente alla lista dei seguaci dell'utente target nel database Firebase
         val userReference = FirebaseDatabase.getInstance().reference.child("users").child(userId ?: "")
         userReference.child("followers").child(currentUserUid).setValue(true)
@@ -881,7 +898,7 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
                 // Aggiorna il pulsante nello stato delle preferenze condivise
                 saveButtonState(isFollowing, isRequestSent)
                 // Aggiorna il contatore di following
-                updateFollowingCount(userId ?: "", increment = true)
+                updateFollowerCount(userId ?: "", increment = true)
             }
             .addOnFailureListener { exception ->
                 // Gestisci eventuali errori

@@ -219,6 +219,11 @@ open class ThirdFragment : Fragment() {
                     // Gestisci eventuali errori qui
                 }
             })
+
+            removeCurrentUserFromFollowers(userId)
+            removeCurrentUserFromFollowing(userId)
+            removeCurrentUserFromAllRequests(userId)
+
         }
 
         // Osserva il risultato del logout dall'account Firebase
@@ -312,6 +317,131 @@ open class ThirdFragment : Fragment() {
         return rootView
     }
 
+    private fun removeCurrentUserFromFollowers(userId: String) {
+        val followersReference = FirebaseDatabase.getInstance().getReference("users")
+        followersReference.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                for (userSnapshot in dataSnapshot.children) {
+                    val otherUserId = userSnapshot.key
+                    otherUserId?.let {
+                        val userFollowersReference = FirebaseDatabase.getInstance().getReference("users").child(it).child("followers")
+                        userFollowersReference.child(userId).addListenerForSingleValueEvent(object : ValueEventListener {
+                            override fun onDataChange(snapshot: DataSnapshot) {
+                                if (snapshot.exists()) {
+                                    // L'utente corrente è un follower di questo utente
+                                    userFollowersReference.child(userId).removeValue()
+                                    decrementFollowerCount(it)
+                                }
+                            }
+
+                            override fun onCancelled(error: DatabaseError) {
+                                // Gestisci eventuali errori qui
+                            }
+                        })
+                    }
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Gestisci eventuali errori qui
+            }
+        })
+    }
+
+    private fun removeCurrentUserFromFollowing(userId: String) {
+        val followersReference = FirebaseDatabase.getInstance().getReference("users")
+        followersReference.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                for (userSnapshot in dataSnapshot.children) {
+                    val otherUserId = userSnapshot.key
+                    otherUserId?.let {
+                        val userFollowingReference = FirebaseDatabase.getInstance().getReference("users").child(it).child("following")
+                        userFollowingReference.child(userId).addListenerForSingleValueEvent(object : ValueEventListener {
+                            override fun onDataChange(snapshot: DataSnapshot) {
+                                if (snapshot.exists()) {
+                                    // L'utente corrente è un follower di questo utente
+                                    userFollowingReference.child(userId).removeValue()
+                                    decrementFollowingCount(it)
+                                }
+                            }
+
+                            override fun onCancelled(error: DatabaseError) {
+                                // Gestisci eventuali errori qui
+                            }
+                        })
+                    }
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Gestisci eventuali errori qui
+            }
+        })
+    }
+
+
+    private fun decrementFollowerCount(userId: String) {
+        val userReference = FirebaseDatabase.getInstance().getReference("users").child(userId)
+        userReference.child("followers counter").runTransaction(object : Transaction.Handler {
+            override fun doTransaction(mutableData: MutableData): Transaction.Result {
+                val currentValue = mutableData.getValue(Int::class.java)
+                mutableData.value = (currentValue ?: 0) - 1
+                return Transaction.success(mutableData)
+            }
+
+            override fun onComplete(databaseError: DatabaseError?, committed: Boolean, dataSnapshot: DataSnapshot?) {
+                if (!committed) {
+                    // Gestisci il fallimento della transazione
+                }
+            }
+        })
+    }
+
+    private fun decrementFollowingCount(userId: String) {
+        val userReference = FirebaseDatabase.getInstance().getReference("users").child(userId)
+        userReference.child("following counter").runTransaction(object : Transaction.Handler {
+            override fun doTransaction(mutableData: MutableData): Transaction.Result {
+                val currentValue = mutableData.getValue(Int::class.java)
+                mutableData.value = (currentValue ?: 0) - 1
+                return Transaction.success(mutableData)
+            }
+
+            override fun onComplete(databaseError: DatabaseError?, committed: Boolean, dataSnapshot: DataSnapshot?) {
+                if (!committed) {
+                    // Gestisci il fallimento della transazione
+                }
+            }
+        })
+    }
+
+    private fun removeCurrentUserFromAllRequests(userId: String) {
+        val followersReference = FirebaseDatabase.getInstance().getReference("users")
+        followersReference.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                for (userSnapshot in dataSnapshot.children) {
+                    val otherUserId = userSnapshot.key
+                    otherUserId?.let {
+                        val userRequestsReference = FirebaseDatabase.getInstance().getReference("users").child(it).child("requests")
+                        userRequestsReference.child(userId).addListenerForSingleValueEvent(object : ValueEventListener {
+                            override fun onDataChange(snapshot: DataSnapshot) {
+                                if (snapshot.exists()) {
+                                    // L'utente corrente è un tra le richieste di questo utente
+                                    userRequestsReference.child(userId).removeValue()
+                                }
+                            }
+                            override fun onCancelled(error: DatabaseError) {
+                                // Gestisci eventuali errori qui
+                            }
+                        })
+                    }
+                }
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Gestisci eventuali errori qui
+            }
+        })
+    }
 
 
     private fun observeToken() {

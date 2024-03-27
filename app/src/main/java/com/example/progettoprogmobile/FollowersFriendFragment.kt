@@ -90,6 +90,8 @@ class FollowersFriendFragment: Fragment() {
 
                     val usersRef = database.getReference("users")
 
+                    utenteList.clear()
+
                     for (followerId in followerIds) {
                         val userRef = usersRef.child(followerId)
                         userRef.addListenerForSingleValueEvent(object : ValueEventListener {

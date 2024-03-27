@@ -52,7 +52,7 @@
     <string name="newFRequest">wants to start following you</string>
     <string name="newFollower">started follow you</string>
     <string name="follow">Follow</string>
-    <string name="following1">Stop following</string>
+    <string name="following1">Unfollow</string>
     <string name="newReviewNotification">"wrote a new review of the song "</string>
     <string name="newResponseNotification">commented on your review</string>
     <string name="newLikedReview">likes your review</string>

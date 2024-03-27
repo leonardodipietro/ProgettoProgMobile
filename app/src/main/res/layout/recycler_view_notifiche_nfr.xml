@@ -31,13 +31,14 @@
             android:id="@+id/followersRequest"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
             android:layout_marginStart="5dp"
             android:layout_marginEnd="10dp"
+            android:gravity="center_vertical"
             android:text="@string/newFRequest"
             android:textColor="@color/white"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/confirm"
             app:layout_constraintStart_toEndOf="@+id/followersImage"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -46,14 +47,14 @@
             style="@style/CustomButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:baselineAligned="false"
+            android:layout_marginStart="10dp"
             android:layout_marginEnd="10dp"
+            android:baselineAligned="false"
             android:text="@string/confirm"
-            android:textSize="11sp"
             android:textAllCaps="false"
+            android:textSize="11sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/delete"
-            app:layout_constraintStart_toEndOf="@+id/followersRequest"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.5" />
 
