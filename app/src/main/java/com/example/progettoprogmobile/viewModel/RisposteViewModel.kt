@@ -108,19 +108,6 @@ class RisposteViewModel: ViewModel() {
     }
 
 
-    fun deleteRisposte (answerId: String) {
-        val userId = FirebaseAuth.getInstance().currentUser?.uid
-        val commentReference = FirebaseDatabase.getInstance().getReference("answers")
-        commentReference.child(answerId).removeValue()
 
-            .addOnSuccessListener {
-                //POTREBBE ESSERE TOLTO VEDIAMO
-                //sharedEditTextVisibilityManager.setEditTextVisibility(isVisible = true)
-                Log.d("COMMENTTO ELIMINATO","COMMENTO ELIMINATO")
-            }
-            .addOnFailureListener { e ->
-                Log.d("qualcosa è andato storto","qualcosa è andato storto")
-            }
-    }
 
 }

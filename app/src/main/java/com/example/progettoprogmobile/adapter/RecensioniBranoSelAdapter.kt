@@ -1,5 +1,6 @@
 package com.example.progettoprogmobile.adapter
 
+import android.app.AlertDialog
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -46,26 +47,12 @@ class RecensioniBranoSelAdapter(
         val imgProfile: ImageView = view.findViewById(R.id.improfBranoSelezionato)
         val txtUserName: TextView = view.findViewById(R.id.nomeutenteBranoselezionato)
         val txtRecensione: TextView = view.findViewById(R.id.recensione1)
-        private val btnDeleteRecensione: Button = view.findViewById(R.id.eliminarecensione)
-        private val btnModificaRecensione: Button = view.findViewById(R.id.modificarecensione)
-        private val btnCommentaRecensione: ImageButton = view.findViewById(R.id.commentarecensione)
+         val btnDeleteRecensione: Button = view.findViewById(R.id.eliminarecensione)
+         val btnModificaRecensione: Button = view.findViewById(R.id.modificarecensione)
+         val btnCommentaRecensione: ImageButton = view.findViewById(R.id.commentarecensione)
         val risposteRecyclerView:RecyclerView =  view.findViewById(R.id.risposteRecyclerView)
 
         init {
-            btnDeleteRecensione.setOnClickListener {
-                val position = adapterPosition
-                if (position != RecyclerView.NO_POSITION) {
-                    val recensione = recensioni[position]
-                    listener.onRecensioneDeleteClicked(recensione.commentId, recensione.userId)
-                }
-            }
-            btnModificaRecensione.setOnClickListener {
-                val position = adapterPosition
-                if (position != RecyclerView.NO_POSITION) {
-                    val recensione = recensioni[position]
-                    listener.onRecensioneModificaClicked(recensione)
-                }
-            }
             btnCommentaRecensione.setOnClickListener{
                 Log.d("DDDD","bottone commento cliccato")
 
@@ -82,6 +69,39 @@ class RecensioniBranoSelAdapter(
                 if (position != RecyclerView.NO_POSITION) {
                     val recensione = recensioni[position]
                     listener.onRecensioneCommentaClicked(recensione)
+                }
+            }
+            /*view.setOnLongClickListener {
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    val recensione = recensioni[position]
+                    if (recensione.userId == currentUserId) {
+                    val opzioni = arrayOf("Modifica", "Elimina")
+
+                    AlertDialog.Builder(itemView.context)
+                        .setTitle("Seleziona Azione")
+                        .setItems(opzioni) { dialog, which ->
+                            when (which) {
+                                0 -> listener.onRecensioneModificaClicked(recensione)
+                                1 -> listener.onRecensioneDeleteClicked(recensione.commentId, recensione.userId)
+                            }
+                        }.show()
+                    }
+                }
+                true // Indica che l'evento di click è stato gestito
+            }*/
+            btnModificaRecensione.setOnClickListener {
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    val recensione = recensioni[position]
+                    listener.onRecensioneModificaClicked(recensione)
+                }
+            }
+            btnDeleteRecensione.setOnClickListener {
+                val position = adapterPosition
+                if (position != RecyclerView.NO_POSITION) {
+                    val recensione = recensioni[position]
+                    listener.onRecensioneDeleteClicked(recensione.commentId, recensione.userId)
                 }
             }
         }
@@ -104,8 +124,8 @@ class RecensioniBranoSelAdapter(
                 }
             }
             val isUserReview = recensione.userId == currentUserId
-            btnDeleteRecensione.visibility = if (isUserReview) View.VISIBLE else View.GONE
-            btnModificaRecensione.visibility = if (isUserReview) View.VISIBLE else View.GONE
+            //btnDeleteRecensione.visibility = if (isUserReview) View.VISIBLE else View.GONE
+            //btnModificaRecensione.visibility = if (isUserReview) View.VISIBLE else View.GONE
 
 
             //SIRECUPERA LA LISTA DELLE RISPOSTE
@@ -121,6 +141,7 @@ class RecensioniBranoSelAdapter(
 
     }
 
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.recycler_view_recensioni, parent, false)
         return ViewHolder(view)
@@ -128,6 +149,13 @@ class RecensioniBranoSelAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val recensione = recensioni[position]
         val risposte = risposteMap[recensione.commentId] ?: listOf()
+        // Controlla se l'ID utente corrente corrisponde all'ID dell'utente della recensione
+        val isUserRecensione = recensione.userId == currentUserId
+
+        // Imposta la visibilità dei bottoni basandoti sulla condizione
+        holder.btnDeleteRecensione.visibility = if (isUserRecensione) View.VISIBLE else View.GONE
+        holder.btnModificaRecensione.visibility = if (isUserRecensione) View.VISIBLE else View.GONE
+
 
         holder.bind(recensione, isCommentsVisible)
 

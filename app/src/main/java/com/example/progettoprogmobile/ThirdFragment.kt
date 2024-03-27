@@ -233,20 +233,50 @@ open class ThirdFragment : Fragment() {
                 }
             } ?: run {
                 Log.d("PlaylistButton", "shortTermTracksShared.value è null")
+                Toast.makeText(requireContext(), "Errore nella creazione della playlist.", Toast.LENGTH_LONG).show()
+
             }
         }
 
         secondPlaylistButton?.setOnClickListener {
             sharedViewModel.mediumTermTracksShared.value?.items?.let { items ->
-                createPlaylistFromTopTracks(items)
+                Log.d("PlaylistButton", "First playlist button clicked")
+                sharedViewModel.mediumTermTracksShared.value?.items?.let { items ->
+                    if (items.isNullOrEmpty()) {
+                        Log.d("Playlist", "La lista delle tracce è vuota")
+                    } else {
+                        Log.d("Playlist", "Chiamata a createPlaylistFromTopTracks con ${items.size} tracce")
+                        createPlaylistFromTopTracks(items)
+                    }
+                } ?: run {
+                    Log.d("PlaylistButton", "shortTermTracksShared.value è null")
+                    Toast.makeText(requireContext(), "Errore nella creazione della playlist.", Toast.LENGTH_LONG).show()
+
+                }
+
             }
         }
 
         thirdPlaylistButton?.setOnClickListener {
             sharedViewModel.longTermTracksShared.value?.items?.let { items ->
-                createPlaylistFromTopTracks(items)
+                Log.d("PlaylistButton", "Third playlist button clicked")
+                sharedViewModel.longTermTracksShared.value?.items?.let { items ->
+                    if (items.isNullOrEmpty()) {
+                        Log.d("Playlist", "La lista delle tracce è vuota")
+                    } else {
+                        Log.d("Playlist", "Chiamata a createPlaylistFromTopTracks con ${items.size} tracce")
+                        createPlaylistFromTopTracks(items)
+                    }
+                } ?: run {
+                    Log.d("PlaylistButton", "shortTermTracksShared.value è null")
+                    Toast.makeText(requireContext(), "Errore nella creazione della playlist.", Toast.LENGTH_LONG).show()
+
+                }
+
             }
         }
+
+
         return rootView
     }
 
@@ -262,22 +292,32 @@ open class ThirdFragment : Fragment() {
                 Log.d("SpotifyToken dentro il third parte 2", "Token ottenuto: $token")
             } ?: run {
                 Log.d("SpotifyToken", "Token non ottenuto")
+
             }
         }
     }
     private fun createPlaylistFromTopTracks(items: List<Track>) {
-        val currentToken = token // Usa una variabile locale per ridurre l'uso di '!!'
-      Log.d("SpotifyToken dentro il third parte 3", "Token ottenuto: $currentToken")
+        val currentToken = token
+        Log.d("SpotifyToken dentro il third parte 3", "Token ottenuto: $currentToken")
         if (currentToken != null) {
             Log.d("Playlist", "playlist chiamata nel fragment")
             val trackUris = items.map { "spotify:track:${it.id}" }
             spotifyViewModel.createSpotifyPlaylist(currentToken, trackUris)
+            // Osserva il risultato della creazione della playlist
+            spotifyViewModel.playlistCreationResult.observe(viewLifecycleOwner) { success ->
+                if (success) {
+                    Toast.makeText(requireContext(), "Playlist creata con successo!", Toast.LENGTH_LONG).show()
+                } else {
+
+                }
+            }
+
+
         } else {
             Log.e("SpotifyToken", "Token non disponibile")
+            Toast.makeText(requireContext(), "Errore!!! Connettiti su spotify e riprova", Toast.LENGTH_LONG).show()
         }
     }
-
-
     private fun openFileChooser() {
 
         // Array di SpannableString con il testo bianco

@@ -28,8 +28,7 @@ import com.example.progettoprogmobile.viewModel.RisposteViewModel
 import com.example.progettoprogmobile.viewModel.SharedDataViewModel
 import com.google.firebase.auth.FirebaseAuth
 
-class BranoSelezionato : Fragment(), RecensioniBranoSelAdapter.OnRecensioneInteractionListener,
-    RisposteAdapterBranoSel.OnCommentiInteractionListener
+class BranoSelezionato : Fragment(), RecensioniBranoSelAdapter.OnRecensioneInteractionListener
 {
 
     private lateinit var recensioneViewModel: RecensioneViewModel
@@ -38,14 +37,15 @@ class BranoSelezionato : Fragment(), RecensioniBranoSelAdapter.OnRecensioneInter
     private lateinit var inviarButton: Button
     private lateinit var EditText: EditText
     private lateinit var backButton: Button
-    private lateinit var eliCommButton: Button
+    private lateinit var eliCommButderton: Button
     private var recensioneCorrenteDaModificare: Recensione? = null
     private val sharedEditTextVisibilityManager = SharedEditTextVisibilityManager()
     private lateinit var risposteViewModel:RisposteViewModel
     private lateinit var sharedDataViewModel: SharedDataViewModel
     private var isInCommentMode = false
 
-
+    private var currentTrack: Track? = null//Servono per resettare lo stato dopo la modalita commento
+    private var currentArtistId: String? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val rootView = inflater.inflate(R.layout.branoselezionato, container, false)
@@ -75,8 +75,14 @@ class BranoSelezionato : Fragment(), RecensioniBranoSelAdapter.OnRecensioneInter
 
         val track = arguments?.getSerializable("trackDetail") as? Track
         val artistId = track?.artists?.firstOrNull()?.id ?: ""
-        setupTrackInformation(rootView, track, artistId)
-        setupSubmission(track, artistId)
+        currentTrack = track
+        currentArtistId=artistId
+        setupTrackInformation(rootView, track, currentArtistId!!)
+
+        setupSubmission()
+
+
+
 
 
         // Osserva il LiveData per il contenuto dell'EditText
@@ -84,9 +90,13 @@ class BranoSelezionato : Fragment(), RecensioniBranoSelAdapter.OnRecensioneInter
             EditText.setText(text)
         }
 
-        // Osserva il LiveData per lo stato corrente
         sharedDataViewModel.currentActionState.observe(viewLifecycleOwner) { state ->
-
+            when (state) {
+                ActionState.NONE -> EditText.hint = "Scrivi una recensione"
+                ActionState.COMMENTING -> EditText.hint = "Scrivi un commento"
+                ActionState.EDITING -> EditText.hint = "Modifica la recensione"
+                else -> {}
+            }
         }
 
     }
@@ -150,13 +160,13 @@ class BranoSelezionato : Fragment(), RecensioniBranoSelAdapter.OnRecensioneInter
 
      }*/
 
-    private fun setupTrackInformation(rootView: View, track: Track?, artistId: String) {
+    private fun setupTrackInformation(rootView: View, currentrack: Track?, artistId: String) {
         val titoloCanzone: TextView = rootView.findViewById(R.id.titolocanzone)
         val albumBranoSelezionato: TextView = rootView.findViewById(R.id.albumbranoselezionato)
         val artistaBranoSelezionato: TextView = rootView.findViewById(R.id.artistabranoselezionato)
         val imageBranoSelezionato: ImageView = rootView.findViewById(R.id.imagebranoselezionato)
 
-        track?.let { currentTrack ->
+        currentrack?.let { currentTrack ->
             titoloCanzone.text = currentTrack.name
             albumBranoSelezionato.text = currentTrack.album.name
             artistaBranoSelezionato.text = currentTrack.artists.firstOrNull()?.name ?: "Sconosciuto"
@@ -190,7 +200,10 @@ class BranoSelezionato : Fragment(), RecensioniBranoSelAdapter.OnRecensioneInter
         }
     }
 
-    private fun setupSubmission(track: Track?, artistId: String) {
+    private fun setupSubmission() {
+        val track = currentTrack
+        val artistId = currentArtistId
+        Log.d("DDDD", "${track?.id}")
         Log.d("DDDD", "setupSubmission: Inizio")
         if (!isInCommentMode && sharedDataViewModel.isEditingReview.value != true) {
             Log.d("DDDD", "setupSubmission: Non in modalità commento, configurazione pulsante invio")
@@ -204,7 +217,7 @@ class BranoSelezionato : Fragment(), RecensioniBranoSelAdapter.OnRecensioneInter
                             val commentContent = EditText.text.toString()
                             if (commentContent.isNotBlank()) {
                                 Log.d("DDDD", "setupSubmission: Contenuto valido, procedendo con l'invio della recensione")
-                                recensioneViewModel.saveRecensione(userId, track.id, artistId,commentContent)
+                                recensioneViewModel.saveRecensione(userId, track.id,artistId!!  ,commentContent)
                                 Log.d("DDDD", "setupSubmission: Recensione inviata con successo")
                                 finalizeReviewSubmission()
                             } else {
@@ -213,7 +226,8 @@ class BranoSelezionato : Fragment(), RecensioniBranoSelAdapter.OnRecensioneInter
                         }
                     } else {
                         Log.d("DDDD", "setupSubmission: Recensione esistente trovata, invio bloccato")
-                        // Qui potresti voler mostrare un messaggio all'utente che una recensione esiste già.
+
+
                     }
                 }
             } else {
@@ -221,7 +235,7 @@ class BranoSelezionato : Fragment(), RecensioniBranoSelAdapter.OnRecensioneInter
             }
         } else {
             Log.d("DDDD", "setupSubmission: Condizione non consentita per l'invio di recensioni")
-            // Qui puoi gestire il caso in cui l'utente sia in modalità commento o in fase di modifica.
+
         }
     }
 
@@ -230,26 +244,17 @@ class BranoSelezionato : Fragment(), RecensioniBranoSelAdapter.OnRecensioneInter
 
     override fun onRecensioneDeleteClicked(commentId: String, userId: String) {
         val currentUserID = FirebaseAuth.getInstance().currentUser?.uid
+        var track =currentTrack
         if (userId == currentUserID) {
-            recensioneViewModel.deleteRecensione(commentId)
-        }
-    }
-
-    override fun onEliminaClicked(answerId: String, userId: String) {
-        val currentUserID = FirebaseAuth.getInstance().currentUser?.uid
-        if (userId == currentUserID&& this::risposteViewModel.isInitialized) {
-
-            risposteViewModel.deleteRisposte(answerId)
-            risposteViewModel.commentiData.observe(viewLifecycleOwner, Observer { commentiData ->
+            recensioneViewModel.deleteRecensione(commentId,userId, onSuccess = {
+                // Dopo aver cancellato la recensione, verifica nuovamente
+                recensioneViewModel.checkUserReview(track!!.id, userId)
+            }, onFailure = {
 
             })
-
-
-        }
-        else {
-            Log.e("BranoSelezionato", "risposteViewModel non è stato inizializzato")
         }
     }
+
     override fun onRecensioneModificaClicked(recensione: Recensione) {
         Log.d("DDDD", "onRecensioneModificaClicked: Inizio modifica recensione")
         sharedDataViewModel.currentActionState.value = ActionState.EDITING
@@ -264,16 +269,15 @@ class BranoSelezionato : Fragment(), RecensioniBranoSelAdapter.OnRecensioneInter
 
     private fun setupSubmissionForEditing(recensione: Recensione) {
         Log.d("DDDD", "setupSubmissionForEditing: Configurazione pulsante invio per modifica")
+        sharedDataViewModel.editTextContent.value = ""
         inviarButton.setOnClickListener {
             // Verifica se l'utente sta effettivamente modificando
             if (sharedDataViewModel.isEditingReview.value == true) {
                 val commentContent = EditText.text.toString()
                 Log.d("DDDD", "setupSubmissionForEditing: Tentativo invio modifica, contenuto: $commentContent")
                 recensioneViewModel.saveOrUpdateRecensione(recensione.userId, recensione.trackId, recensione.artistId, commentContent)
-                // Logica di invio qui
                 finalizeReviewSubmission()
             } else {
-                // Altrimenti, ignora o mostra un messaggio
                 Log.d("DDDD", "setupSubmissionForEditing: Azione ignorata, non in modalità modifica")
             }
         }
@@ -281,11 +285,10 @@ class BranoSelezionato : Fragment(), RecensioniBranoSelAdapter.OnRecensioneInter
 
     private fun finalizeReviewSubmission() {
         Log.d("DDDD", "finalizeReviewSubmission: Finalizzazione invio/modifica recensione")
+        sharedDataViewModel.isEditingReview.value = false
         sharedDataViewModel.editTextContent.value = "" // Resetta il campo dopo l'invio
         sharedDataViewModel.currentActionState.value = ActionState.NONE // Aggiorna lo stato a NONE
 
-        // Resetta il flag di modifica solo dopo l'invio di una recensione/modifica
-        sharedDataViewModel.isEditingReview.value = false
         Log.d("DDDD", "finalizeReviewSubmission: Reset stato di modifica")
     }
     override fun onRecensioneCommentaClicked(recensione: Recensione) {
@@ -298,17 +301,22 @@ class BranoSelezionato : Fragment(), RecensioniBranoSelAdapter.OnRecensioneInter
             (recyclerView.adapter as? RecensioniBranoSelAdapter)?.isCommentsVisible = true
             recyclerView.adapter?.notifyDataSetChanged()
             sharedDataViewModel.currentActionState.value = ActionState.COMMENTING
+
             sharedDataViewModel.isEditingReview.value = false // Importante: Reimposta lo stato di modifica qui
             risposteViewModel.fetchCommentfromRecensione(recensione.commentId)
             configureActionButtonForComment(recensione)
+
         } else {
             Log.d("DDDD", "Modalità commento: disattivata")
+            sharedDataViewModel.currentActionState.value = ActionState.NONE
             // Disattiva la modalità commento e nasconde i commenti
             (recyclerView.adapter as? RecensioniBranoSelAdapter)?.isCommentsVisible = false
             recyclerView.adapter?.notifyDataSetChanged()
             resetCommentModeUI(recensione)
-            sharedDataViewModel.isEditingReview.value = false // Reimposta anche qui lo stato di modifica
+            sharedDataViewModel.isEditingReview.value = false
+
         }
+
     }
     private fun inviaCommento(recensione: Recensione) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
@@ -319,7 +327,6 @@ class BranoSelezionato : Fragment(), RecensioniBranoSelAdapter.OnRecensioneInter
             risposteViewModel.saveRisposta(userId, recensione.commentId, answerContent)
             finalizeReviewSubmission()
             risposteViewModel.fetchCommentfromRecensione(recensione.commentId)
-            // Aggiorna l'UI dopo l'invio del commento
             resetCommentModeUI(recensione)
 
         } else {
@@ -332,27 +339,21 @@ class BranoSelezionato : Fragment(), RecensioniBranoSelAdapter.OnRecensioneInter
         }
     }
     private fun resetCommentModeUI(recensione: Recensione) {
-        // Esempio di reset di UI specifiche, come nascondere la lista dei commenti se mostrata
-        // ...
 
-        // Reset del testo del pulsante e del listener per riflettere la funzione originale
+        setupSubmission()
         inviarButton.text = "Invia Recensione"
 
-        // Assumi che `currentTrack` e `currentArtistId` siano disponibili a questo livello,
-        // altrimenti, dovrai trovare un modo per renderli accessibili qui.
         inviarButton.setOnClickListener {
-            // Assicurati di avere accesso al track e artistId correnti qui
             val userId = FirebaseAuth.getInstance().currentUser?.uid
             val commentContent = EditText.text.toString()
             if (userId != null && recensione!!.trackId != null && commentContent.isNotBlank()) {
                 Log.d("BranoSelezionato", "Invio recensione: Dati validi, invio in corso")
-                recensioneViewModel.saveOrUpdateRecensione(userId, recensione!!.trackId, recensione!!.artistId, commentContent)
+
                 sharedDataViewModel.editTextContent.value = "" // Resetta il campo dopo l'invio
                 sharedDataViewModel.currentActionState.value = ActionState.NONE
-
-                isInCommentMode = false // Assicurati che la modalità commento sia disattivata
+                isInCommentMode = false
                 finalizeReviewSubmission()
-                // Aggiorna l'UI dopo l'invio della recensione, se necessario
+
             } else {
                 Log.d("BranoSelezionato", "Invio recensione: Dati non validi, invio annullato")
             }
@@ -374,7 +375,7 @@ class BranoSelezionato : Fragment(), RecensioniBranoSelAdapter.OnRecensioneInter
 
 
 enum class ActionState {
-    NONE, COMMENTING, EDITING,AGGIORNA
+    NONE, COMMENTING, EDITING
 }
 
 

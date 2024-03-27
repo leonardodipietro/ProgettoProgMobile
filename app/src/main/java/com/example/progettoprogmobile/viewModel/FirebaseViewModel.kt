@@ -21,7 +21,10 @@ import kotlin.coroutines.resumeWithException
 import com.example.progettoprogmobile.model.Utente
 
 
-class FirebaseViewModel (application: Application): AndroidViewModel(application) {
+class FirebaseViewModel @JvmOverloads constructor(
+    application: Application,
+    private val artistDataSource: ArtistDataSource = FirebaseArtistDataSource(FirebaseDatabase.getInstance().reference.child("artists"))
+) : AndroidViewModel(application) {
 
     private val database: DatabaseReference = FirebaseDatabase.getInstance().reference
     var filter: String = "shortterm" // Default o valore iniziale
@@ -475,7 +478,7 @@ class FirebaseViewModel (application: Application): AndroidViewModel(application
         }
     }
 
-    fun retrieveArtistById(artistId: String, onComplete: (Artist?) -> Unit) {
+    /*fun retrieveArtistById(artistId: String, onComplete: (Artist?) -> Unit) {
         val database = FirebaseDatabase.getInstance().reference
         val artistRef = database.child("artists").child(artistId)
 
@@ -497,6 +500,14 @@ class FirebaseViewModel (application: Application): AndroidViewModel(application
                 // Gestisci l'errore qui
                 onComplete(null)
             }
+        })
+    }*/
+    fun retrieveArtistById(artistId: String, onComplete: (Artist?) -> Unit) {
+        artistDataSource.retrieveArtistById(artistId, onComplete = { artist ->
+            onComplete(artist)
+        }, onError = { error ->
+            Log.e("FirebaseError", "Errore durante il recupero degli artisti: ${error.message}")
+            onComplete(null)
         })
     }
 

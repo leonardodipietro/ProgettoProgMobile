@@ -10,7 +10,7 @@ import com.example.progettoprogmobile.BranoSelezionato
 import com.example.progettoprogmobile.R
 import com.example.progettoprogmobile.model.Risposta
 import com.example.progettoprogmobile.model.Utente
-
+import com.google.firebase.database.FirebaseDatabase
 
 
 class RisposteAdapterBranoSel(
@@ -49,7 +49,18 @@ class RisposteAdapterBranoSel(
                 val position = adapterPosition
                 if (position != RecyclerView.NO_POSITION) {
                     val commento = commentList[position]
-                    listener.onEliminaClicked(commento.answerId, commento.userId)
+                    //listener.onEliminaClicked(commento.answerId, commento.userId)
+                    val commentReference = FirebaseDatabase.getInstance().getReference("answers")
+                    commentReference.child(commento.answerId).removeValue()
+
+                        .addOnSuccessListener {
+                            //POTREBBE ESSERE TOLTO VEDIAMO
+                            //sharedEditTextVisibilityManager.setEditTextVisibility(isVisible = true)
+                            Log.d("COMMENTTO ELIMINATO","COMMENTO ELIMINATO")
+                        }
+                        .addOnFailureListener { e ->
+                            Log.d("qualcosa è andato storto","qualcosa è andato storto")
+                        }
                 }
             }
         }

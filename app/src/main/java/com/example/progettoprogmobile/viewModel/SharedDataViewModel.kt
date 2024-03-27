@@ -20,26 +20,30 @@ class SharedDataViewModel: ViewModel() {
     }*/
 
     val editTextContent = MutableLiveData<String?>()
-    val currentActionState = MutableLiveData<ActionState>()
+
     val commentJustSubmitted = MutableLiveData<Boolean>().apply { value = false }
     val isEditingReview = MutableLiveData<Boolean>(false)
     val usersMap: MutableLiveData<Map<String, Utente>> = MutableLiveData()
 
     val shortTermTracksShared = MutableLiveData<TopTracksResponse>()
-    val mediumTermTracksShared = MutableLiveData<TopTracksResponse?>()
-    val longTermTracksShared = MutableLiveData<TopTracksResponse?>()
+    val mediumTermTracksShared = MutableLiveData<TopTracksResponse>()
+    val longTermTracksShared = MutableLiveData<TopTracksResponse>()
 
     val spotifyToken: MutableLiveData<String?> = MutableLiveData()
+
+
+
+    val currentActionState = MutableLiveData<ActionState>().apply { value = ActionState.NONE }
 
     fun updateShortTermTracks(data: TopTracksResponse) {
         shortTermTracksShared.value = data
     }
 
-    fun updateMediumTermTracks(data: TopTracksResponse?) {
+    fun updateMediumTermTracks(data: TopTracksResponse) {
         mediumTermTracksShared.value = data
     }
 
-    fun updateLongTermTracks(data: TopTracksResponse?) {
+    fun updateLongTermTracks(data: TopTracksResponse) {
         longTermTracksShared.value = data
     }
 

@@ -23,7 +23,9 @@ import java.util.Locale
 
 
 //Per i test
-open class RecensioneViewModel() : ViewModel() {
+class RecensioneViewModel @JvmOverloads constructor(
+    private val db: DatabaseReference = FirebaseDatabase.getInstance().reference
+) : ViewModel() {
     private var database: DatabaseReference = FirebaseDatabase.getInstance().reference
     val recensioniData: MutableLiveData<List<Recensione>> = MutableLiveData()
     var usersData: MutableLiveData<Map<String, Utente>> = MutableLiveData()
@@ -204,7 +206,6 @@ open class RecensioneViewModel() : ViewModel() {
 
     }
 
-    //LA USIAMO SIA NEL SALVARE LA RECENSIONE IN SAVEORUPDATERECENSIONE SIA NEL CARICAMENTO DELLA PAGINA BRANO SELEZONATO
     fun hasUserReviewed(trackId: String, userId: String, onComplete: (Recensione?) -> Unit) {
         database.child("reviews").orderByChild("trackId").equalTo(trackId).addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -361,53 +362,41 @@ open class RecensioneViewModel() : ViewModel() {
     }
 
 
-//TODO RIFARE QUESTA PARTE
-    fun fetchRecensioniForArtist(artistId: String) {
-        Log.d("Recensioni", "Sto cercando le recensioni per l'artista con ID: $artistId")
+    fun deleteRecensione(commentId: String, userId: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+        val database = FirebaseDatabase.getInstance()
+        val reviewsReference = database.getReference("reviews")
+        val userReviewsReference = database.getReference("users").child(userId).child("reviews")
 
-        database.child("reviews")
-            .orderByChild("artistId")
-            .equalTo(artistId)
-            .addValueEventListener(object : ValueEventListener {
+        reviewsReference.child(commentId).removeValue().addOnSuccessListener {
+            userReviewsReference.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    Log.d("Recensioni", "Recensioni trovate nel database per l'artista con ID: $artistId")
-
-                    val recensioniList = mutableListOf<Recensione>()
-                    val userIds = mutableListOf<String>()
-                    for (snapshot in dataSnapshot.children) {
-                        val recensione = snapshot.getValue(Recensione::class.java)
-                        recensione?.let {
-                            recensioniList.add(it)
-                            userIds.add(it.userId)
+                    // Trova la chiave che corrisponde all'ID della recensione che si desidera eliminare
+                    var id: String? = null
+                    for (child in dataSnapshot.children) {
+                        if (commentId == child.value as String) {
+                            id = child.key
+                            break
                         }
                     }
-                    recensioniData.value = recensioniList
-                    fetchUsers(userIds)
 
-                    Log.d("Recensioni", "Recensioni caricate con successo per l'artista con ID: $artistId")
-                    Log.d("Recensioni", "Numero totale di recensioni: ${recensioniList.size}")
+                    // Se trovi una corrispondenza, procedi con la rimozione
+                    if (id != null) {
+                        userReviewsReference.child(id).removeValue().addOnSuccessListener {
+                            onSuccess() // Chiamato se la rimozione è riuscita
+                        }.addOnFailureListener { e ->
+                            onFailure(e) // Chiamato se c'è un errore durante la rimozione
+                        }
+                    } else {
+                        onFailure(Exception("Recensione non trovata nel nodo dell'utente."))
+                    }
                 }
 
                 override fun onCancelled(databaseError: DatabaseError) {
-                    Log.e("Recensioni", "Errore durante la ricerca delle recensioni: ${databaseError.message}")
-                    // Gestisci l'errore qui
+                    onFailure(databaseError.toException())
                 }
             })
+        }.addOnFailureListener { e ->
+            onFailure(e) // Chiamato se c'è un errore durante la rimozione dal nodo globale delle recensioni
+        }
     }
-
-
-   fun deleteRecensione(commentId: String) {
-        val currentUserID = FirebaseAuth.getInstance().currentUser?.uid
-        val reviewsReference = FirebaseDatabase.getInstance().getReference("reviews")
-        reviewsReference.child(commentId).removeValue()
-
-            .addOnSuccessListener {
-                //POTREBBE ESSERE TOLTO VEDIAMO
-                sharedEditTextVisibilityManager.setEditTextVisibility(isVisible = true)
-            }
-            .addOnFailureListener { e ->
-                Log.d("qualcosa è andato storto","qualcosa è andato storto")
-            }
-    }
-
 }

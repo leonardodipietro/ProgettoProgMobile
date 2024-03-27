@@ -26,6 +26,9 @@ class SpotifyViewModel : ViewModel(){
     private val trackInfo = mutableListOf<Track>() // Lista per conservare gli ID delle tracce
     val trackInfoExtracted = MutableLiveData<Boolean>()
     //il code che passiamo non è il token di accesso che
+    val playlistCreationResult = MutableLiveData<Boolean>()//per verificare su schermo che la creazione avviene
+
+    //il code che passiamo non è il token di accesso che
     fun getAccessToken(code: String) {
         repository.getAccessToken(
             code,
@@ -45,7 +48,7 @@ class SpotifyViewModel : ViewModel(){
         Log.d("Playlistchiamata", "playlistchiamata")
         val playlistBody = CreatePlaylistBody(name = "Top Tracks", description = "ecco le tue top tracks filtrate")
 
-        // Nota che ora `trackUris` è già nel formato corretto, quindi non è necessario mapparlo
+
         repository.createPlaylist(token, playlistBody) { response, error ->
             if (response != null) {
                 val playlistId = response.id
@@ -53,12 +56,15 @@ class SpotifyViewModel : ViewModel(){
                 repository.addTracksToPlaylist(token, playlistId, addTracksBody) { success, error ->
                     if (success) {
                         Log.d("Spotify", "Tracce aggiunte con successo alla playlist.")
+                        playlistCreationResult.postValue(true)
                     } else {
                         Log.e("Spotify", "Errore nell'aggiungere tracce alla playlist: $error")
+                        playlistCreationResult.postValue(false)
                     }
                 }
             } else {
                 Log.e("Spotify", "Errore nella creazione della playlist: $error")
+                playlistCreationResult.postValue(false)
             }
         }
     }

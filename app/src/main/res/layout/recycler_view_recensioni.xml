@@ -1,4 +1,3 @@
-<!-- res/layout/item_layout.xml -->
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -121,28 +120,28 @@
         </RelativeLayout>
 
 
-        </RelativeLayout>
+    </RelativeLayout>
 
-        <RelativeLayout
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@id/layout">
+
+        <View
+            android:id="@+id/view4"
+            android:layout_width="wrap_content"
+            android:layout_height="1dp"
+            android:layout_weight="1"
+            android:background="@color/dark_gray"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/risposteRecyclerView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            app:layout_constraintTop_toBottomOf="@id/layout">
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:nestedScrollingEnabled="false" />
 
-            <View
-                android:id="@+id/view4"
-                android:layout_width="wrap_content"
-                android:layout_height="1dp"
-                android:layout_weight="1"
-                android:background="@color/dark_gray"/>
+    </RelativeLayout>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/risposteRecyclerView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:nestedScrollingEnabled="false" />
-
-        </RelativeLayout>
-
-  </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
