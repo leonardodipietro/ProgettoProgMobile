@@ -94,7 +94,7 @@
     <string name="confirm">Conferma</string>
     <string name="newFollower">ha iniziato a seguirti</string>
     <string name="follow">Segui</string>
-    <string name="following1">Smetti di  seguire</string>
+    <string name="following1">Smetti di \n seguire</string>
 
     <string name="newReviewNotification">ha scritto una nuova recensione della canzone</string>
     <string name="newResponseNotification">ha commentato la tua recensione</string>
