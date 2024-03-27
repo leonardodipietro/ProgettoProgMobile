@@ -49,11 +49,6 @@ class RecensioneViewModel @JvmOverloads constructor(
         database = mockDatabase
     }
 
-
-
-    fun setSharedEditTextVisibilityManager(manager: SharedEditTextVisibilityManager) {
-        this.sharedEditTextVisibilityManager = manager
-    }
     fun getCurrentUserId(): String? {
         return FirebaseAuth.getInstance().currentUser?.uid
     }
@@ -122,31 +117,6 @@ class RecensioneViewModel @JvmOverloads constructor(
       //sharedEditTextVisibilityManager.hideEditText()
     }
 
- /*   fun updateRecensione(commentId: String, userId: String, commentContent: String) {
-        // Ottieni la data e l'ora attuali
-        val currentTimestamp = System.currentTimeMillis()
-        val date = Date(currentTimestamp)
-        // Formatta la data/ora per la visualizzazione
-        val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-        val formattedDateTime = formatter.format(date)
-
-        database.child("reviews").child(commentId).get().addOnSuccessListener { dataSnapshot ->
-            val existingReview = dataSnapshot.getValue(Recensione::class.java)
-            existingReview?.let {
-                val updatedReview = it.copy(content = commentContent, timestamp = formattedDateTime)
-
-                database.child("reviews").child(commentId).setValue(updatedReview)
-                    .addOnSuccessListener {
-                        Log.d("Update", "Aggiornamento completato")
-                    }
-                    .addOnFailureListener {
-                        // Gestione dell'errore
-                    }
-            }
-        }
-        sharedEditTextVisibilityManager.hideEditText()
-    }
-*/
 
     fun saveOrUpdateRecensione(userId: String, trackId: String, artistId:String, commentContent: String) {
         hasUserReviewed(trackId, userId) { existingReview ->
@@ -179,8 +149,7 @@ class RecensioneViewModel @JvmOverloads constructor(
                     .addOnFailureListener {
 
                     }
-                //StatoRecensioneLiveData.value = true se funziona tolgo
-                sharedEditTextVisibilityManager.hideEditText()
+
             } else {
                 // Ottieni la data e l'ora attuali.
                 val currentTimestamp = System.currentTimeMillis()
@@ -199,7 +168,7 @@ class RecensioneViewModel @JvmOverloads constructor(
                     .addOnFailureListener {
 
                     }
-                sharedEditTextVisibilityManager.hideEditText()
+
             }
         }
     }
@@ -218,7 +187,6 @@ class RecensioneViewModel @JvmOverloads constructor(
                     val review = snapshot.getValue(Recensione::class.java)
                     if (review?.userId == userId) {
                         foundRecensione = review
-                        //TODO CONVERTIRE IL LOG CON UN MESSAGGIO DI ERRORE
                         Log.d("HASUSERREVIEWED","RECENSIONE GIA INSERITA")
                     }
                 }
@@ -230,20 +198,6 @@ class RecensioneViewModel @JvmOverloads constructor(
             }
         })
     }
-
-    //PER AGGIORNARE IL LIVE DATA
-    fun checkUserReview(trackId: String, userId: String) {
-        hasUserReviewed(trackId, userId) { existingReview ->
-            // Se NON esiste una recensione, l'EditText DEVE essere visibile.
-            val shouldShowEditText = existingReview == null
-            if(::sharedEditTextVisibilityManager.isInitialized) {
-                sharedEditTextVisibilityManager.setEditTextVisibility(shouldShowEditText)
-            }
-        }
-    }
-
-
-
 
     private fun addCommentIdToTrack(commentId: String, trackId: String) {
         database.child("tracks").child(trackId).child("comments").push().setValue(commentId)
@@ -397,7 +351,7 @@ class RecensioneViewModel @JvmOverloads constructor(
                         }
                     }
 
-                    // Se trovi una corrispondenza, procedi con la rimozione
+                    // Se trova una corrispondenza, procedi con la rimozione
                     if (id != null) {
                         userReviewsReference.child(id).removeValue().addOnSuccessListener {
                             onSuccess() // Chiamato se la rimozione è riuscita
