@@ -173,15 +173,32 @@ open class ThirdFragment : Fragment() {
 
             // Ora, elimina anche tutte le recensioni associate a questo utente
             val reviewsReference = FirebaseDatabase.getInstance().getReference("reviews")
+            val answersReference = FirebaseDatabase.getInstance().getReference("answers")
 
             // Query per ottenere le recensioni dell'utente che stai eliminando
             val query = reviewsReference.orderByChild("userId").equalTo(userId)
+            val queryAnswers = answersReference.orderByChild("userId").equalTo(userId)
 
             query.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     for (reviewSnapshot in dataSnapshot.children) {
                         // Rimuovi questa recensione
-                        reviewSnapshot.ref.removeValue()
+                        reviewSnapshot.ref.removeValue().addOnSuccessListener {
+                            val reviewId = reviewSnapshot.key
+                            val queryAnswers = answersReference.orderByChild("reviewId").equalTo(reviewId)
+                            queryAnswers.addListenerForSingleValueEvent(object : ValueEventListener {
+                                override fun onDataChange(answerDataSnapshot: DataSnapshot) {
+                                    for (answerSnapshot in answerDataSnapshot.children) {
+                                        // Rimuovi questa risposta
+                                        answerSnapshot.ref.removeValue()
+                                    }
+                                }
+
+                                override fun onCancelled(answerDatabaseError: DatabaseError) {
+                                    // Gestisci eventuali errori qui
+                                }
+                            })
+                        }
                     }
                 }
 
@@ -190,6 +207,18 @@ open class ThirdFragment : Fragment() {
                 }
             })
 
+            queryAnswers.addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(userAnswersDataSnapshot: DataSnapshot) {
+                    for (userAnswerSnapshot in userAnswersDataSnapshot.children) {
+                        // Rimuovi questa risposta
+                        userAnswerSnapshot.ref.removeValue()
+                    }
+                }
+
+                override fun onCancelled(userAnswersDatabaseError: DatabaseError) {
+                    // Gestisci eventuali errori qui
+                }
+            })
         }
 
         // Osserva il risultato del logout dall'account Firebase
