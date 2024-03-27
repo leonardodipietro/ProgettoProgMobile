@@ -484,9 +484,9 @@ class FourthFragment : Fragment(),
     // Metodo chiamato quando si clicca su "Conferma" in una notifica
     override fun onConfirmClickListener(userId: String) {
         // Incrementa il contatore dei follower dell'utente che ha inviato la richiesta
-        incrementFollowerCount(userId)
+        incrementFollowerCount(currentUserId)
         // Incrementa il contatore dei following dell'utente corrente
-        incrementFollowingCount(currentUserId)
+        incrementFollowingCount(userId)
         // Rimuovi la richiesta di follow
         removeFollowRequest(userId)
 
