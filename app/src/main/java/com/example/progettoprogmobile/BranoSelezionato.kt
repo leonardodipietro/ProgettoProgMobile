@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -27,6 +28,10 @@ import com.example.progettoprogmobile.viewModel.RecensioneViewModel
 import com.example.progettoprogmobile.viewModel.RisposteViewModel
 import com.example.progettoprogmobile.viewModel.SharedDataViewModel
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class BranoSelezionato : Fragment(), RecensioniBranoSelAdapter.OnRecensioneInteractionListener
 {
@@ -292,11 +297,13 @@ class BranoSelezionato : Fragment(), RecensioniBranoSelAdapter.OnRecensioneInter
         Log.d("DDDD", "finalizeReviewSubmission: Reset stato di modifica")
     }
     override fun onRecensioneCommentaClicked(recensione: Recensione) {
+        lifecycleScope.launch {
         isInCommentMode = !isInCommentMode // Alterna lo stato tra vero e falso
         Log.d("DDDD", "onRecensioneCommentaClicked: isInCommentMode=$isInCommentMode")
 
         if (isInCommentMode) {
             Log.d("DDDD", "Modalità commento: attivata")
+
             // Attiva la modalità commento e mostra i commenti
             (recyclerView.adapter as? RecensioniBranoSelAdapter)?.isCommentsVisible = true
             recyclerView.adapter?.notifyDataSetChanged()
@@ -305,6 +312,22 @@ class BranoSelezionato : Fragment(), RecensioniBranoSelAdapter.OnRecensioneInter
             sharedDataViewModel.isEditingReview.value = false // Importante: Reimposta lo stato di modifica qui
             risposteViewModel.fetchCommentfromRecensione(recensione.commentId)
             configureActionButtonForComment(recensione)
+
+            val recensioni = async { recensioneViewModel.fetchRecensioniAndUsersForTrackSuspended(currentTrack!!.id) }
+            val risposte = async { risposteViewModel.fetchCommentfromRecensioneSuspended(recensione.commentId) }
+            // Attendi i risultati
+            val recensioniResult = recensioni.await()
+            val risposteResult = risposte.await()
+
+            // Aggiorna i LiveData con i risultati
+            withContext(Dispatchers.Main) {
+                recensioneViewModel.recensioniData.value = recensioniResult
+                risposteViewModel.commentiData.value = risposteResult
+                // Notifica gli adapter dei cambiamenti
+               // updateUIForCommentMode()
+            }
+
+
 
         } else {
             Log.d("DDDD", "Modalità commento: disattivata")
@@ -316,7 +339,7 @@ class BranoSelezionato : Fragment(), RecensioniBranoSelAdapter.OnRecensioneInter
             sharedDataViewModel.isEditingReview.value = false
 
         }
-
+        }
     }
     private fun inviaCommento(recensione: Recensione) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return

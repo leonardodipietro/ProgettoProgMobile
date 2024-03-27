@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.progettoprogmobile.model.Recensione
+import com.example.progettoprogmobile.model.Risposta
 import com.example.progettoprogmobile.model.Track
 import com.example.progettoprogmobile.model.Utente
 import com.example.progettoprogmobile.utils.SharedEditTextVisibilityManager
@@ -16,6 +17,9 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -360,6 +364,20 @@ class RecensioneViewModel @JvmOverloads constructor(
                 }
             })
     }
+
+    suspend fun fetchRecensioniAndUsersForTrackSuspended(trackId: String): List<Recensione> = withContext(
+        Dispatchers.IO) {
+        val snapshot = db.child("reviews").orderByChild("trackId").equalTo(trackId).get().await()
+        val recensioniList = mutableListOf<Recensione>()
+        snapshot.children.forEach {
+            val recensione = it.getValue(Recensione::class.java)
+            recensione?.let { rec ->
+                recensioniList.add(rec)
+            }
+        }
+        recensioniList
+    }
+
 
 
     fun deleteRecensione(commentId: String, userId: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {

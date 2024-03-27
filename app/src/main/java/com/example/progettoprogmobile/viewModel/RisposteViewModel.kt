@@ -16,7 +16,13 @@ import java.util.Locale
 import com.example.progettoprogmobile.model.Utente
 import com.firebase.ui.auth.data.model.User
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import java.util.concurrent.CountDownLatch
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 class RisposteViewModel: ViewModel() {
     private val database: DatabaseReference = FirebaseDatabase.getInstance().reference
@@ -77,8 +83,34 @@ class RisposteViewModel: ViewModel() {
                 }
             })
     }
+    suspend fun fetchCommentfromRecensioneSuspended(commentIdfather: String): List<Risposta> = suspendCoroutine { cont ->
+        database.child("answers")
+            .orderByChild("commentIdfather")
+            .equalTo(commentIdfather)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    val commentiList = mutableListOf<Risposta>()
+                    val userIds = mutableListOf<String>()
+                    for (snapshot in dataSnapshot.children) {
+                        val commento = snapshot.getValue(Risposta::class.java)
+                        commento?.let {
+                            commentiList.add(it)
+                            userIds.add(it.userId)
+                        }
+                    }
+                    // Invece di impostare direttamente i dati su un LiveData, ritorniamo i risultati tramite continuation
+                    cont.resume(commentiList)
+                    // Potresti voler gestire anche userIds qui, a seconda di come sono usati
+                }
 
-    fun fetchUsers(userIds: List<String>) {
+                override fun onCancelled(databaseError: DatabaseError) {
+                    // Passa l'errore alla coroutine
+                    cont.resumeWithException(databaseError.toException())
+                }
+            })
+    }
+
+    /*fun fetchUsers(userIds: List<String>) {
         val tempUsersMap = mutableMapOf<String, Utente>()
         var loadedUsersCount = 0 // Contatore per tracciare il numero di utenti caricati
 
@@ -105,6 +137,27 @@ class RisposteViewModel: ViewModel() {
                     }
                 })
         }
+    }*/
+    private fun fetchUsers(userIds: List<String>) {
+        database.child("users")
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    val usersMap = mutableMapOf<String, Utente>()
+                    userIds.forEach { id ->
+                        dataSnapshot.child(id).getValue(Utente::class.java)?.let { user ->
+                            val imageUrl = dataSnapshot.child(id).child("profile image").getValue(String::class.java)
+                            val updatedUser = user.copy(userImage = imageUrl ?: "") // Crea un nuovo oggetto Utente con l'URL dell'immagine aggiornato
+                            Log.d("FetchUsers", "Utente: ${updatedUser.name}, URL Immagine: ${updatedUser.userImage}")
+                            usersMap[id] = updatedUser // Aggiungi l'utente alla mappa
+                        }
+                    }
+                    usersData.value = usersMap // Aggiorna LiveData con la nuova mappa
+                }
+
+                override fun onCancelled(databaseError: DatabaseError) {
+                    Log.e("FetchUsers", "Errore nel database: ${databaseError.toException()}")
+                }
+            })
     }
 
 

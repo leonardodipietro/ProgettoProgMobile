@@ -56,7 +56,7 @@ class FirstFragment : Fragment(),TrackAdapter.OnTrackClickListener,
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?): View? {
 
-        //TODO SISTEMARE COLORE E STILE DEI BOTTONI
+
         val rootView = inflater.inflate(R.layout.fragment_first, container, false)
         sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
 
@@ -218,13 +218,22 @@ class FirstFragment : Fragment(),TrackAdapter.OnTrackClickListener,
     private fun handleStartAuthButtonClick() {
         startSpotifyAuthentication()
         observeToken()
-        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-        token?.let { token ->
+    }
 
-            getTopTracks(token, userId)
-            getTopArtists(token, userId)
-        } ?: run {
-            Log.d("TrackGen", "Token is null")
+    private fun observeToken() {
+        spotifyViewModel.spotifyTokenResponse.observe(viewLifecycleOwner) { tokenResponse ->
+            tokenResponse?.access_token?.let { accessToken ->
+                // Aggiorna il token nel ViewModel condiviso
+                sharedViewModel.updateToken(accessToken)
+                Log.d("SpotifyToken", "Token ottenuto: $accessToken")
+
+                // Ora che abbiamo il token, possiamo recuperare i top tracks e top artists
+                val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return@let
+                getTopTracks(accessToken, userId)
+                getTopArtists(accessToken, userId)
+            } ?: run {
+                Log.d("SpotifyToken", "Token non ottenuto")
+            }
         }
     }
 
@@ -410,19 +419,7 @@ class FirstFragment : Fragment(),TrackAdapter.OnTrackClickListener,
             }
         }
     }*/
-    private fun observeToken() {
-        spotifyViewModel.spotifyTokenResponse.observe(viewLifecycleOwner) { tokenResponse ->
-            tokenResponse?.access_token?.let { accessToken ->
-                // Aggiorna il token nel ViewModel condiviso
-                sharedViewModel.updateToken(accessToken)
-                token=accessToken
-                Log.d("SpotifyToken", "Token ottenuto: $token")
-                Log.d("SpotifyToken", "Token ottenuto: $accessToken")
-            } ?: run {
-                Log.d("SpotifyToken", "Token non ottenuto")
-            }
-        }
-    }
+
     fun handleIntent(intent: Intent?) {
         Log.d("PRIMO LOG FRAGMENT", "Handling Intent: $intent")
         val uri = intent?.data

@@ -4,13 +4,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.progettoprogmobile.BranoSelezionato
 import com.example.progettoprogmobile.R
 import com.example.progettoprogmobile.model.Risposta
 import com.example.progettoprogmobile.model.Utente
 import com.google.firebase.database.FirebaseDatabase
+import com.squareup.picasso.Picasso
 
 
 class RisposteAdapterBranoSel(
@@ -29,19 +32,42 @@ class RisposteAdapterBranoSel(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val risposta = commentList[position]
-        val userName = usersMap[risposta.userId]?.name ?: "Nome non disponibile"
+        val user = usersMap[risposta.userId]
+        val userName = user?.name ?: "Nome non disponibile"
+        val userProfileImageUrl = user?.userImage
 
         Log.d("RisposteAdapter", "Mostrando risposta di ${risposta.userId}: $userName")
         holder.userNameComment.text = userName
         holder.commentContent.text = risposta.answercontent
 
+        if (userProfileImageUrl.isNullOrEmpty()) {
+            // Qui impostiamo un'immagine di fallback se l'URL è nullo o vuoto.
+            holder.imgProfile.setImageResource(R.drawable.baseline_person_24)
+        } else {
+            // Utilizziamo Picasso per caricare l'immagine dall'URL.
+            Picasso.get()
+                .load(userProfileImageUrl)
+                .error(R.drawable.baseline_person_24) // Immagine di fallback in caso di errore nel caricamento.
+                .into(holder.imgProfile)
+        }
     }
+        /*usersMap[risposta.userId]?.let { user ->
+            txtUserName.text = user.name
+            if (!user.userImage.isNullOrEmpty()) {
+                Log.d("PicassoLoading", "Caricamento immagine per ${user.name} URL: ${user.userImage}")
+                Picasso.get().load(user.userImage).into(imgProfile)
+            } else {
+                // Qui imposti un'immagine di fallback o lasci l'immagine corrente
+                imgProfile.setImageResource(R.drawable.baseline_person_24) // Immagine di fallback
+            }
+        }*/
 
     override fun getItemCount(): Int = commentList.size
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val userNameComment: TextView = itemView.findViewById(R.id.userNameComment)
         val commentContent: TextView = itemView.findViewById(R.id.commentContent)
+        val imgProfile: ImageView = itemView.findViewById(R.id.imageProfileRisp)
         private val btnEliminaCommento: Button = itemView.findViewById(R.id.eliminacommento)
 
         init {
