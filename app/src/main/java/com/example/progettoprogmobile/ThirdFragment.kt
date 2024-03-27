@@ -95,6 +95,9 @@ open class ThirdFragment : Fragment() {
         // Mostra l'immagine di profilo se l'URL è presente
         if (!imageUrl.isNullOrEmpty()) {
             Picasso.get().load(imageUrl).into(userImage)
+        } else {
+            // Se non è presente un'immagine di profilo, mostra l'immagine di default
+            userImage.setImageResource(R.drawable.default_profile_image)
         }
 
         val reviewTextView = rootView.findViewById<TextView>(R.id.reviewTextButton)
@@ -324,6 +327,7 @@ open class ThirdFragment : Fragment() {
         val options = arrayOf(
             Html.fromHtml("<font color='#FFFFFF'>${getString(R.string.takePicture)}</font>", Html.FROM_HTML_MODE_LEGACY),
             Html.fromHtml("<font color='#FFFFFF'>${getString(R.string.choseFromGallery)}</font>", Html.FROM_HTML_MODE_LEGACY),
+            Html.fromHtml("<font color='#FFFFFF'>${getString(R.string.removeCurrentPicture)}</font>", Html.FROM_HTML_MODE_LEGACY),
             Html.fromHtml("<font color='#FFFFFF'>${getString(R.string.cancel)}</font>", Html.FROM_HTML_MODE_LEGACY)
         )
 
@@ -349,10 +353,13 @@ open class ThirdFragment : Fragment() {
                         Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
                     galleryIntent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*")
                     startActivityForResult(galleryIntent, photoRequestCodeFromGallery)
-
                 }
 
                 2 -> {
+                    // Rimuovi la foto corrente dal profilo
+                    removeCurrentPhotoFromProfile()
+                }
+                3 -> {
                     // Annulla
                     dialog.dismiss()
                 }
@@ -396,6 +403,25 @@ open class ThirdFragment : Fragment() {
             // Si è verificato un errore durante l'upload
             // Gestisci l'errore come preferisci
             Log.e ("LOG UPLOAD",  "Errore durante il caricamento dell'immagine.")
+        }
+    }
+    private fun removeCurrentPhotoFromProfile() {
+        val sharedPreferences = requireContext().getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.remove("profile image_$userId")
+        editor.apply()
+
+        // Aggiorna anche il riferimento nell'ID utente nel database
+        val userReference = FirebaseDatabase.getInstance().getReference("users").child(userId)
+        userReference.child("profile image").removeValue().addOnSuccessListener {
+            Log.d("RemovePhoto", "Riferimento all'immagine del profilo eliminato con successo dal database")
+
+            // Una volta rimosso il riferimento dell'immagine dal database, puoi rimuovere anche l'immagine visualizzata nell'ImageView
+            userImage.setImageResource(R.drawable.default_profile_image)
+            Toast.makeText(requireContext(), "Immagine del profilo rimossa con successo", Toast.LENGTH_SHORT).show()
+        }.addOnFailureListener { exception ->
+            Log.e("RemovePhoto", "Errore durante l'eliminazione del riferimento all'immagine del profilo dal database: ${exception.message}")
+            Toast.makeText(requireContext(), "Si è verificato un errore durante la rimozione dell'immagine del profilo", Toast.LENGTH_SHORT).show()
         }
     }
 

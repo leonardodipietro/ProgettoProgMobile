@@ -2,10 +2,73 @@
 <resources>
 
 
-    <string name="newDislikedReview">didn\'t like your review</string>
+    <string name="welcomeToSeeYourMusic">Welcome to See Your Music</string>
+    <string name="login">Login</string>
+    <string name="newDislikedReview">dislikes your review</string>
     <string name="clessidra">Hourglass</string>
     <string name="frecciaindietro">Back arrow</string>
     <string name="calendario">Calendar</string>
+    <string name="cerca">Search</string>
+    <string name="cerca_utenti">Search users</string>
+    <string name="cerca2">Search</string>
+    <string name="brani">Tracks</string>
+    <string name="Artisti">Artists</string>
+    <string name="choseFromGallery">Chose from gallery</string>
+    <string name="choseAnOption">"Choose an option: "</string>
+    <string name="cancel">Cancel</string>
+    <string name="aggiungi_amico">Add friend</string>
+    <string name="clessidra1">Hourglass</string>
+    <string name="artista">Artist</string>
+    <string name="editImageButton">Edit profile image</string>
+    <string name="delete">Delete account</string>
+    <string name="delete1">Delete</string>
+    <string name="confirm">Confirm</string>
+    <string name="contatorerecensioni">Review counter</string>
+    <string name="email">Login</string>
+    <string name="settings">Settings</string>
+    <string name="startSpotifyAuthentication">Start Spotify authentication</string>
+    <string name="topTracks">Top Tracks</string>
+    <string name="topArtists">Top Artists</string>
+    <string name="lastMonth">Last month</string>
+    <string name="lastSixMonths">Last six months</string>
+    <string name="ever">Always</string>
+    <string name="userImage">User image</string>
+    <string name="takePicture">Take a picture</string>
+    <string name="reviewText">Reviews</string>
+    <string name="username">"User name: "</string>
+    <string name="editNameButton">Edit username</string>
+    <string name="enterYourName">Enter your name</string>
+    <string name="save">Save</string>
+    <string name="notification">Notification</string>
+    <string name="newfollowers">New followers</string>
+    <string name="newreviews">"New following reviews: "</string>
+    <string name="everyone">Everyone</string>
+    <string name="review">"Reviews: "</string>
+    <string name="nobody">Nobody</string>
+    <string name="nome_utente">Username</string>
+    <string name="recensioni">Reviews</string>
+    <string name="followersNotification">Follow requests</string>
+    <string name="reviewNotification">Reviews</string>
+    <string name="newFRequest">wants to start following you</string>
+    <string name="newFollower">started follow you</string>
+    <string name="follow">Follow</string>
+    <string name="following1">Stop following</string>
+    <string name="newReviewNotification">"wrote a new review of the song "</string>
+    <string name="newResponseNotification">commented on your review</string>
+    <string name="newLikedReview">likes your review</string>
+    <string name="griglia1">Grid</string>
+    <string name="remove">Remove</string>
+    <string name="requestSent">Request sent</string>
+    <string name="Recensioni">"Reviews: "</string>
+    <string name="questo_account_privato">This account is private</string>
+    <string name="linear">Linear view</string>
+    <string name="grid">Grid view</string>
+    <string name="removeCurrentPicture">Remove current picture</string>
+    <string name="top_track">Top Tracks</string>
+    <string name="top_artist">Top Artists</string>
+    <string name="trackImage">Track image</string>
+    <string name="segui_già">Following</string>
+    <string name="view_style">Choose view style</string>
 
 
 </resources>

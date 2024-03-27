@@ -9,31 +9,6 @@
     tools:context=".FourthFragment">
 
     <RelativeLayout
-        android:id="@+id/relativeLayout1"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="@color/dark_gray"
-        android:orientation="vertical"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <TextView
-            android:id="@+id/notification1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:gravity="center|center_horizontal|center_vertical"
-            android:text="@string/notification"
-            android:textAlignment="center"
-            android:textColor="@color/white"
-            android:textSize="25sp" />
-
-    </RelativeLayout>
-
-    <RelativeLayout
         android:id="@+id/relativeLayout2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -41,7 +16,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/relativeLayout1">
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/newFollowersRecyclerView"

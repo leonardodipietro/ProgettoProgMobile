@@ -26,7 +26,7 @@ import androidx.fragment.app.FragmentActivity
 import com.example.progettoprogmobile.FifthFragment
 
 
-// Sealed class che rappresenta due tipi di notifiche: follower e richieste
+// Sealed class che rappresenta tre tipi di notifiche: follower, richieste e recensioni
 sealed class NotificationItem {
     data class FollowerItem(val utente: Utente) : NotificationItem()
     data class RequestItem(val utente: Utente) : NotificationItem()
