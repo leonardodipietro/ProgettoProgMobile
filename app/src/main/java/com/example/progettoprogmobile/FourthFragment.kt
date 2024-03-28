@@ -402,7 +402,7 @@ class FourthFragment : Fragment(),
 
             override fun onComplete(databaseError: DatabaseError?, committed: Boolean, dataSnapshot: DataSnapshot?) {
                 if (!committed) {
-                    // Gestisci il fallimento della transazione
+
                 }
             }
         })
@@ -426,13 +426,13 @@ class FourthFragment : Fragment(),
                         }
                     }
 
-                    // Verifica se ci sono richieste di follow
+
                     if (followRequests.isNotEmpty()) {
                         // Recupera i dati degli utenti associati alle richieste e aggiorna la RecyclerView
                         for (userId in followRequests) {
                             retrieveUserDataForRequest(userId)
                         }
-                        // Aggiungi la chiamata a retrieveFollowersData() qui
+
                         retrieveFollowersData()
                     }
                 } else {
@@ -443,7 +443,7 @@ class FourthFragment : Fragment(),
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                // Gestisci eventuali errori nel recupero dei dati delle richieste di follow
+
                 Log.e("FollowRequests", "Error retrieving follow requests: ${databaseError.message}")
             }
         })
@@ -463,17 +463,14 @@ class FourthFragment : Fragment(),
                         userImage = imageUrl.takeIf { !it.isNullOrEmpty() } ?: defaultImageUrl
                     )
 
-                    // Log dei dati dell'utente associato alla richiesta
-                    Log.d("UserDataForRequest", "User Data for Request: $user")
 
-                    // Aggiungi l'utente associato alla richiesta alla lista delle notifiche
+                    Log.d("UserDataForRequest", "User Data for Request: $user")
                     notificationList.add(NotificationItem.RequestItem(user))
                     notificationsAdapter.submitList(notificationList)
                     notificationsAdapter.notifyDataSetChanged()
                 }
             }
             override fun onCancelled(databaseError: DatabaseError) {
-                // Gestisci eventuali errori nel recupero dei dati dell'utente associato alla richiesta
                 Log.e("UserDataForRequest", "Error retrieving user data: ${databaseError.message}")
             }
         })
@@ -485,16 +482,13 @@ class FourthFragment : Fragment(),
         incrementFollowerCount(currentUserId)
         // Incrementa il contatore dei following dell'utente corrente
         incrementFollowingCount(userId)
-        // Rimuovi la richiesta di follow
         removeFollowRequest(userId)
 
-        // Aggiungi l'utente ai followers
         addFollower(userId)
 
-        // Aggiungi l'utente ai following
+
         addUserIdToMyFollowing(userId)
 
-        // Rimuovi l'utente dalla lista delle notifiche
         removeNotificationItem(userId)
 
         addNewFollowerNotification(userId)
@@ -537,18 +531,17 @@ class FourthFragment : Fragment(),
         userReference.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    // Ottieni i dati dell'utente
+
                     val imageUrl = dataSnapshot.child("profile image").getValue(String::class.java)
                     val defaultImageUrl = "drawable://" + R.drawable.baseline_person_24
 
-                    // Crea un oggetto Utente con i dati recuperati
                     val newUser = Utente(
                         userId = userId,
                         name = dataSnapshot.child("name").getValue(String::class.java) ?: "",
                         userImage = imageUrl.takeIf { !it.isNullOrEmpty() } ?: defaultImageUrl
                     )
 
-                    // Aggiungi la nuova notifica di follower
+
                     notificationList.add(NotificationItem.FollowerItem(newUser))
                     notificationsAdapter.submitList(notificationList)
                     notificationsAdapter.notifyItemInserted(notificationList.size - 1)
@@ -557,7 +550,6 @@ class FourthFragment : Fragment(),
             } override fun onCancelled(databaseError: DatabaseError) {
                 // Implementa l'azione da eseguire in caso di cancellazione dell'evento
                 Log.e("UserDataForRequest", "Error retrieving user data: ${databaseError.message}")
-                // Puoi mostrare un messaggio Toast o effettuare altre operazioni in risposta a questa cancellazione
             }
         })
     }
@@ -583,13 +575,13 @@ class FourthFragment : Fragment(),
                             moveRequestToFollowers(requestId)
                         }
                     }
-                    // Dopo aver spostato gli ID, rimuovi il nodo "requests"
+
                     requestsReference.removeValue()
                 }
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                // Gestisci eventuali errori nel recupero dei dati delle richieste di follow
+
                 Log.e("FollowRequests", "Error retrieving follow requests: ${databaseError.message}")
             }
         })
@@ -600,10 +592,10 @@ class FourthFragment : Fragment(),
         followersReference.child(userId).setValue(true)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    // Aggiungi l'utente corrente alla lista "followers" dell'utente seguito
+
                     addCurrentUserToFollower(userId)
                 } else {
-                    // Gestisci eventuali errori durante l'aggiunta
+
                     Log.e("MoveRequestToFollowers", "Error moving request to followers: ${task.exception?.message}")
                 }
             }
@@ -618,7 +610,7 @@ class FourthFragment : Fragment(),
                     // Se l'aggiunta è riuscita, mostra un messaggio di successo
                     Toast.makeText(requireContext(), "Utente aggiunto con successo alla lista following", Toast.LENGTH_SHORT).show()
                 } else {
-                    // Gestisci eventuali errori durante l'aggiunta
+
                     Toast.makeText(requireContext(), "Errore durante l'aggiunta dell'utente alla lista following", Toast.LENGTH_SHORT).show()
                 }
             }
@@ -678,7 +670,6 @@ class FourthFragment : Fragment(),
                                                     images = artistImages
                                                 )
 
-                                                // Create Track object
                                                 val albumImage = Image(url = imageUrl)
                                                 val track = Track(
                                                     name = trackName,
@@ -691,8 +682,6 @@ class FourthFragment : Fragment(),
                                                     id = trackId
                                                 )
 
-
-                                                // Aggiungi l'utente associato alla richiesta alla lista delle notifiche
                                                 notificationList.add(
                                                     NotificationItem.ReviewItem(
                                                         user,
@@ -702,7 +691,6 @@ class FourthFragment : Fragment(),
                                                 notificationsAdapter.submitList(notificationList)
                                                 notificationsAdapter.notifyDataSetChanged()
 
-                                                // Stampiamo nel log il fatto che l'oggetto Track sia stato passato all'adapter
                                                 Log.d(
                                                     "TrackObject",
                                                     "Track object passed to adapter: $track"
@@ -710,7 +698,7 @@ class FourthFragment : Fragment(),
                                             }
                                         }
                                         override fun onCancelled(databaseError: DatabaseError) {
-                                            // Gestione degli errori nell'ottenere i dati dell'artista
+
                                             Log.e("ArtistData", "Errore nel recupero dei dati dell'artista: ${databaseError.message}")
                                         }
                                     })
@@ -722,7 +710,7 @@ class FourthFragment : Fragment(),
                         }
 
                         override fun onCancelled(databaseError: DatabaseError) {
-                            // Gestisci eventuali errori nel recupero dei dati della traccia
+
                             Log.e("TrackName", "Errore nel recupero del nome della traccia: ${databaseError.message}")
                         }
                     })
@@ -730,7 +718,7 @@ class FourthFragment : Fragment(),
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                // Gestisci eventuali errori nel recupero dei dati dell'utente associato alla recensione
+
                 Log.e("UserDataForReview", "Error retrieving user data: ${databaseError.message}")
             }
         })
@@ -744,7 +732,6 @@ class FourthFragment : Fragment(),
                 if (reviewsSnapshot.exists()) {
                     // Itera sulle recensioni
                     for (reviewSnapshot in reviewsSnapshot.children) {
-                        // Ottieni i dati della recensione
                         val review = reviewSnapshot.getValue(Recensione::class.java)
                         if (review != null) {
                             // Controlla se l'userId della recensione è presente nella lista "following" dell'utente corrente
@@ -763,7 +750,7 @@ class FourthFragment : Fragment(),
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                // Gestisci eventuali errori nel recupero delle recensioni
+
                 Log.e("RetrieveReviews", "Error retrieving reviews: ${databaseError.message}")
             }
         })
@@ -779,7 +766,7 @@ class FourthFragment : Fragment(),
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                // Gestisci eventuali errori nel recupero dei dati
+
                 Log.e("IsUserFollowing", "Error checking if user is following: ${databaseError.message}")
                 callback(false)
             }
