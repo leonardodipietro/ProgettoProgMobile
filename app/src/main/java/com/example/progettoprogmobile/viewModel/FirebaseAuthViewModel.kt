@@ -18,7 +18,6 @@ import android.util.Log
 class FirebaseAuthViewModel : ViewModel() {
 
 
-    // Definisci i possibili risultati dell'accesso
     enum class SignInResult {
         SUCCESS,
         FAILURE
@@ -61,7 +60,6 @@ class FirebaseAuthViewModel : ViewModel() {
             AuthUI.IdpConfig.GoogleBuilder().build()
         )
 
-        // Create and launch sign-in intent
         signInIntent = AuthUI.getInstance()
             .createSignInIntentBuilder()
             .setAvailableProviders(providers)

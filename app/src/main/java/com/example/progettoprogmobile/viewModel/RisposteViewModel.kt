@@ -79,7 +79,7 @@ class RisposteViewModel: ViewModel() {
                     fetchUsers(userIds)
                 }
                 override fun onCancelled(databaseError: DatabaseError) {
-                    // Handle error here
+
                 }
             })
     }
@@ -98,9 +98,9 @@ class RisposteViewModel: ViewModel() {
                             userIds.add(it.userId)
                         }
                     }
-                    // Invece di impostare direttamente i dati su un LiveData, ritorniamo i risultati tramite continuation
+
                     cont.resume(commentiList)
-                    // Potresti voler gestire anche userIds qui, a seconda di come sono usati
+
                 }
 
                 override fun onCancelled(databaseError: DatabaseError) {
@@ -148,7 +148,7 @@ class RisposteViewModel: ViewModel() {
                             val imageUrl = dataSnapshot.child(id).child("profile image").getValue(String::class.java)
                             val updatedUser = user.copy(userImage = imageUrl ?: "") // Crea un nuovo oggetto Utente con l'URL dell'immagine aggiornato
                             Log.d("FetchUsers", "Utente: ${updatedUser.name}, URL Immagine: ${updatedUser.userImage}")
-                            usersMap[id] = updatedUser // Aggiungi l'utente alla mappa
+                            usersMap[id] = updatedUser
                         }
                     }
                     usersData.value = usersMap // Aggiorna LiveData con la nuova mappa

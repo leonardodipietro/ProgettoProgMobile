@@ -71,7 +71,7 @@ class RecensioneViewModel @JvmOverloads constructor(
             override fun onDataChange(snapshot: DataSnapshot) {
                 val utente = snapshot.getValue(Utente::class.java)
                 if (utente != null) {
-                    // Prova a recuperare direttamente l'URL dell'immagine del profilo
+
                     val imageUrl = snapshot.child("profile image").getValue(String::class.java)
                     utente.userImage = imageUrl ?: "" // Aggiorna l'URL dell'immagine nel tuo oggetto Utente
 
@@ -309,24 +309,21 @@ class RecensioneViewModel @JvmOverloads constructor(
                     for (snapshot in dataSnapshot.children) {
                         val recensione = snapshot.getValue(Recensione::class.java)
                         recensione?.let {
-                            // Aggiungi l'ID della traccia alla lista se non è già presente
                             if (!tracksReviewedByArtist.contains(it.trackId)) {
                                 tracksReviewedByArtist.add(it.trackId)
                             }
                         }
-                        // Ora hai una lista di ID di tracce recensite dall'artista
-                        // Chiama retrieveTracksDetails per ottenere i dettagli delle tracce
+
                     }
                     Log.d("TracceRecensite", "Prima di onComplete: $tracksReviewedByArtist")
 
-                    // Ora hai una lista di ID di tracce recensite dall'artista
                     onComplete(tracksReviewedByArtist)
                     Log.d("TracceRecensite", "Lista di ID delle tracce recensite dall'artista: $tracksReviewedByArtist")
                 }
 
                 override fun onCancelled(databaseError: DatabaseError) {
                     Log.e("TracceRecensite", "Errore durante la ricerca delle tracce recensite: ${databaseError.message}")
-                    // Gestisci l'errore qui
+
                 }
             })
     }
@@ -363,7 +360,7 @@ class RecensioneViewModel @JvmOverloads constructor(
                         }
                     }
 
-                    // Se trova una corrispondenza, procedi con la rimozione
+                    // Se trova una corrispondenza, procede con la rimozione
                     if (id != null) {
                         userReviewsReference.child(id).removeValue().addOnSuccessListener {
                             onSuccess() // Chiamato se la rimozione è riuscita

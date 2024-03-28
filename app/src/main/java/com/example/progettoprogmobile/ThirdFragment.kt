@@ -65,7 +65,6 @@ open class ThirdFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
-        // Legge il layout XML per questo fragment
         val rootView = inflater.inflate(R.layout.fragment_third, container, false)
         //ottengo il token di spotify
 
@@ -152,12 +151,6 @@ open class ThirdFragment : Fragment() {
 
 
 
-
-
-
-
-
-        // Imposta un click listener per il pulsante "Sign Out"
         signOut.setOnClickListener {
             firebaseauthviewModel.signOut(requireContext())
         }
@@ -166,23 +159,19 @@ open class ThirdFragment : Fragment() {
         delete.setOnClickListener {
             firebaseauthviewModel.delete(requireContext())
 
-            // Ottieni un riferimento al nodo utente nel Realtime Database
             val databaseReference = FirebaseDatabase.getInstance().getReference("users").child(userId)
-            // Rimuovi il nodo utente dal database in tempo reale
+
             databaseReference.removeValue()
 
-            // Ora, elimina anche tutte le recensioni associate a questo utente
             val reviewsReference = FirebaseDatabase.getInstance().getReference("reviews")
             val answersReference = FirebaseDatabase.getInstance().getReference("answers")
-
-            // Query per ottenere le recensioni dell'utente che stai eliminando
             val query = reviewsReference.orderByChild("userId").equalTo(userId)
             val queryAnswers = answersReference.orderByChild("userId").equalTo(userId)
 
             query.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     for (reviewSnapshot in dataSnapshot.children) {
-                        // Rimuovi questa recensione
+
                         reviewSnapshot.ref.removeValue().addOnSuccessListener {
                             val reviewId = reviewSnapshot.key
                             val queryAnswers = answersReference.orderByChild("reviewId").equalTo(reviewId)
@@ -195,7 +184,7 @@ open class ThirdFragment : Fragment() {
                                 }
 
                                 override fun onCancelled(answerDatabaseError: DatabaseError) {
-                                    // Gestisci eventuali errori qui
+
                                 }
                             })
                         }
@@ -203,20 +192,20 @@ open class ThirdFragment : Fragment() {
                 }
 
                 override fun onCancelled(databaseError: DatabaseError) {
-                    // Gestisci eventuali errori qui
+
                 }
             })
 
             queryAnswers.addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(userAnswersDataSnapshot: DataSnapshot) {
                     for (userAnswerSnapshot in userAnswersDataSnapshot.children) {
-                        // Rimuovi questa risposta
+
                         userAnswerSnapshot.ref.removeValue()
                     }
                 }
 
                 override fun onCancelled(userAnswersDatabaseError: DatabaseError) {
-                    // Gestisci eventuali errori qui
+
                 }
             })
 
@@ -233,18 +222,17 @@ open class ThirdFragment : Fragment() {
                 val intent = Intent(requireContext(), MainActivity::class.java)
                 startActivity(intent)
             } else {
-                // Se il logout non è riuscito, gestisce l'errore qui
+
             }
         }
 
-        // Osserva il risultato dell'eliminazione dell'account Firebase
         firebaseauthviewModel.deleteResult.observe(viewLifecycleOwner) { result ->
             if (result == FirebaseAuthViewModel.DeleteResult.SUCCESS) {
-                // Se l'eliminazione dell'account è riuscita, avvia l'activity principale
+
                 val intent = Intent(requireContext(), MainActivity::class.java)
                 startActivity(intent)
             } else {
-                // Se l'eliminazione dell'account non è riuscita, gestisce l'errore qui
+
             }
         }
 
@@ -335,7 +323,7 @@ open class ThirdFragment : Fragment() {
                             }
 
                             override fun onCancelled(error: DatabaseError) {
-                                // Gestisci eventuali errori qui
+
                             }
                         })
                     }
@@ -343,7 +331,7 @@ open class ThirdFragment : Fragment() {
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                // Gestisci eventuali errori qui
+
             }
         })
     }
@@ -366,7 +354,7 @@ open class ThirdFragment : Fragment() {
                             }
 
                             override fun onCancelled(error: DatabaseError) {
-                                // Gestisci eventuali errori qui
+
                             }
                         })
                     }
@@ -374,7 +362,7 @@ open class ThirdFragment : Fragment() {
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                // Gestisci eventuali errori qui
+
             }
         })
     }
@@ -391,7 +379,7 @@ open class ThirdFragment : Fragment() {
 
             override fun onComplete(databaseError: DatabaseError?, committed: Boolean, dataSnapshot: DataSnapshot?) {
                 if (!committed) {
-                    // Gestisci il fallimento della transazione
+
                 }
             }
         })
@@ -408,7 +396,7 @@ open class ThirdFragment : Fragment() {
 
             override fun onComplete(databaseError: DatabaseError?, committed: Boolean, dataSnapshot: DataSnapshot?) {
                 if (!committed) {
-                    // Gestisci il fallimento della transazione
+
                 }
             }
         })
@@ -425,12 +413,12 @@ open class ThirdFragment : Fragment() {
                         userRequestsReference.child(userId).addListenerForSingleValueEvent(object : ValueEventListener {
                             override fun onDataChange(snapshot: DataSnapshot) {
                                 if (snapshot.exists()) {
-                                    // L'utente corrente è un tra le richieste di questo utente
+
                                     userRequestsReference.child(userId).removeValue()
                                 }
                             }
                             override fun onCancelled(error: DatabaseError) {
-                                // Gestisci eventuali errori qui
+
                             }
                         })
                     }
@@ -438,7 +426,7 @@ open class ThirdFragment : Fragment() {
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                // Gestisci eventuali errori qui
+
             }
         })
     }
@@ -447,7 +435,7 @@ open class ThirdFragment : Fragment() {
     private fun observeToken() {
         sharedViewModel.spotifyToken.observe(viewLifecycleOwner) { accessToken ->
             accessToken?.let {
-                // Qui puoi usare accessToken per le tue chiamate API di Spotify
+
                 Log.d("SpotifyToken dentro il third", "Token ottenuto: $it")
                 // Chiamata per creare la playlist, o qualsiasi altra operazione che richieda il token
                 token = accessToken
@@ -465,7 +453,7 @@ open class ThirdFragment : Fragment() {
             Log.d("Playlist", "playlist chiamata nel fragment")
             val trackUris = items.map { "spotify:track:${it.id}" }
             spotifyViewModel.createSpotifyPlaylist(currentToken, trackUris)
-            // Osserva il risultato della creazione della playlist
+
             spotifyViewModel.playlistCreationResult.observe(viewLifecycleOwner) { success ->
                 if (success) {
                     Toast.makeText(requireContext(), "Playlist creata con successo!", Toast.LENGTH_LONG).show()
@@ -482,7 +470,7 @@ open class ThirdFragment : Fragment() {
     }
     private fun openFileChooser() {
 
-        // Array di SpannableString con il testo bianco
+
         val options = arrayOf(
             Html.fromHtml("<font color='#FFFFFF'>${getString(R.string.takePicture)}</font>", Html.FROM_HTML_MODE_LEGACY),
             Html.fromHtml("<font color='#FFFFFF'>${getString(R.string.choseFromGallery)}</font>", Html.FROM_HTML_MODE_LEGACY),

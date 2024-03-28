@@ -29,7 +29,6 @@ class FollowingAdapter (
     val view: View = LayoutInflater.from(parent.context).inflate(R.layout.recycler_view_following, parent, false)
     private val utenteList = mutableListOf<Utente>() // Lista per tenere traccia dei follower
 
-    // Aggiungi una variabile per memorizzare il listener del click sull'elemento della recensione
     private var followingItemClickListener: NotificationsAdapter.RequestViewHolder.OnClickListener? = null
     // Funzione per impostare il listener del click sull'elemento della recensione
     fun setFollowingItemClickListener(listener: NotificationsAdapter.RequestViewHolder.OnClickListener) {

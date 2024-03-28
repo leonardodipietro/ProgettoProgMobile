@@ -44,7 +44,6 @@ class NotificationsAdapter (
     private val currentUserId: String
 ) : ListAdapter<NotificationItem, RecyclerView.ViewHolder>(NotificationItemDiffCallback()) {
 
-    // View utilizzata per l'inflazione del layout del fragment (R.layout.fragment_fourth)
     val view = LayoutInflater.from(parent.context).inflate(R.layout.fragment_fourth, parent, false)
 
 
@@ -62,21 +61,20 @@ class NotificationsAdapter (
     // Lista di utenti che seguono l'utente corrente
     private val newFollowers = mutableListOf<Utente>()
 
-    // Aggiungi una variabile per memorizzare il listener del click sull'elemento della recensione
     private var followerItemClickListener: FollowerViewHolder.OnClickListener? = null
-    // Funzione per impostare il listener del click sull'elemento della recensione
+
     fun setFollowerItemClickListener(listener: FollowerViewHolder.OnClickListener) {
         followerItemClickListener = listener
     }
 
-    // Aggiungi una variabile per memorizzare il listener del click sull'elemento della recensione
+
     private var requestItemClickListener: RequestViewHolder.OnClickListener? = null
     // Funzione per impostare il listener del click sull'elemento della recensione
     fun setRequestItemClickListener(listener: RequestViewHolder.OnClickListener) {
         requestItemClickListener = listener
     }
 
-    // Aggiungi una variabile per memorizzare il listener del click sull'elemento della recensione
+
     private var reviewItemClickListener: ReviewViewHolder.OnClickListener? = null
 
     // Funzione per impostare il listener del click sull'elemento della recensione

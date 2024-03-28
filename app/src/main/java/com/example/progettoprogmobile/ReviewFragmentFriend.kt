@@ -93,7 +93,6 @@ class ReviewFragmentFriend: Fragment() {
                                             id = trackId
                                         )
 
-                                        // Pass data to BranoSelezionato fragment
                                         val branoSelezionatoFragment = BranoSelezionato()
                                         val bundle = Bundle().apply {
                                             putSerializable("trackDetail", track)
@@ -108,7 +107,7 @@ class ReviewFragmentFriend: Fragment() {
                                 }
 
                                 override fun onCancelled(databaseError: DatabaseError) {
-                                    // Handle errors
+
                                 }
                             })
                         }
@@ -116,7 +115,6 @@ class ReviewFragmentFriend: Fragment() {
                     }
 
                     override fun onCancelled(databaseError: DatabaseError) {
-                        // Gestisci eventuali errori
                     }
                 })
             }
@@ -173,7 +171,6 @@ class ReviewFragmentFriend: Fragment() {
                                             )
                                             reviewDataList.add(reviewData)
 
-                                            // Se hai raccolto tutte le recensioni, aggiorna la RecyclerView
                                             if (reviewDataList.size == dataSnapshot.childrenCount.toInt()) {
                                                 reviewAdapter.submitList(reviewDataList)
                                             }
@@ -181,21 +178,19 @@ class ReviewFragmentFriend: Fragment() {
                                     }
 
                                     override fun onCancelled(databaseError: DatabaseError) {
-                                        // Gestisci eventuali errori
                                     }
                                 })
                             }
                         }
 
                         override fun onCancelled(databaseError: DatabaseError) {
-                            // Gestisci eventuali errori
                         }
                     })
                 }
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                // Gestisci eventuali errori
+
             }
         })
     }

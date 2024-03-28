@@ -45,7 +45,7 @@ class SecondFragment : Fragment() {
         // Osserva i cambiamenti nella lista di utenti nel ViewModel
         firebaseViewModel._users.observe(viewLifecycleOwner, Observer { users ->
             Log.d("SecondFragment", "Received users: $users")
-            // Aggiorna la lista di utenti nel tuo adattatore e quindi nella RecyclerView
+
             utenteAdapter.setUtenti(users)
             // Notifica all'adapter che i dati sono stati aggiornati
             utenteAdapter.notifyDataSetChanged()
@@ -61,7 +61,7 @@ class SecondFragment : Fragment() {
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                // Gestisci la ricerca in tempo reale qui
+
                 if (!newText.isNullOrEmpty()) {
                     firebaseViewModel.cercaUtenti(newText)
                 } else {
@@ -76,7 +76,7 @@ class SecondFragment : Fragment() {
         return rootView
     }
 
-    // Quando un utente seleziona un altro utente nella tua RecyclerView
+    // Quando un utente seleziona un altro utente nella RecyclerView
     fun onUserSelected(userId: String) {
         Log.d("SecondFragment", "onUserSelected called with userId: $userId")
 

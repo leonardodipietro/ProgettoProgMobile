@@ -49,19 +49,16 @@ class FirebaseViewModel @JvmOverloads constructor(
         ref.orderByChild("name")
             .addListenerForSingleValueEvent(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    Log.d("FirebaseViewModel", "Raw Data Snapshot: $snapshot")
+
                     snapshot.children.forEach {
-                        Log.d("FirebaseViewModel", "Raw User Data: ${it.value}")
                         val utente = it.getValue(Utente::class.java)
 
                         if (utente != null) {
-                            Log.d("FirebaseViewModel", "Read user name from Firebase: ${utente.name}")
-                            Log.d("FirebaseViewModel", "Read ID from Firebase: ${utente.userId}")
 
                             // Converti il nome dell'utente in minuscolo per rendere il confronto case insensitive
                             val userNameLowerCase = utente.name.toLowerCase()
                             if (userNameLowerCase.contains(queryLowerCase)) {
-                                // Ora ottieni anche l'URL dell'immagine dell'utente
+
                                 val userImage = it.child("profile image").getValue(String::class.java)
                                 if (!userImage.isNullOrEmpty()) {
                                     // Crea una nuova istanza di Utente con l'immagine aggiornata
@@ -72,7 +69,7 @@ class FirebaseViewModel @JvmOverloads constructor(
                                 }
                             }
                         } else {
-                            Log.e("FirebaseViewModel", "Error reading user: $it")
+
                         }
                     }
                     _users.value = risultati
@@ -116,7 +113,6 @@ class FirebaseViewModel @JvmOverloads constructor(
     fun checkUserIdInFirebase(context: Context, userId: String, onComplete: (Boolean) -> Unit) {
         val userRef = FirebaseDatabase.getInstance().reference.child("users").child(userId)
 
-        // Controlla se l'utente è già registrato nel tuo database Firebase
         userRef.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val isRegistered = snapshot.exists()
@@ -124,7 +120,7 @@ class FirebaseViewModel @JvmOverloads constructor(
             }
 
             override fun onCancelled(error: DatabaseError) {
-                // Gestisci l'errore in caso di problemi nella lettura dal database
+
                 Log.e("FirebaseError", "Errore durante la lettura dal database Firebase: ${error.message}")
                 onComplete(false) // Indica che non è stato possibile verificare lo stato di registrazione
             }
@@ -136,7 +132,7 @@ class FirebaseViewModel @JvmOverloads constructor(
 
         topTrack.forEach { track ->
             val imageUrl = track.album.images.getOrNull(0)?.url ?: ""
-            val artistIdsForTrackNode = track.artists.map { it.id } // Estrai solo gli ID degli artisti
+            val artistIdsForTrackNode = track.artists.map { it.id } // Estrae solo gli ID degli artisti
 
             val trackData = mapOf(
                 "trackName" to track.name,
@@ -333,7 +329,7 @@ class FirebaseViewModel @JvmOverloads constructor(
             }.awaitAll()
 
             tracks.addAll(trackDetails)
-            // Dopo aver ottenuto i dettagli delle tracce, chiami onComplete se è stato fornito
+
             onComplete?.invoke(tracks)
             withContext(Dispatchers.Main) {
                 topTracksfromdb.postValue(tracks)
@@ -536,7 +532,7 @@ class FirebaseViewModel @JvmOverloads constructor(
             }
 
             override fun onCancelled(error: DatabaseError) {
-                // Gestisci l'errore durante la lettura dei dati utente
+
             }
         })
     }

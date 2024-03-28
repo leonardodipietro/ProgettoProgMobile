@@ -71,7 +71,6 @@ class ReviewFragment: Fragment() {
                                     artistNameList.add(artistName)
 
                                     if (artistNameList.size == artistIds.size) {
-                                        // All artist information has been retrieved
                                         val artistImages = artistNameList.map { Image(url = it) }
                                         val artist = Artist(
                                             id = artistId,
@@ -80,7 +79,6 @@ class ReviewFragment: Fragment() {
                                             images = artistImages
                                         )
 
-                                        // Create Track object
                                         val albumImage = Image(url = imageUrl)
                                         val track = Track(
                                             name = trackName,
@@ -89,7 +87,6 @@ class ReviewFragment: Fragment() {
                                             id = trackId
                                         )
 
-                                        // Pass data to BranoSelezionato fragment
                                         val branoSelezionatoFragment = BranoSelezionato()
                                         val bundle = Bundle().apply {
                                             putSerializable("trackDetail", track)
@@ -104,7 +101,7 @@ class ReviewFragment: Fragment() {
                                 }
 
                                 override fun onCancelled(databaseError: DatabaseError) {
-                                    // Handle errors
+
                                 }
                             })
                         }
@@ -112,7 +109,6 @@ class ReviewFragment: Fragment() {
                     }
 
                     override fun onCancelled(databaseError: DatabaseError) {
-                        // Gestisci eventuali errori
                     }
                 })
             }
@@ -171,8 +167,6 @@ class ReviewFragment: Fragment() {
                                                 trackId
                                             )
                                             reviewDataList.add(reviewData)
-
-                                            // Se hai raccolto tutte le recensioni, aggiorna la RecyclerView
                                             if (reviewDataList.size == dataSnapshot.childrenCount.toInt()) {
                                                 reviewAdapter.submitList(reviewDataList)
                                             }
@@ -180,21 +174,18 @@ class ReviewFragment: Fragment() {
                                     }
 
                                     override fun onCancelled(databaseError: DatabaseError) {
-                                        // Gestisci eventuali errori
                                     }
                                 })
                             }
                         }
 
                         override fun onCancelled(databaseError: DatabaseError) {
-                            // Gestisci eventuali errori
                         }
                     })
                 }
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                // Gestisci eventuali errori
             }
         })
     }

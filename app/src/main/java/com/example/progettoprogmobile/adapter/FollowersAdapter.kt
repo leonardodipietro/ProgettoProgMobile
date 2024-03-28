@@ -29,7 +29,6 @@ class FollowersAdapter (
 
     private val utenteList = mutableListOf<Utente>() // Lista per tenere traccia dei follower
 
-    // Aggiungi una variabile per memorizzare il listener del click sull'elemento della recensione
     private var followerItemClickListener: NotificationsAdapter.FollowerViewHolder.OnClickListener? = null
     // Funzione per impostare il listener del click sull'elemento della recensione
     fun setFollowerItemClickListener(listener: NotificationsAdapter.FollowerViewHolder.OnClickListener) {
@@ -52,7 +51,7 @@ class FollowersAdapter (
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FollowersAdapter.ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.recycler_view_followers, parent, false)
 
-        // Aggiungi un log per verificare quando viene creato un ViewHolder
+
         Log.d("FollowersAdapter", "ViewHolder creato")
 
         return FollowersAdapter.ViewHolder(view)
@@ -85,7 +84,7 @@ class FollowersAdapter (
             fragmentTransaction.commit()
         }
 
-        // Aggiungi un log per verificare quando viene eseguito il bind del ViewHolder
+
         Log.d("FollowersAdapter", "ViewHolder binded, Position: $position")
 
     }

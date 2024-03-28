@@ -29,15 +29,12 @@ class ReviewAdapter (private val activity: FragmentActivity) : ListAdapter<Revie
         val timestamp: TextView = view.findViewById(R.id.timestamp)
     }
 
-    // Aggiungi un'interfaccia di callback per gestire i clic sugli elementi
     interface OnReviewItemClickListener {
         fun onReviewItemClick(reviewData: ReviewData)
     }
 
-    // Aggiungi una variabile per memorizzare il listener di clic
     private var listener: OnReviewItemClickListener? = null
 
-    // Aggiungi un metodo per impostare il listener di clic
     fun setOnReviewItemClickListener(listener: OnReviewItemClickListener) {
         this.listener = listener
     }
