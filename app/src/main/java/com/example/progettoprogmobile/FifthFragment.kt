@@ -172,10 +172,11 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
                     includeLayout = inflater.inflate(R.layout.fragment_profilo_privato, null) // Assegna alla variabile includeLayout
 
                     val rootLayout = rootView.findViewById<RelativeLayout>(R.id.root_layout)
-                    rootLayout.removeAllViews()
+                    rootLayout.removeAllViews() // Per rimuovere tutti i layout precedentemente aggiunti
                     includeLayout?.let {
                         rootLayout.addView(it)
 
+                        // Visibilità del layout
                         it.visibility = View.VISIBLE
                     }
                 } else {
@@ -190,7 +191,6 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
 
             // Configura il listener per il click sul pulsante
             followButton.setOnClickListener {
-
                 when {
                     isRequestSent -> {
                         Log.d("FollowButton", "Canceling follow request")
@@ -202,14 +202,13 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
                     }
                     else -> {
                         Log.d("FollowButton", "Sending follow request")
-                        sendFollowRequest()
+                        sendFollowRequest() // Altrimenti, invia una richiesta di seguimento
                     }
                 }
                 // Dopo aver eseguito l'azione, salva lo stato del pulsante nelle preferenze condivise
                 saveButtonState(isFollowing, isRequestSent)
             }
         }
-
 
         val userReference = database.reference.child("users").child(userId ?: "")
 
@@ -219,7 +218,6 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
                 Log.d("reviewTextView", "followersPrivacy: $followersPrivacy, isFollowing: $isFollowing")
                 if (!followersPrivacy) {
                     val reviewFragmentFriend = ReviewFragmentFriend()
-
                     val bundle = Bundle().apply {
                         putString("userId", userId)
                     }
@@ -230,7 +228,6 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
                         .commit()
                 } else if (followersPrivacy && isFollowing) {
                     val reviewFragmentFriend = ReviewFragmentFriend()
-
                     val bundle = Bundle().apply {
                         putString("userId", userId)
                     }
@@ -310,7 +307,6 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
         }
 
 
-
         userReference.child("name").get().addOnSuccessListener { dataSnapshot ->
             val username = dataSnapshot.value as? String
             username?.let {
@@ -321,7 +317,6 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
             // Gestisci l'errore
             Log.e("FifthFragment", "Errore nel recupero del nome utente: ${exception.message}")
         }
-
 
         userReference.child("profile image").get().addOnSuccessListener { dataSnapshot ->
             val profileImageUrl = dataSnapshot.value as? String
@@ -547,7 +542,7 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
                 .addToBackStack(null)
                 .commit()
 
-
+            // Per salvare lo stato corrente su brani
             saveCurrentView(requireContext(), "brani")
         }
     }
@@ -556,7 +551,6 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
     override fun onArtistClicked(data: Any) {
         Log.d("FragmentClick", "Item clicked with data: $data")
         if (data is Artist) {
-
             val newFragment = com.example.progettoprogmobile.ArtistaSelezionato()
             val bundle = Bundle()
             bundle.putSerializable("artistdetails", data)
@@ -694,17 +688,15 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
 
         // Aggiorna la TextView con il conteggio dei followers
         val followersNumberTextView = rootView.findViewById<TextView>(R.id.followers)
-
         followersReference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
-
                 val reviewCount = dataSnapshot.value as? Long ?: 0
-
+                // Aggiorna la TextView con il conteggio delle recensioni
                 followersNumberTextView.text = reviewCount.toString()
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-
+                // Gestisci eventuali errori
                 Log.e("Firebase", "Error fetching review count: ${databaseError.message}")
             }
         })
@@ -716,11 +708,10 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
 
         // Aggiorna la TextView con il conteggio delle recensioni
         val followingNumberTextView = rootView.findViewById<TextView>(R.id.following)
-
         followingReference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val reviewCount = dataSnapshot.value as? Long ?: 0
-
+                // Aggiorna la TextView con il conteggio delle recensioni
                 followingNumberTextView.text = reviewCount.toString()
             }
 
@@ -807,7 +798,6 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-
                 Log.e("Firebase", "Error updating follow button state: ${databaseError.message}")
             }
         })
@@ -864,7 +854,6 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
     private fun startFollowingUser() {
         val currentUserUid = FirebaseAuth.getInstance().currentUser?.uid!!
 
-        // Aggiungi l'utente alla lista dei seguaci dell'utente
         val userReference = FirebaseDatabase.getInstance().reference.child("users").child(userId ?: "")
         userReference.child("followers").child(currentUserUid).setValue(true)
             .addOnSuccessListener {
@@ -913,6 +902,7 @@ class FifthFragment : Fragment(),TrackAdapter.OnTrackClickListener,
                 Log.d("UnfollowUser", "Successfully removed other user from current user's following")
             }
             .addOnFailureListener { exception ->
+                // Gestisci eventuali errori
                 Log.e("Firebase", "Error removing other user from current user's following: ${exception.message}")
             }
     }

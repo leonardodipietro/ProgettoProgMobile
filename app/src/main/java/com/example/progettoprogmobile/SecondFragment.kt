@@ -45,7 +45,7 @@ class SecondFragment : Fragment() {
         // Osserva i cambiamenti nella lista di utenti nel ViewModel
         firebaseViewModel._users.observe(viewLifecycleOwner, Observer { users ->
             Log.d("SecondFragment", "Received users: $users")
-
+            // Per aggiornare la lista di utenti nella RecyclerView
             utenteAdapter.setUtenti(users)
             // Notifica all'adapter che i dati sono stati aggiornati
             utenteAdapter.notifyDataSetChanged()
@@ -61,7 +61,6 @@ class SecondFragment : Fragment() {
             }
 
             override fun onQueryTextChange(newText: String?): Boolean {
-
                 if (!newText.isNullOrEmpty()) {
                     firebaseViewModel.cercaUtenti(newText)
                 } else {
