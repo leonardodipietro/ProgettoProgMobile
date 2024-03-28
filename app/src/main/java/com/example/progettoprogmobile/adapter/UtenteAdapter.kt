@@ -28,7 +28,6 @@ class UtenteAdapter(private val onUserSelected: (String) -> Unit) :
         val utente = getItem(position)
         holder.bind(utente)
 
-        // Aggiungi un listener per l'evento di clic sulla vista dell'utente
         holder.itemView.setOnClickListener {
             val userId = utente.userId
             Log.d("UtenteAdapter", "Item clicked with userId: $userId")

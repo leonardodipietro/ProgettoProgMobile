@@ -28,7 +28,7 @@ class FirebaseArtistDataSource(private val artistsRef: DatabaseReference) : Arti
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                // Gestisci l'errore qui
+
                 onComplete(null)
             }
         })
