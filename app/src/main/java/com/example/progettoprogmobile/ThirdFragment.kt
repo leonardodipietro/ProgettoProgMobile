@@ -644,7 +644,7 @@ open class ThirdFragment : Fragment() {
     private fun privacyATranslationMap(context: Context): Map<String, String> {
         return mapOf(
             context.getString(R.string.everyone) to getString(R.string.everyone),
-            context.getString(R.string.followers) to "Followers"
+            context.getString(R.string.followers) to getString(R.string.followers)
         )
     }
     fun saveSelectedAP(context: Context, accountPrivacy: String) {
