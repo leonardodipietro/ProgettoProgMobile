@@ -38,7 +38,7 @@ class FollowingFragment: Fragment(), FollowingAdapter.OnFollowingButtonClickList
         val backButton: Button = rootView.findViewById(R.id.backArrow)
 
         backButton.setOnClickListener {
-            // Azione da eseguire quando il pulsante freccia viene cliccato
+
             requireActivity().onBackPressed() // Torna al fragment precedente
         }
 
@@ -63,7 +63,7 @@ class FollowingFragment: Fragment(), FollowingAdapter.OnFollowingButtonClickList
                     val fragmentManager = requireActivity().supportFragmentManager
                     fragmentManager.beginTransaction()
                         .replace(R.id.nav_host_fragment, followerSelezionatoFragment)
-                        .addToBackStack(null)  // Aggiungi la transazione allo stack indietro
+                        .addToBackStack(null)
                         .commit()
                 }
             }
@@ -105,12 +105,9 @@ class FollowingFragment: Fragment(), FollowingAdapter.OnFollowingButtonClickList
                                         imageUrl
                                     )
 
-                                    // Aggiungi log per verificare le informazioni recuperate
                                     Log.d("UtenteInfo", "Username: $username, ImageUrl: $imageUrl")
 
                                     utenteList.add(utente)
-
-                                    // Controlla se hai raccolto tutti gli utenti
                                     if (utenteList.size == followerIds.size) {
                                         followingAdapter.submitUserList(utenteList)
                                     }
@@ -119,7 +116,7 @@ class FollowingFragment: Fragment(), FollowingAdapter.OnFollowingButtonClickList
                             }
 
                             override fun onCancelled(databaseError: DatabaseError) {
-                                // Gestisci eventuali errori
+
                             }
                         })
                     }
@@ -192,7 +189,7 @@ class FollowingFragment: Fragment(), FollowingAdapter.OnFollowingButtonClickList
 
             override fun onComplete(databaseError: DatabaseError?, committed: Boolean, dataSnapshot: DataSnapshot?) {
                 if (!committed) {
-                    // Gestisci il fallimento della transazione
+
                     Log.e("DecrementFollowing", "Transaction failed.")
                 }
             }

@@ -39,7 +39,6 @@ class FollowingFriendFragment: Fragment() {
         Log.d("FifthFragment", "User ID ricevuto per following: $userId")
 
         backButton.setOnClickListener {
-            // Azione da eseguire quando il pulsante freccia viene cliccato
             requireActivity().onBackPressed() // Torna al fragment precedente
         }
 
@@ -121,7 +120,7 @@ class FollowingFriendFragment: Fragment() {
                             }
 
                             override fun onCancelled(databaseError: DatabaseError) {
-                                // Gestisci eventuali errori
+
                             }
                         })
                     }

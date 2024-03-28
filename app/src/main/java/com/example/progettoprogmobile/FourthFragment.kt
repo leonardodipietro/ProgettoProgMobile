@@ -79,7 +79,7 @@ class FourthFragment : Fragment(),
                     val fragmentManager = requireActivity().supportFragmentManager
                     fragmentManager.beginTransaction()
                         .replace(R.id.nav_host_fragment, followerSelezionatoFragment)
-                        .addToBackStack(null)  // Aggiungi la transazione allo stack indietro
+                        .addToBackStack(null)
                         .commit()
                 }
             }
@@ -100,7 +100,7 @@ class FourthFragment : Fragment(),
                     val fragmentManager = requireActivity().supportFragmentManager
                     fragmentManager.beginTransaction()
                         .replace(R.id.nav_host_fragment, followerSelezionatoFragment)
-                        .addToBackStack(null)  // Aggiungi la transazione allo stack indietro
+                        .addToBackStack(null)
                         .commit()
                 }
             }
@@ -120,7 +120,7 @@ class FourthFragment : Fragment(),
                     val fragmentManager = requireActivity().supportFragmentManager
                     fragmentManager.beginTransaction()
                         .replace(R.id.nav_host_fragment, branoSelezionatoFragment)
-                        .addToBackStack(null)  // Aggiungi la transazione allo stack indietro
+                        .addToBackStack(null)
                         .commit()
                 }
             }
@@ -140,7 +140,7 @@ class FourthFragment : Fragment(),
         userReference.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    // Ottieni i dati dell'utente corrente
+
                     val userData = dataSnapshot.getValue(Utente::class.java)
                     if (userData != null) {
                         // Controlla le impostazioni sulla privacy dell'account per determinare cosa mostrare
@@ -166,32 +166,32 @@ class FourthFragment : Fragment(),
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                // Gestisci eventuali errori nel recupero dei dati dell'utente corrente
+
                 Log.e("DatabaseError", "Error in retrieving data: ${databaseError.message}")
-                // Puoi gestire l'errore mostrando un Toast o loggando l'errore.
+
             }
         })
     }
 
     // Metodo per recuperare i dati di un follower specifico
     private fun retrieveFollowersData() {
-        // Recupera i dati del follower dal database
+
         val followersReference = database.reference.child("users").child(currentUserId).child("followers")
         followersReference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    // Itera sui follower e recupera i loro dati
+
                     for (followerSnapshot in dataSnapshot.children) {
                         val followerId = followerSnapshot.key
                         if (followerId != null) {
-                            // Recupera i dati del follower
+
                             retrieveFollowerData(followerId)
                         }
                     }
                 }
             }
             override fun onCancelled(databaseError: DatabaseError) {
-                // Gestisci eventuali errori nel recupero dei dati
+
             }
         })
     }
@@ -199,17 +199,17 @@ class FourthFragment : Fragment(),
     // Metodo per recuperare i dati di un follower specifico
     private fun retrieveFollowerData(followerId: String) {
         Log.d("FollowerId", "Follower ID: $followerId")
-        // Recupera i dati del follower dal database
+
         val followerDataReference = database.reference.child("users").child(followerId)
         followerDataReference.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(followerDataSnapshot: DataSnapshot) {
                 if (followerDataSnapshot.exists()) {
-                    // Gestisci i dati del follower
+
                     handleFollowerData(followerDataSnapshot)
                 }
             }
             override fun onCancelled(databaseError: DatabaseError) {
-                // Gestisci eventuali errori nel recupero dei dati
+
             }
         })
     }
@@ -259,7 +259,7 @@ class FourthFragment : Fragment(),
                 }
 
                 override fun onCancelled(databaseError: DatabaseError) {
-                    // Gestisci eventuali errori nel recupero dei dati
+
                 }
             })
         } else {
@@ -278,7 +278,7 @@ class FourthFragment : Fragment(),
                     // Se l'aggiunta è riuscita, aggiungi l'utente corrente alla lista "followers" dell'utente seguito
                     addCurrentUserToFollower(userId)
                 } else {
-                    // Gestisci eventuali errori durante l'aggiunta
+
                     Toast.makeText(requireContext(), "Errore durante l'aggiunta dell'utente alla lista following", Toast.LENGTH_SHORT).show()
                 }
             }
@@ -298,7 +298,7 @@ class FourthFragment : Fragment(),
                     // Se l'aggiunta è riuscita, mostra un messaggio di successo
                     Toast.makeText(requireContext(), "Utente corrente aggiunto con successo alla lista followers dell'utente seguito", Toast.LENGTH_SHORT).show()
                 } else {
-                    // Gestisci eventuali errori durante l'aggiunta
+
                     Toast.makeText(requireContext(), "Errore durante l'aggiunta dell'utente corrente alla lista followers dell'utente seguito", Toast.LENGTH_SHORT).show()
                 }
             }
@@ -310,12 +310,10 @@ class FourthFragment : Fragment(),
         followingReference.child(userId).removeValue()
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    // Se la rimozione è riuscita, rimuovi l'utente corrente dalla lista "followers" dell'utente seguito
+
                     removeCurrentUserFromFollower(userId)
-                    // L'utente è stato rimosso con successo dalla lista "following"
                     Toast.makeText(requireContext(), "Utente rimosso con successo dalla lista following", Toast.LENGTH_SHORT).show()
                 } else {
-                    // Gestisci eventuali errori durante la rimozione
                     Toast.makeText(requireContext(), "Errore durante la rimozione dell'utente dalla lista following", Toast.LENGTH_SHORT).show()
                 }
             }
@@ -351,7 +349,7 @@ class FourthFragment : Fragment(),
 
             override fun onComplete(databaseError: DatabaseError?, committed: Boolean, dataSnapshot: DataSnapshot?) {
                 if (!committed) {
-                    // Gestisci il fallimento della transazione
+
                 }
             }
         })
@@ -369,7 +367,7 @@ class FourthFragment : Fragment(),
 
             override fun onComplete(databaseError: DatabaseError?, committed: Boolean, dataSnapshot: DataSnapshot?) {
                 if (!committed) {
-                    // Gestisci il fallimento della transazione
+
                 }
             }
         })
@@ -386,7 +384,7 @@ class FourthFragment : Fragment(),
 
             override fun onComplete(databaseError: DatabaseError?, committed: Boolean, dataSnapshot: DataSnapshot?) {
                 if (!committed) {
-                    // Gestisci il fallimento della transazione
+
                 }
             }
         })
