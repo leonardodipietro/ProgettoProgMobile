@@ -503,11 +503,11 @@ open class ThirdFragment : Fragment() {
                 }
 
                 2 -> {
-                    // Rimuovi la foto corrente dal profilo
+
                     removeCurrentPhotoFromProfile()
                 }
                 3 -> {
-                    // Annulla
+
                     dialog.dismiss()
                 }
             }
@@ -526,7 +526,6 @@ open class ThirdFragment : Fragment() {
         val storageReference = storage.getReference("profile image")
         val imageRef = storageReference.child("$userId.jpg")
 
-        // Converte la Bitmap in un array di byte
         val baos = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
         val data = baos.toByteArray()
@@ -534,10 +533,9 @@ open class ThirdFragment : Fragment() {
         // Carica l'immagine nello storage di Firebase
         val uploadTask = imageRef.putBytes(data)
 
-        // Aggiungi un listener per gestire l'avanzamento dell'upload
+
         uploadTask.addOnSuccessListener { taskSnapshot ->
-            // L'upload è stato completato con successo
-            // Puoi ottenere l'URL dell'immagine caricata
+
             imageRef.downloadUrl.addOnSuccessListener { uri ->
                 val imageUrl = uri.toString()
                 saveProfileImageURL(context, userId, imageUrl)
@@ -547,8 +545,7 @@ open class ThirdFragment : Fragment() {
                 Log.e ("LOG UPLOAD", "Immagine caricata con successo: $imageUrl")
             }
         }.addOnFailureListener { exception ->
-            // Si è verificato un errore durante l'upload
-            // Gestisci l'errore come preferisci
+
             Log.e ("LOG UPLOAD",  "Errore durante il caricamento dell'immagine.")
         }
     }
@@ -558,16 +555,15 @@ open class ThirdFragment : Fragment() {
         editor.remove("profile image_$userId")
         editor.apply()
 
-        // Aggiorna anche il riferimento nell'ID utente nel database
         val userReference = FirebaseDatabase.getInstance().getReference("users").child(userId)
         userReference.child("profile image").removeValue().addOnSuccessListener {
             Log.d("RemovePhoto", "Riferimento all'immagine del profilo eliminato con successo dal database")
 
-            // Una volta rimosso il riferimento dell'immagine dal database, puoi rimuovere anche l'immagine visualizzata nell'ImageView
+
             userImage.setImageResource(R.drawable.default_profile_image)
             Toast.makeText(requireContext(), "Immagine del profilo rimossa con successo", Toast.LENGTH_SHORT).show()
         }.addOnFailureListener { exception ->
-            Log.e("RemovePhoto", "Errore durante l'eliminazione del riferimento all'immagine del profilo dal database: ${exception.message}")
+
             Toast.makeText(requireContext(), "Si è verificato un errore durante la rimozione dell'immagine del profilo", Toast.LENGTH_SHORT).show()
         }
     }
@@ -597,7 +593,7 @@ open class ThirdFragment : Fragment() {
                     // Puoi fare qualcosa qui se necessario
                 }
                 .addOnFailureListener { e ->
-                    // Gestisci eventuali errori nell'aggiornamento del nome utente
+
                     Log.e("Firebase", "Errore nell'aggiornamento del nome utente: ${e.message}")
                 }
             alertDialog.dismiss() // Close the dialog
@@ -639,7 +635,7 @@ open class ThirdFragment : Fragment() {
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
-                Log.e("Firebase", "Errore nel recupero del nome utente: ${databaseError.message}")
+
             }
         })
     }
@@ -664,14 +660,13 @@ open class ThirdFragment : Fragment() {
             .child("privacy")
             .child("account")
 
-        // Invoca la funzione per creare la mappa di traduzione delle opzioni di privacy
+
         val privacyATranslationMap = privacyATranslationMap(context)
 
-        // Usa la mappa di traduzione per ottenere la chiave univoca
         val databaseKey = privacyATranslationMap[selectedROption]
 
         if (databaseKey != null) {
-            // Imposta solo la chiave univoca nel database Firebase
+
             val privacyOptions = privacyATranslationMap.values
             for (option in privacyOptions) {
                 userRef.child(option).setValue(option == databaseKey)
@@ -687,7 +682,7 @@ open class ThirdFragment : Fragment() {
         if (requestCode==photoRequestCode) {
             if (resultCode == Activity.RESULT_OK) {
                 val bp = data?.extras?.get("data") as Bitmap
-                // Salva l'immagine nello storage di Firebase
+
                 uploadImageToFirebaseStorage(requireContext(), userId, bp)
                 userImage.setImageBitmap(bp)
 
@@ -705,9 +700,9 @@ open class ThirdFragment : Fragment() {
                     if (selectedImageUri != null) {
                         try {
                             val bitmap = MediaStore.Images.Media.getBitmap(requireActivity().contentResolver, selectedImageUri)
-                            // Aggiorna l'ImageView con la nuova immagine
+
                             userImage.setImageBitmap(bitmap)
-                            // Carica l'immagine su Firebase Storage
+
                             uploadImageToFirebaseStorage(requireContext(), userId, bitmap)
                             userImage.setImageBitmap(bitmap)
                         } catch (e: IOException) {
@@ -724,11 +719,10 @@ open class ThirdFragment : Fragment() {
 
         val accountPrivacy = arrayOf(getString(R.string.everyone), getString(R.string.followers))
 
-        // Crea un adapter per la ListView con le opzioni di privacy
         val accountAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, accountPrivacy)
         accountPrivacyListView.adapter = accountAdapter
 
-        // Crea una PopupWindow
+
         val popupWindow = PopupWindow(dialogView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
 
         accountPrivacyListView.setOnItemClickListener { _, _, position, _ ->
@@ -739,7 +733,6 @@ open class ThirdFragment : Fragment() {
             account.text = selectedAccountPrivacy
         }
 
-        // Chiudi il popup quando viene toccato fuori
         dialogView.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
                 val rect = Rect()
@@ -772,12 +765,10 @@ open class ThirdFragment : Fragment() {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     val reviewCount = dataSnapshot.childrenCount.toInt()
 
-                    // Ora puoi salvare il conteggio nel nodo dell'utente
                     saveReviewCountToUserNode(userId, reviewCount, databaseReference)
 
                     Log.d("CountUserReviews", "Review count for user $userId: $reviewCount")
 
-                    // Aggiorna la TextView con il conteggio delle recensioni
                     val reviewNumberTextView = rootView.findViewById<TextView>(R.id.reviewNumber)
                     reviewNumberTextView.text = reviewCount.toString()
                 }
@@ -799,7 +790,6 @@ open class ThirdFragment : Fragment() {
 
                 Log.d("CountUserFollowers", "Followers count for user $userId: $followersCount")
 
-                // Aggiorna la TextView con il conteggio dei followers
                 val followersNumberTextView = rootView.findViewById<TextView>(R.id.followersNumber)
                 followersNumberTextView.text = followersCount.toString()
             }
@@ -816,12 +806,10 @@ open class ThirdFragment : Fragment() {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 val followingCount = dataSnapshot.childrenCount.toInt()
 
-                // Ora puoi salvare il conteggio nel nodo dell'utente
                 saveFollowingCountToUserNode(userId, followingCount, databaseReference)
 
                 Log.d("CountUserFollowing", "Following count for user $userId: $followingCount")
 
-                // Aggiorna la TextView con il conteggio delle recensioni
                 val followingNumberTextView = rootView.findViewById<TextView>(R.id.followingNumber)
                 followingNumberTextView.text = followingCount.toString()
             }
@@ -835,19 +823,16 @@ open class ThirdFragment : Fragment() {
     private fun saveReviewCountToUserNode(userId: String, reviewCount: Int, databaseReference: DatabaseReference) {
         val userReference = databaseReference.child("users").child(userId)
 
-        // Salva il conteggio delle recensioni nel nodo dell'utente
         userReference.child("reviews counter").setValue(reviewCount)
     }
     private fun saveFollowersCountToUserNode(userId: String, followersCount: Int, databaseReference: DatabaseReference) {
         val userReference = databaseReference.child("users").child(userId)
 
-        // Salva il conteggio delle recensioni nel nodo dell'utente
         userReference.child("followers counter").setValue(followersCount)
     }
     private fun saveFollowingCountToUserNode(userId: String, followingCount: Int, databaseReference: DatabaseReference) {
         val userReference = databaseReference.child("users").child(userId)
 
-        // Salva il conteggio delle recensioni nel nodo dell'utente
         userReference.child("following counter").setValue(followingCount)
     }
 }
