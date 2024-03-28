@@ -224,7 +224,7 @@ class BranoSelezionato : Fragment(), RecensioniBranoSelAdapter.OnRecensioneInter
                         }
                     }
                 } else {
-                    Toast.makeText(context, "Hai già recensito questo brano.", Toast.LENGTH_LONG).show()
+                    //Toast.makeText(context, "Hai già recensito questo brano.", Toast.LENGTH_LONG).show()
                     Log.d("DDDD", "setupSubmission: Recensione esistente trovata, invio bloccato")
                 }
             }

@@ -119,7 +119,7 @@ class RecensioniBranoSelAdapter(
                     Log.d("PicassoLoading", "Caricamento immagine per ${user.name} URL: ${user.userImage}")
                     Picasso.get().load(user.userImage).into(imgProfile)
                 } else {
-                    // Qui imposti un'immagine di fallback o lasci l'immagine corrente
+
                     imgProfile.setImageResource(R.drawable.baseline_person_24) // Immagine di fallback
                 }
             }
@@ -174,7 +174,7 @@ class RecensioniBranoSelAdapter(
     }
     fun updateUserMap(newUsersMap: Map<String, Utente>) {
         this.usersMap = newUsersMap
-        notifyDataSetChanged() // Notifica che i dati sono cambiati per aggiornare la visualizzazione
+        notifyDataSetChanged()
     }
 
     fun updateRisposteMap(newRisposteMap: Map<String, List<Risposta>>) {

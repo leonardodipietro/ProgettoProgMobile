@@ -72,7 +72,7 @@ class ArtistaSelezionato : Fragment(), ArtistaSelezionatoAdapter.OnTrackClickLis
         backButton = rootView.findViewById(R.id.backArrow)
 
         backButton.setOnClickListener {
-            requireActivity().onBackPressed() // Torna al fragment precedente
+            requireActivity().onBackPressed()
         }
 
         return rootView
@@ -81,7 +81,7 @@ class ArtistaSelezionato : Fragment(), ArtistaSelezionatoAdapter.OnTrackClickLis
    override fun onTrackClicked(data: Any) {
         Log.d("FragmentClick", "Item clicked with data: $data")
         if (data is Track) {
-            // Qui naviga verso il nuovo fragment, puoi passare "data" come argomento se necessario
+
             val newFragment = com.example.progettoprogmobile.BranoSelezionato()
             val bundle = Bundle()
             bundle.putSerializable("trackDetail", data)

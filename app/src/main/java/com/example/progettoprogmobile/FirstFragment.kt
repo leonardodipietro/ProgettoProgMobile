@@ -48,7 +48,7 @@ class FirstFragment : Fragment(),TrackAdapter.OnTrackClickListener,
 
     private lateinit var sharedPreferences: SharedPreferences
 
-    // Ottieni il ViewModel condiviso
+    // Ottiene il ViewModel condiviso
     val sharedViewModel: SharedDataViewModel by activityViewModels()
 
     private var token: String? = null

@@ -41,10 +41,10 @@ class RisposteAdapterBranoSel(
         holder.commentContent.text = risposta.answercontent
 
         if (userProfileImageUrl.isNullOrEmpty()) {
-            // Qui impostiamo un'immagine di fallback se l'URL è nullo o vuoto.
+
             holder.imgProfile.setImageResource(R.drawable.baseline_person_24)
         } else {
-            // Utilizziamo Picasso per caricare l'immagine dall'URL.
+
             Picasso.get()
                 .load(userProfileImageUrl)
                 .error(R.drawable.baseline_person_24) // Immagine di fallback in caso di errore nel caricamento.
@@ -95,7 +95,7 @@ class RisposteAdapterBranoSel(
     fun updateDataComment(newCommentList: List<Risposta>, newUserMap: Map<String, Utente>) {
         this.commentList = newCommentList
         this.usersMap = newUserMap
-        // Aggiorna la mappa delle risposte con le nuove risposte
+
 
         notifyDataSetChanged()
     }
