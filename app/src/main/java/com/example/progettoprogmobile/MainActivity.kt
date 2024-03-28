@@ -17,7 +17,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private var user: FirebaseUser? = null //per evitare il tipo mismatch error
 
-    // Initialize the FirebaseUI Widget using Firebase
+
     var ui: AuthUI = AuthUI.getInstance()
 
     private lateinit var firebaseviewModel: FirebaseAuthViewModel
@@ -48,11 +48,8 @@ class MainActivity : AppCompatActivity() {
         // Inizializza la ViewModel
         firebaseviewModel = ViewModelProvider(this)[FirebaseAuthViewModel::class.java]
 
-        // Ottieni una referenza al pulsante di accesso
         val signInButton = findViewById<Button>(R.id.signInButton)
 
-
-        // Gestisci il click sul pulsante
         signInButton.setOnClickListener {
             // Avvia l'intento di accesso
             firebaseviewModel.createSignInIntent(R.style.Theme_ProgettoProgMobile)
