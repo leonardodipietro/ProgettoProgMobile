@@ -34,7 +34,7 @@ class ArtistaSelezionatoAdapter(private var tracks: List<Track>, private val lis
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         fun bind(track: Track) {
             Log.d("ArtistaSelezionatoAdapter", "bind: track ${track.name}")
-            // Inserisci qui la logica per impostare i dati nelle viste dell'elemento
+
             val nomeArtista = itemView.findViewById<TextView>(R.id.Branolistaartistselezionato)
             val album = itemView.findViewById<TextView>(R.id.Albumlistaartistaselezionato)
             val albumImageView: ImageView = itemView.findViewById(R.id.imageviewlistaartistselezionato)
@@ -55,8 +55,8 @@ class ArtistaSelezionatoAdapter(private var tracks: List<Track>, private val lis
 
     fun updateData(newTracks: List<Track>) {
         Log.d("ArtistaSelezionatoAdapter", "updateData: Aggiornamento dati con ${newTracks.size} nuove tracce")
-        tracks = newTracks // Aggiungi i nuovi dati
-        notifyDataSetChanged() // Notifica all'adapter che i dati sono stati modificati
+        tracks = newTracks
+        notifyDataSetChanged()
     }
 
     interface OnTrackClickListener {
