@@ -99,7 +99,6 @@ class RecensioneViewModel @JvmOverloads constructor(
     fun saveRecensione(userId: String, trackId: String, artistId: String, commentContent: String) {
         // Genera un identificativo univoco per Firebase
         val commentId = database.push().key!!
-        // Ottieni la data e l'ora attuali
         val currentTimestamp = System.currentTimeMillis()
         val date = Date(currentTimestamp)
         // Formatta la data/ora per la visualizzazione
@@ -135,7 +134,6 @@ class RecensioneViewModel @JvmOverloads constructor(
             if (existingReview == null) {
                 //genera un identificativo univoco per firebase
                 val commentId = database.push().key!!
-                // Ottieni la data e l'ora attuali.
                 val currentTimestamp = System.currentTimeMillis()
                 val date = Date(currentTimestamp)
                 // Formatta la data/ora per la visualizzazione.
@@ -163,7 +161,6 @@ class RecensioneViewModel @JvmOverloads constructor(
                     }
 
             } else {
-                // Ottieni la data e l'ora attuali.
                 val currentTimestamp = System.currentTimeMillis()
                 val date = Date(currentTimestamp)
                 // Formatta la data/ora per la visualizzazione.
@@ -227,7 +224,7 @@ class RecensioneViewModel @JvmOverloads constructor(
                             val imageUrl = dataSnapshot.child(id).child("profile image").getValue(String::class.java)
                             val updatedUser = user.copy(userImage = imageUrl ?: "") // Crea un nuovo oggetto Utente con l'URL dell'immagine aggiornato
                             Log.d("FetchUsers", "Utente: ${updatedUser.name}, URL Immagine: ${updatedUser.userImage}")
-                            usersMap[id] = updatedUser // Aggiungi l'utente alla mappa
+                            usersMap[id] = updatedUser
                         }
                     }
                     usersData.value = usersMap // Aggiorna LiveData con la nuova mappa
