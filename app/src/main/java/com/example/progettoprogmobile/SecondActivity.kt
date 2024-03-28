@@ -19,7 +19,7 @@ class SecondActivity : AppCompatActivity() {
     private val fragmentManager: FragmentManager = supportFragmentManager
     private lateinit var currentFragment: Fragment
     private lateinit var bottomNavigationView: BottomNavigationView
-    private lateinit var firebaseViewModel: FirebaseViewModel // Dichiarazione del tuo ViewModel
+    private lateinit var firebaseViewModel: FirebaseViewModel
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,8 +30,6 @@ class SecondActivity : AppCompatActivity() {
         // Inizializza il tuo ViewModel
         firebaseViewModel = ViewModelProvider(this).get(FirebaseViewModel::class.java)
 
-        // Verifica se l'activity è stata avviata per la prima volta (savedInstanceState == null)
-        // e se è così, sostituisci il contenuto con il tuo fragment iniziale (FirstFragment)
         if (savedInstanceState == null) {
             val fragment = FirstFragment()
             fragmentManager.beginTransaction()
@@ -40,7 +38,7 @@ class SecondActivity : AppCompatActivity() {
             currentFragment = fragment
         }
 
-        // Trova il componente BottomNavigationView nel layout XML e lo assegna ad una variabile
+        // Trova il componente BottomNavigationView n e lo assegna ad una variabile
         bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
 
         // Imposta un listener per la selezione degli elementi nel BottomNavigationView
@@ -54,7 +52,7 @@ class SecondActivity : AppCompatActivity() {
             // Gestisci la selezione in base all'ID dell'elemento selezionato
             when (item.itemId) {
                 R.id.home -> {
-                    // Crea un nuovo fragment e sostituiscilo
+
                     val newFragment = FirstFragment()
                     transaction.replace(R.id.nav_host_fragment, newFragment, "firstFragment")
                     currentFragment = newFragment
@@ -89,7 +87,6 @@ class SecondActivity : AppCompatActivity() {
                     // L'utente non è registrato, quindi salva le sue credenziali
                     firebaseViewModel.saveUserIdToFirebase(userId)
 
-                    // Aggiorna la UI o esegui altre azioni necessarie
                 }
             }
         }
@@ -104,10 +101,10 @@ class SecondActivity : AppCompatActivity() {
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         Log.d("PRIMO LOG ACTIVITY", "ONNEWINTENTCHIAMATA")
-        // Verifica se l'Intent contiene dati
+
         if (intent != null && intent.data != null) {
             Log.d("SECONDO LOG ACTIVITY", "Intent contain data:  $intent")
-            // Passa l'Intent ricevuto al tuo Fragment corrente
+
             val currentFragment = fragmentManager.findFragmentByTag("firstFragment")
             Log.d("TERZO LOG ACTIVITY", "Intent contain data:  ${R.id.firstFragment}")
             Log.d("QUARTO LOG ACTIVITY", "Intent contain data:  $currentFragment")
